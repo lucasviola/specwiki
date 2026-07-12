@@ -13,8 +13,11 @@ Read every section before writing a single line. This document is the ground tru
 > - Follow Test-Driven Development on every task (§0.1).
 > - Run the full quality gate after every task (§0.2). **Do not** run e2e/browser tests
 >   or record demo videos unless the owner explicitly asks (§0.2.1).
+> - Run **automated code review** (§0.2.5) and **QA analysis** (§0.2.6) via subagents on a
+>   **different LLM** than the implementer — include both in the §0.3 checkpoint summary.
 > - **Stop and ask for confirmation** after every task — do not start the next task until
->   the owner approves the checkpoint **and** the commit is on the branch (§0.3).
+>   the owner approves the checkpoint **and** the commit is on the branch (§0.3). Ask whether
+>   to implement code-review patches **before** committing.
 > - **Update project logs** after every task (§0.4). Skipping this is as serious as
 >   skipping tests.
 > - **Minimal comments** — do not annotate every function or variable; comment only where
@@ -142,10 +145,126 @@ When the owner **does** request e2e work:
 - Output lives in gitignored directories (`e2e/artifacts/`, `test-results/`, etc.).
 - Do not `git add` video files. Commit only spec/helper changes.
 
+### 0.2.5 Automated code review — mandatory after every task
+
+After §0.2 passes and **before** the §0.3 checkpoint, run an adversarial code review
+using a **subagent on a different LLM** than the one that implemented the task. The
+implementing agent triages findings and presents them; it does **not** auto-apply fixes
+unless the owner approves.
+
+#### When to run
+
+- **Every task/story** — no exceptions, including doc-only tasks (review prose and structure).
+- **Order:** §0.1 TDD → §0.2 quality gate → **§0.2.5 code review** → §0.2.6 QA analysis → §0.3 checkpoint.
+
+#### Subagent invocation
+
+Launch **exactly one** review subagent, synchronously (`run_in_background: false`):
+
+| Priority | Subagent | Notes |
+| -------- | -------- | ----- |
+| 1 (preferred) | `bugbot` (`subagent_type: "bugbot"`, `readonly: true`) | Follow the `review-bugbot` skill prompt shape |
+| 2 (alternate) | `bmad-code-review` workflow | Blind Hunter + Edge Case Hunter in parallel |
+
+**Diff scope:** `uncommitted changes` (default) — all staged and unstaged changes for the
+current task. Use `branch changes` only when reviewing an entire feature branch.
+
+**Model rule — different LLM required:**
+
+| Implementer model family | Reviewer model (pick one) |
+| ------------------------ | ------------------------- |
+| Composer / GPT / Codex   | `claude-opus-4-8-thinking-high` or `claude-sonnet-5-thinking-high` |
+| Claude                   | `gpt-5.3-codex` or `gpt-5.5-medium` |
+
+Pass the reviewer `model` parameter explicitly on the `Task` tool call. Record the reviewer
+model in the story file (`Senior Developer Review (AI) → Reviewer model`) and in the §0.3
+checkpoint.
+
+#### Triage (implementing agent)
+
+Classify every finding before presenting to the owner:
+
+| Category | Meaning | Default action |
+| -------- | ------- | -------------- |
+| **Patch** | Real issue; fixable without scope change | Offer to implement before commit |
+| **Defer** | Real issue; out of scope or larger than this task | Log in story file; do not fix now |
+| **Reject** | Noise, false positive, or already covered by tests | Drop silently |
+
+Present findings as a compact table: **Severity | Location | Finding | Triage**.
+
+#### Owner gate — patches before commit
+
+In the §0.3 checkpoint, after the review table, ask explicitly:
+
+> **Implement review patches?** I found N Patch item(s). Would you like me to implement them
+> before you commit, or proceed to commit as-is?
+
+- **Do not** apply Patch items automatically.
+- **Do not** commit until the owner answers the patch question **and** approves the checkpoint.
+- If the owner says yes, fix Patch items, re-run §0.2, and re-run §0.2.5 on the updated diff.
+
+#### Subagent unavailable (fallback)
+
+If subagent launch fails (API limit, capability unavailable):
+
+1. Perform **inline adversarial triage** yourself — deliberately hunt for edge cases, missing
+   tests, and AC gaps the implementation model may have missed.
+2. Document: `Reviewer model: Inline triage (subagent unavailable — <reason>)`.
+3. Still ask the owner about Patch items before commit.
+
+#### Story file updates
+
+When a story file exists under `_bmad-output/implementation-artifacts/`, append or update:
+
+- `## Senior Developer Review (AI)` — review date, outcome, reviewer model, action items
+- Checkboxes for Patch/Defer items; mark Patch items `[x]` only after owner-approved fixes
+
+### 0.2.6 QA analysis — mandatory after every task
+
+Immediately after §0.2.5, launch a **QA analysis subagent on a different LLM** (may be the
+same reviewer family as §0.2.5, but must differ from the implementer). Goal: validate that
+the change is testable by a human and surface regression risks.
+
+#### Subagent invocation
+
+Launch **exactly one** `generalPurpose` subagent with `readonly: true`. Prompt must include:
+
+- Story/task name and acceptance criteria (or HARNESS bullet description)
+- File list and summary of what changed
+- `project-context.md` and relevant HARNESS sections (§0.8 logging, §0.9 security)
+- Request structured output with these sections:
+  1. **AC coverage** — table mapping each AC to evidence (test, log event, CLI behaviour)
+  2. **Regression risks** — what existing behaviour could break and why
+  3. **Gaps** — anything not covered by automated tests
+  4. **Manual validation steps** — numbered, copy-paste commands for the owner
+
+Use a **different model** than the implementer (same cross-family table as §0.2.5). Record
+the QA model in the checkpoint.
+
+#### Manual validation steps (required output)
+
+The QA subagent must produce **step-by-step manual validation** the owner can run locally.
+For specwiki, prefer concrete commands, for example:
+
+```markdown
+1. `npm run test` — confirm N tests pass (note any new test names to watch)
+2. `npm run dev list -- -p tests/fixtures/sample-project` — expect grouped categories with titles
+3. `npm run dev generate -- -p tests/fixtures/sample-project -o /tmp/specwiki-qa` — expect summary line with file counts
+4. `cat /tmp/specwiki-qa/index.md` — spot-check index structure and category headings
+5. (if logging story) `npm run dev list -- -p tests/fixtures/sample-project -v 2>&1 | grep discover.` — expect structured events
+```
+
+Tailor steps to the task — every step must be **actionable** (command + expected outcome).
+
+#### Fallback
+
+If the QA subagent is unavailable, produce the four sections yourself in the §0.3 checkpoint.
+Label: `QA model: Inline analysis (subagent unavailable — <reason>)`.
+
 ### 0.3 Code review checkpoint — after every task
 
-After the quality gate passes, **stop and ask the owner for a code review** before
-starting the next task. Do this even if the next task feels trivial.
+After §0.2, §0.2.5, and §0.2.6 complete, **stop and present the checkpoint** to the owner.
+Do not start the next task until approved. Do this even if the next task feels trivial.
 
 Format your checkpoint message exactly like this:
 
@@ -176,6 +295,31 @@ Format your checkpoint message exactly like this:
 - [x] npm run typecheck  — 0 errors
 - [x] npm run build  — exited 0
 
+### Automated code review (§0.2.5)
+**Reviewer model:** <model slug or "Inline triage (subagent unavailable)">
+
+| Severity | Location | Finding | Triage |
+| -------- | -------- | ------- | ------ |
+| ...      | ...      | ...     | Patch / Defer / Reject |
+
+**Patch items:** N · **Defer items:** N · **Rejected:** N
+
+**Implement review patches?** <ask owner: implement Patch items before commit, or commit as-is?>
+
+### QA analysis (§0.2.6)
+**QA model:** <model slug or "Inline analysis (subagent unavailable)">
+
+**AC coverage:** <brief table or bullet summary>
+
+**Regression risks:** <1–3 bullets>
+
+**Gaps:** <anything not covered by automated tests, or "None identified">
+
+**Manual validation steps:**
+1. `<command>` — <expected outcome>
+2. `<command>` — <expected outcome>
+3. ...
+
 ### IMPLEMENTATION.md updated
 - [x] Relevant checklist checkbox(es) marked complete
 - [x] Build log row appended (§0.4)
@@ -191,7 +335,11 @@ Format your checkpoint message exactly like this:
 ```
 
 ### Ready to proceed?
-Waiting for your review and approval before starting the next task.
+Waiting for your review:
+1. **Review patches** — implement Patch items before commit? (yes / no / pick items)
+2. **Checkpoint approval** — LGTM to commit and move to the next task?
+
+Do not commit or start the next §9 bullet until both are answered and any approved patches are applied and re-gated.
 ```
 
 Do not suggest more than one commit per task. Do not commit automatically — wait for
@@ -257,6 +405,8 @@ The following are **hard failures** against this harness:
 | Marking "Phase N complete" without per-task commits               | Owner cannot review or bisect history                   |
 | Changing code without updating the project log                    | Breaks traceability and owner visibility                |
 | Proceeding after checkpoint without owner approval                | Owner loses control of merge order                      |
+| Skipping §0.2.5 code review or §0.2.6 QA analysis                 | Misses adversarial review and manual validation guidance |
+| Auto-applying code-review Patch items without owner approval      | Owner cannot control scope before commit                  |
 | Committing without being asked                                    | §0.3 — owner commits or explicitly delegates            |
 | Batch-updating status only at the end of a phase                  | Build log must grow one row per task                    |
 | Running e2e tests or recording demo videos without owner request  | Wastes time; violates §0.2.1 owner opt-in policy        |
@@ -463,6 +613,7 @@ Every story in `epics-and-stories.md` includes two AC groups in addition to func
 
 1. **Logging & diagnostics** — structured events for code paths touched; `log.error` on failures; verbose-gated `log.info`; no secrets in payloads
 2. **Quality measures** — full §0.2 gate; coverage ≥ 90% on touched modules
+3. **Post-implementation review** — §0.2.5 code review + §0.2.6 QA analysis (subagents on different LLM); manual validation steps in §0.3 checkpoint; owner approves patches before commit
 
 Do **not** defer logging to a later epic or "logging retrofit" pass. A feature without logs is incomplete (same severity as missing tests).
 
@@ -644,9 +795,9 @@ wiki/
 
 <!-- TODO(owner): phases drafted from README and current code — replace with IMPLEMENTATION.md plan -->
 
-Work through these in order. Apply the full §0 workflow (TDD → quality gate → §0.3
-checkpoint → owner approval → commit → §0.4 project log update) to **every bullet point**
-inside every phase before moving to the next bullet.
+Work through these in order. Apply the full §0 workflow (TDD → quality gate → §0.2.5 code
+review → §0.2.6 QA analysis → §0.3 checkpoint → owner approval → commit → §0.4 project log
+update) to **every bullet point** inside every phase before moving to the next bullet.
 
 **One bullet = one agent turn = one commit = one build-log row.**
 
@@ -776,6 +927,8 @@ When MVP is complete, the following must all be true:
 ### Code quality
 
 - [ ] All §0.2 quality gate commands pass
+- [ ] §0.2.5 automated code review run per task (subagent or documented fallback)
+- [ ] §0.2.6 QA analysis with manual validation steps delivered per task
 - [ ] Coverage meets §0.1 threshold (90%)
 - [ ] Comments follow §0.6
 - [ ] Code cleanliness follows §0.7

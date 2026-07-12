@@ -40,6 +40,11 @@ Every story below has three AC groups:
 2. **Logging & diagnostics (§0.8)** — structured events, verbose gating, safe payloads
 3. **Quality measures** — §0.2 gate + coverage on touched modules
 
+**Post-implementation (HARNESS §0.2.5–§0.2.6, not separate AC):** after each story, the
+implementing agent runs automated code review and QA analysis subagents on a different LLM,
+includes results in the §0.3 checkpoint, and asks the owner whether to apply review patches
+before committing.
+
 Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime code changes.
 
 ---

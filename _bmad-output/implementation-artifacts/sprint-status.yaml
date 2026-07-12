@@ -37,7 +37,11 @@
 # - Epic transitions to 'in-progress' automatically when first story is created
 # - Stories can be worked in parallel if team capacity allows
 # - Developer typically creates next story after previous one is 'done' to incorporate learnings
-# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+# - After implementation: run HARNESS §0.2 quality gate, then §0.2.5 code review + §0.2.6 QA
+#   analysis via subagents on a different LLM; present both in §0.3 checkpoint; ask owner
+#   whether to apply review patches before committing
+# - Dev moves story to 'review' after implementation; code-review findings live in story file
+#   under 'Senior Developer Review (AI)' and 'QA Manual Validation'
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-07-12

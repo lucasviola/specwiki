@@ -603,6 +603,8 @@ TypeScript 5.8 strict, Node ≥20, Commander, fast-glob, gray-matter, marked, Vi
 
 - TDD Red → Green → Refactor; 90% coverage minimum
 - Quality gate: test, lint, format, coverage, typecheck, build
+- **Automated code review (§0.2.5)** — subagent on a different LLM after every task; triage Patch/Defer/Reject; ask owner before applying patches or committing
+- **QA analysis (§0.2.6)** — subagent report + step-by-step manual validation in every checkpoint
 - Structured logging on all features (§0.8)
 - Path/HTML security (§0.9)
 - One task at a time with checkpoints — **for implementation loop only**; discovery loop uses subagents instead of owner checkpoints

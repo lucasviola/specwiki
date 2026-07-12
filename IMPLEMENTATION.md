@@ -23,7 +23,9 @@
 Active development follows **[HARNESS.md](./HARNESS.md)**:
 
 - **[§0 Working rules](./HARNESS.md#0-working-rules-mandatory--never-bypass)** — TDD (§0.1), quality gate (§0.2), checkpoint (§0.3), project logs (§0.4)
-- **[§0.8 Structured logging](./HARNESS.md#08-structured-logging-mandatory)** — every feature story ships diagnostics; logging is woven into vertical slices, not a separate epic
+- **[§0.2.5 Automated code review](./HARNESS.md#025-automated-code-review--mandatory-after-every-task)** — subagent on a different LLM after every task; triage Patch/Defer/Reject; ask owner before applying patches or committing
+- **[§0.2.6 QA analysis](./HARNESS.md#026-qa-analysis--mandatory-after-every-task)** — subagent QA report + step-by-step manual validation in every checkpoint summary
+- **[§0.8 Structured logging](./HARNESS.md#08-structured-logging--mandatory-on-every-feature)** — every feature story ships diagnostics; logging is woven into vertical slices, not a separate epic
 - **[§0.10 Vertical slices + INVEST](./HARNESS.md#010-story-slicing--vertical-slices-and-invest-mandatory)** — thin end-to-end user value per story; no horizontal layer-only work
 
 Epic and story definitions: [`_bmad-output/planning-artifacts/discovery/epics/epics-and-stories.md`](./_bmad-output/planning-artifacts/discovery/epics/epics-and-stories.md)

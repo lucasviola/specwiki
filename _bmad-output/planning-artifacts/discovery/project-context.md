@@ -134,6 +134,7 @@ Do not add runtime dependencies without justification (HARNESS §12).
 - **Logging woven in (HARNESS §0.8)** — every story AC includes diagnostics; no logging epic
 - **One story = one §0.3 checkpoint** — epics are user journeys (List, Generate MD, Generate HTML, etc.)
 - **One bullet = one task = one commit** (HARNESS §9) — discovery loop overrides checkpoints with subagent escalation.
+- **Post-implementation review (HARNESS §0.2.5–§0.2.6)** — after every task: run code-review and QA subagents on a **different LLM** than the implementer; include findings and manual validation steps in the §0.3 checkpoint; ask owner whether to apply review patches **before** committing.
 - Update `IMPLEMENTATION.md` build log after each implementation task (when file exists).
 - Do not run e2e/browser tests unless owner explicitly requests (HARNESS §0.2.1).
 
