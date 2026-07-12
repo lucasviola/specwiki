@@ -27,6 +27,8 @@ Read every section before writing a single line. This document is the ground tru
 > - **Security (§0.9)** — treat user-supplied paths as untrusted; validate inputs,
 >   never write outside the resolved output directory, and never leak secrets in logs
 >   or error messages.
+> - **Vertical slices + INVEST (§0.10)** — every story delivers thin end-to-end user
+>   value; satisfy INVEST before implementation; no horizontal layer-only stories.
 
 ---
 
@@ -260,6 +262,9 @@ The following are **hard failures** against this harness:
 | Running e2e tests or recording demo videos without owner request | Wastes time; violates §0.2.1 owner opt-in policy       |
 | Committing gitignored artifacts (videos, build output, secrets)  | Pollutes repo; may leak sensitive data                 |
 | Drive-by refactors or unrelated file churn in a task             | Violates §0.7 scope; obscures review and bisect        |
+| Horizontal layer-only story with no user-visible outcome         | Violates §0.10 — reframe as vertical slice             |
+| Epic organized by module (`discover/`, `parse/`) not user journey | Violates §0.10 vertical slicing                        |
+| Epic or story dedicated to logging / verbose diagnostics only    | Violates §0.8 + §0.10 — weave logs into feature stories |
 | Leaving dead imports, unused helpers, or stale comments          | Codebase rots between tasks                            |
 | Shipping a feature without structured logs (§0.8)                | Owner cannot debug failures in QA or production        |
 | Logging passwords, tokens, JWTs, emails, or secrets              | Security violation — use IDs and sanitized fields only |
@@ -431,6 +436,76 @@ Before the §0.3 checkpoint, confirm (when the bullet touches I/O):
 - [ ] HTML escaping preserved for new template fields
 - [ ] Tests cover at least one malicious or edge-case path input
 
+### 0.10 Story slicing — vertical slices and INVEST (mandatory)
+
+Every implementation task must be framed as a **vertical slice**: a thin, end-to-end
+delivery of **user-visible value** that cuts through the pipeline (`discover` → `parse` →
+`output` → `commands`) as needed — not a horizontal "finish the discover module" milestone.
+
+Sprint stories live in `_bmad-output/planning-artifacts/discovery/epics/epics-and-stories.md`
+(or the active sprint plan derived from it). **That document's vertical epics take precedence
+over horizontal §9 module bullets** when planning what to build next.
+
+#### Vertical slicing rules
+
+| Rule | Detail |
+| ---- | ------ |
+| **User value first** | A story is done when a persona (Alex — solo Cursor dev) can *demonstrate* the capability, not when a layer hits arbitrary coverage |
+| **End-to-end thin slice** | Prefer one list journey, one generate-md journey, one generate-html journey — each touching every layer required for that journey |
+| **No layer epics** | Do not schedule "all discovery tests" then "all parse tests" as separate epics unless documenting brownfield retrofit mapping |
+| **No logging epic** | Structured logging (§0.8) is **woven into every story's AC** — never a standalone epic or story whose sole purpose is instrumentation |
+| **Enabler exception** | Shared infrastructure (e.g. `Logger.ts` in E1, Vitest scaffold) is allowed only as a minimal foundation story — logging behaviour ships with the feature stories that use it |
+| **Demo path required** | Every story states how to show value after merge: CLI command + fixture path |
+
+#### Logging & diagnostics — mandatory per story (§0.8)
+
+Every story in `epics-and-stories.md` includes two AC groups in addition to functional criteria:
+
+1. **Logging & diagnostics** — structured events for code paths touched; `log.error` on failures; verbose-gated `log.info`; no secrets in payloads
+2. **Quality measures** — full §0.2 gate; coverage ≥ 90% on touched modules
+
+Do **not** defer logging to a later epic or "logging retrofit" pass. A feature without logs is incomplete (same severity as missing tests).
+
+`src/core/Logger.ts` is introduced in **E1** (foundation). Feature epics add events in the same story that ships the behaviour.
+
+#### INVEST checklist (required per story)
+
+Before starting a story, confirm all six:
+
+| Letter | Meaning | specwiki gate |
+| ------ | ------- | ------------- |
+| **I** — Independent | Implementable without unfinished blockers | Dependencies explicit; no hidden coupling to in-progress stories |
+| **N** — Negotiable | AC describe outcomes, not mandated internals | "User sees grouped categories" not "add 47 unit tests to `deriveCategory`" |
+| **V** — Valuable | Delivers persona-visible capability | Alex can list, generate, or debug something new |
+| **E** — Estimable | Completable in one §0.3 checkpoint cycle | One owner-reviewed task; split if larger |
+| **S** — Small | Minimal scope for the value delivered | One HARNESS bullet or smaller; never a whole phase |
+| **T** — Testable | Binary pass/fail AC | Automated tests and/or documented manual CLI step |
+
+Record INVEST pass inline in the story (one line: `INVEST: I✓ N✓ V✓ E✓ S✓ T✓`).
+
+#### Anti-patterns (story slicing)
+
+| Anti-pattern | Why forbidden |
+| ------------ | ------------- |
+| Horizontal epic: "Discovery module hardening" | No user demo until unrelated layers also ship |
+| Story with only "add tests for `deriveCategory`" and no user outcome | Layer work masquerading as a story; bundle into list/generate slice |
+| Story spanning multiple user journeys | Violates Small — split into separate vertical slices |
+| "Phase 2 complete" as a story | Phases are containers; stories are user-value slices |
+| Skipping demo path because brownfield exists | Retrofit stories still prove user-visible behaviour unchanged or improved |
+| Separate epic or story for logging / `--verbose` diagnostics | Logging is part of every feature per §0.8 — merge into the vertical slice that ships the behaviour |
+| Deferring §0.8 instrumentation to a "logging phase" | Same severity as deferring tests — story is not done |
+
+#### Relationship to §9 build phases
+
+§9 Phase 1–3 bullets decompose **brownfield retrofit work** by module for coverage tracing.
+When implementing, **reassemble bullets into vertical slices** per `epics-and-stories.md`:
+
+- Phase 1.1–1.3 + list UX + discover logging → **List specs** vertical epic
+- Phase 2.1–2.3 + write markdown + parse/output logging → **Generate markdown wiki** vertical epic
+- Phase 2.4–2.5 + HTML safety + output logging → **Generate HTML wiki** vertical epic
+- Phase 3.2–3.3 + command logging → **CLI contracts** vertical epic
+- Phase 3.4 + path guards → **Trustworthy output** vertical epic
+
 ---
 
 ## 1. Orientation
@@ -574,6 +649,12 @@ checkpoint → owner approval → commit → §0.4 project log update) to **ever
 inside every phase before moving to the next bullet.
 
 **One bullet = one agent turn = one commit = one build-log row.**
+
+**Story slicing:** §9 bullets are a **brownfield retrofit decomposition** by module.
+When picking up work, use **vertical slices** from `epics-and-stories.md` (§0.10) — each
+slice delivers thin end-to-end user value and satisfies INVEST. A single vertical story may
+map to multiple §9 bullets; log each bullet separately in `IMPLEMENTATION.md` when the
+slice completes them.
 
 ### Phase 0 — Scaffold & spec
 
