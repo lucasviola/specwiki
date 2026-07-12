@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { Command } from "commander";
+import { Command, CommanderError } from "commander";
 import path from "node:path";
 import {
   generateWiki,
@@ -9,7 +9,48 @@ import {
 } from "./commands/generate.js";
 import { log } from "./core/Logger.js";
 
+const USAGE_ERROR_CODES = new Set([
+  "commander.unknownOption",
+  "commander.unknownCommand",
+  "commander.missingArgument",
+  "commander.optionMissingArgument",
+  "commander.missingMandatoryOptionValue",
+  "commander.conflictingOption",
+  "commander.excessArguments",
+  "commander.invalidArgument",
+]);
+
+function resolveCommandForUsageError(): string {
+  const entryIndex = process.argv.findIndex(
+    (arg) =>
+      arg.endsWith("cli.ts") ||
+      arg.endsWith("cli.js") ||
+      arg.endsWith("/specwiki") ||
+      arg === "specwiki",
+  );
+  const args =
+    entryIndex >= 0
+      ? process.argv.slice(entryIndex + 1)
+      : process.argv.slice(2);
+  const subcommand = args.find((arg) => !arg.startsWith("-"));
+  return subcommand ?? "specwiki";
+}
+
+function handleCommanderError(err: CommanderError): never {
+  if (USAGE_ERROR_CODES.has(err.code)) {
+    log.error("cli.error", {
+      command: resolveCommandForUsageError(),
+      message: err.message,
+    });
+    process.exit(2);
+  }
+
+  process.exit(err.exitCode ?? 1);
+}
+
 const program = new Command();
+
+program.exitOverride();
 
 program
   .name("specwiki")
@@ -69,4 +110,11 @@ program
     }
   });
 
-program.parse();
+try {
+  program.parse();
+} catch (err) {
+  if (err instanceof CommanderError) {
+    handleCommanderError(err);
+  }
+  throw err;
+}

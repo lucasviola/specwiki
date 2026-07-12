@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-12  
-**Current position:** E6 S6.1 complete (review) — next: E6 S6.2 exit code contracts  
-**Test count:** 130 passing
+**Current position:** E6 S6.2 complete (review) — next: E7 S7.1 dogfood wiki on fixture  
+**Test count:** 134 passing
 
 ## Deliverables
 
@@ -15,7 +15,7 @@
 | Markdown wiki (`wiki/*.md`)                                                       | Brownfield complete — harden in E3        | `src/output/wiki.ts`    |
 | HTML wiki (`wiki/html/`)                                                          | Brownfield complete — harden in E4        | `src/output/wiki.ts`    |
 | Slug collision disambiguation                                                     | Complete — E5 S5.1                        | HARNESS §11 #1          |
-| CLI contracts + exit codes                                                        | In progress — E6 S6.1 review              | `src/commands/`         |
+| CLI contracts + exit codes                                                        | Complete — E6 S6.2 review                 | `src/cli.ts`            |
 | MVP sign-off (HARNESS §13)                                                        | Pending — E7                              | —                       |
 
 ## Workflow References
@@ -29,6 +29,16 @@ Active development follows **[HARNESS.md](./HARNESS.md)**:
 - **[§0.10 Vertical slices + INVEST](./HARNESS.md#010-story-slicing--vertical-slices-and-invest-mandatory)** — thin end-to-end user value per story; no horizontal layer-only work
 
 Epic and story definitions: [`_bmad-output/planning-artifacts/discovery/epics/epics-and-stories.md`](./_bmad-output/planning-artifacts/discovery/epics/epics-and-stories.md)
+
+## CLI exit codes (FR-022)
+
+| Code | Meaning         | Examples                                              |
+| ---- | --------------- | ----------------------------------------------------- |
+| 0    | Success         | `generate`/`list` completed; zero matches with tip    |
+| 1    | Runtime failure | I/O error, parse failure, write failure, path guard   |
+| 2    | Usage error     | Unknown option/command, missing required option value |
+
+Usage errors emit `cli.error` on stderr (JSON) before exit 2. Runtime failures emit `cli.error` before exit 1. User-facing messages remain on stdout.
 
 ## MVP Epic Progression Checklist
 
@@ -54,7 +64,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
   - [x] S5.2 — Path traversal guard tests _(review)_
 - [ ] **E6 — CLI Contracts & Command Polish** — flags, exit codes, lifecycle logging
   - [x] S6.1 — Command integration and lifecycle logging _(review)_
-  - [ ] S6.2 — Exit code contracts
+  - [x] S6.2 — Exit code contracts _(review)_
 - [ ] **E7 — MVP Validation & Sign-off** — dogfood + HARNESS §13 checklist
   - [ ] S7.1 — Dogfood wiki on fixture
   - [ ] S7.2 — Full quality gate and §13 checklist
@@ -79,4 +89,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-12 | E5 S5.1  | `feat(output): slug collision disambiguation with hash suffix` — assignUniqueSlugs in buildWiki; output.slug-collision verbose event; collision-project fixture; 7 new tests; generate integration for collisions            | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E5 S5.2  | `feat(output): path traversal guards on wiki writes` — assertPathConfined with path.resolve/relative check; output.error on rejection; 5 traversal tests for markdown and HTML writes                                        | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E6 S6.1  | `feat(cli): command lifecycle logging and error boundary` — cli.command (verbose) + cli.error (always); removed duplicate scan console.log; CLI try/catch exit 1; 8 new tests; generate.ts 98.16% coverage                   | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-12 | E6 S6.2  | `feat(cli): exit code contracts for usage vs runtime errors` — exit 2 for Commander usage errors with cli.error; exit 1 runtime unchanged; exitOverride before subcommands; 4 new CLI tests; documented in IMPLEMENTATION.md | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | _template_ | _E?_ S?_ | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                         |

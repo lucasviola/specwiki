@@ -8,6 +8,14 @@ import { describe, expect, it } from "vitest";
 
 const execFileAsync = promisify(execFile);
 
+function parseJsonStderrLines(stderr: string): Record<string, unknown>[] {
+  return stderr
+    .trim()
+    .split("\n")
+    .filter((line) => line.startsWith("{"))
+    .map((line) => JSON.parse(line) as Record<string, unknown>);
+}
+
 const projectRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "..",
@@ -172,6 +180,105 @@ describe("cli generate --verbose", () => {
   });
 });
 
+describe("cli exit codes", () => {
+  it("exits 2 and emits cli.error for unknown option", async () => {
+    try {
+      await execFileAsync(
+        process.execPath,
+        ["--import", "tsx/esm", cliPath, "generate", "--bogus-flag"],
+        { cwd: projectRoot },
+      );
+      expect.fail("expected generate with unknown option to exit non-zero");
+    } catch (err) {
+      const execError = err as { code?: number; stderr?: string };
+      expect(execError.code).toBe(2);
+
+      const lines = parseJsonStderrLines(String(execError.stderr ?? ""));
+
+      const cliError = lines.find((line) => line.event === "cli.error");
+      expect(cliError).toMatchObject({
+        event: "cli.error",
+        level: "error",
+        command: "generate",
+      });
+      expect(cliError?.message).toBeTruthy();
+    }
+  });
+
+  it("exits 2 and emits cli.error for unknown command", async () => {
+    try {
+      await execFileAsync(
+        process.execPath,
+        ["--import", "tsx/esm", cliPath, "bogus-cmd"],
+        { cwd: projectRoot },
+      );
+      expect.fail("expected unknown command to exit non-zero");
+    } catch (err) {
+      const execError = err as { code?: number; stderr?: string };
+      expect(execError.code).toBe(2);
+
+      const lines = parseJsonStderrLines(String(execError.stderr ?? ""));
+
+      const cliError = lines.find((line) => line.event === "cli.error");
+      expect(cliError).toMatchObject({
+        event: "cli.error",
+        level: "error",
+        command: "bogus-cmd",
+      });
+    }
+  });
+
+  it("exits 2 and emits cli.error when --project value is missing", async () => {
+    try {
+      await execFileAsync(
+        process.execPath,
+        ["--import", "tsx/esm", cliPath, "generate", "--project"],
+        { cwd: projectRoot },
+      );
+      expect.fail("expected missing --project value to exit non-zero");
+    } catch (err) {
+      const execError = err as { code?: number; stderr?: string };
+      expect(execError.code).toBe(2);
+
+      const lines = parseJsonStderrLines(String(execError.stderr ?? ""));
+
+      const cliError = lines.find((line) => line.event === "cli.error");
+      expect(cliError).toMatchObject({
+        event: "cli.error",
+        level: "error",
+        command: "generate",
+      });
+    }
+  });
+
+  it("exits 0 on successful generate", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-exit-success-"),
+    );
+
+    try {
+      const { stderr } = await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "generate",
+          "--project",
+          fixtureRoot,
+          "--output",
+          outputDir,
+        ],
+        { cwd: projectRoot },
+      );
+
+      expect(stderr).not.toContain('"event":"cli.error"');
+    } finally {
+      await fs.rm(outputDir, { force: true, recursive: true });
+    }
+  });
+});
+
 describe("cli generate failure", () => {
   it("exits 1 and emits cli.error when output path is not writable", async () => {
     const blockedOutput = "AGENTS.md";
@@ -199,11 +306,7 @@ describe("cli generate failure", () => {
       };
       expect(execError.code).toBe(1);
 
-      const lines = String(execError.stderr ?? "")
-        .trim()
-        .split("\n")
-        .filter(Boolean)
-        .map((line) => JSON.parse(line) as Record<string, unknown>);
+      const lines = parseJsonStderrLines(String(execError.stderr ?? ""));
 
       const cliError = lines.find((line) => line.event === "cli.error");
       expect(cliError).toMatchObject({
