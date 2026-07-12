@@ -94,21 +94,31 @@ describe("generateWiki", () => {
 
     const lines = parseStderrLines();
     const writeEvents = lines.filter((line) => line.event === "output.write");
+    const mdWrites = writeEvents.filter((event) =>
+      String(event.relativePath).endsWith(".md"),
+    );
+    const htmlWrites = writeEvents.filter((event) =>
+      String(event.relativePath).startsWith("html/"),
+    );
     const summaryEvent = lines.find(
       (line) => line.event === "generate.summary",
     );
 
     expect(writeEvents.length).toBeGreaterThan(0);
-    expect(writeEvents.some((event) => event.relativePath === "index.md")).toBe(
+    expect(mdWrites.some((event) => event.relativePath === "index.md")).toBe(
       true,
     );
+    expect(
+      htmlWrites.some((event) => event.relativePath === "html/index.html"),
+    ).toBe(true);
     for (const event of writeEvents) {
       expect(event.relativePath).toBeTruthy();
       expect(JSON.stringify(event)).not.toMatch(/rawContent|frontmatter/);
     }
 
-    expect(summaryEvent?.pageCount).toBe(writeEvents.length - 1);
-    expect(summaryEvent?.markdownFiles).toBe(writeEvents.length);
+    expect(summaryEvent?.pageCount).toBe(mdWrites.length - 1);
+    expect(summaryEvent?.markdownFiles).toBe(mdWrites.length);
+    expect(summaryEvent?.htmlFiles).toBe(htmlWrites.length);
   });
 
   it("prints a helpful message when no specs are found", async () => {

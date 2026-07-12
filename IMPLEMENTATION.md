@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-12  
-**Current position:** E4 S4.1 complete — next: E4 S4.2 HTML wiki tree write logging  
-**Test count:** 100 passing
+**Current position:** E4 S4.2 complete — next: E5 S5.1 slug collision disambiguation  
+**Test count:** 108 passing
 
 ## Deliverables
 
@@ -48,7 +48,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
   - [x] S3.2 — Write categorized markdown wiki tree _(review)_
 - [ ] **E4 — Generate HTML Wiki** (`wiki/html/`) — safe HTML rendering + `html/` tree
   - [x] S4.1 — HTML title escaping and page structure _(review)_
-  - [ ] S4.2 — Write HTML wiki tree with path confinement
+  - [x] S4.2 — Write HTML wiki tree with path confinement _(review)_
 - [ ] **E5 — Trustworthy Generate Output** — slug collisions + path confinement
   - [ ] S5.1 — Slug collision disambiguation
   - [ ] S5.2 — Path traversal guard tests
@@ -74,5 +74,6 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-12 | E2 S2.4  | `feat(list): zero-match helpful tip and discover.empty logging` — list tip parity with generate; discover.empty verbose event; 3 new tests; CLI e2e for empty list exit 0                                                    | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E3 S3.1  | `feat(parse): structured parse logging and hardened parse tests` — parse.file verbose event; parse.error on read/parse failure; 12 parse tests; generate verbose parse.file integration; code review patches applied         | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E3 S3.2  | `feat(output): structured output logging and hardened wiki tests` — output.write verbose event; output.error on mkdir/write failure; generate.summary in command layer; 11 new wiki tests; generate output.write integration | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
-| 2026-07-12 | E4 S4.1  | `feat(output): HTML title escaping and render.error logging` — exported escapeHtml/wrapHtml; apostrophe escaping; render.error on marked.parse failure; 10 new tests; wiki.ts 100% lines | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-12 | E4 S4.1  | `feat(output): HTML title escaping and render.error logging` — exported escapeHtml/wrapHtml; apostrophe escaping; render.error on marked.parse failure; 10 new tests; wiki.ts 100% lines                                     | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-12 | E4 S4.2  | `feat(output): HTML wiki write logging and path confinement tests` — output.write verbose for html/ paths; output.error on mkdir/write failure; 8 new writeHtmlWiki tests; generate integration updated for htmlFiles          | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | _template_ | _E?_ S?_ | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                         |

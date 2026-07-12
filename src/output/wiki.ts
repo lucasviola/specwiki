@@ -152,20 +152,47 @@ export async function writeHtmlWiki(
   wiki: WikiOutput,
 ): Promise<string[]> {
   const htmlDir = path.join(outputDir, "html");
-  await fs.mkdir(htmlDir, { recursive: true });
+  try {
+    await fs.mkdir(htmlDir, { recursive: true });
+  } catch (err) {
+    log.error("output.error", {
+      relativePath: "html",
+      message: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
 
   const written: string[] = [];
 
   const indexHtml = wrapHtml("Spec Wiki", renderMarkdown(wiki.indexContent));
   const indexPath = path.join(htmlDir, "index.html");
-  await fs.writeFile(indexPath, indexHtml, "utf-8");
+  try {
+    await fs.writeFile(indexPath, indexHtml, "utf-8");
+  } catch (err) {
+    log.error("output.error", {
+      relativePath: "html/index.html",
+      message: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
   written.push(indexPath);
+  log.info("output.write", { relativePath: "html/index.html" });
 
   for (const page of wiki.pages) {
     const html = wrapHtml(page.title, renderMarkdown(page.content));
     const filePath = path.join(htmlDir, `${page.slug}.html`);
-    await fs.writeFile(filePath, html, "utf-8");
+    const relativePath = `html/${page.slug}.html`;
+    try {
+      await fs.writeFile(filePath, html, "utf-8");
+    } catch (err) {
+      log.error("output.error", {
+        relativePath,
+        message: err instanceof Error ? err.message : String(err),
+      });
+      throw err;
+    }
     written.push(filePath);
+    log.info("output.write", { relativePath });
   }
 
   return written;

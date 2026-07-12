@@ -281,6 +281,156 @@ describe("writeHtmlWiki", () => {
     );
     expect(indexHtml).toContain("Custom Spec Title");
   });
+
+  it("writes html/index.html and html/{slug}.html for each page", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([sampleSpec()]);
+    const written = await writeHtmlWiki(outputDir, wiki);
+
+    expect(written).toHaveLength(2);
+    expect(
+      await fs.readFile(path.join(outputDir, "html", "index.html"), "utf-8"),
+    ).toContain("<html");
+    expect(
+      await fs.readFile(path.join(outputDir, "html", "spec.html"), "utf-8"),
+    ).toContain("Custom Spec Title");
+  });
+
+  it("confines writes to the resolved output directory", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([sampleSpec()]);
+    const written = await writeHtmlWiki(outputDir, wiki);
+
+    for (const filePath of written) {
+      expect(filePath.startsWith(outputDir + path.sep)).toBe(true);
+    }
+  });
+
+  it("emits output.write per HTML file when verbose", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-"),
+    );
+    tempDirs.push(outputDir);
+    log.setVerbose(true);
+
+    const wiki = buildWiki([sampleSpec()]);
+    await writeHtmlWiki(outputDir, wiki);
+
+    const events = parseStderrLines().filter(
+      (line) => line.event === "output.write",
+    );
+
+    expect(events).toHaveLength(2);
+    expect(events.map((event) => event.relativePath).sort()).toEqual([
+      "html/index.html",
+      "html/spec.html",
+    ]);
+    for (const event of events) {
+      expect(JSON.stringify(event)).not.toMatch(/rawContent|frontmatter/);
+    }
+  });
+
+  it("does not emit output.write when verbose is disabled", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([sampleSpec()]);
+    await writeHtmlWiki(outputDir, wiki);
+
+    const events = parseStderrLines().filter(
+      (line) => line.event === "output.write",
+    );
+    expect(events).toHaveLength(0);
+  });
+
+  it("emits output.error and rethrows on index write failure", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([sampleSpec()]);
+    const writeSpy = vi
+      .spyOn(fs, "writeFile")
+      .mockRejectedValueOnce(new Error("disk full"));
+
+    await expect(writeHtmlWiki(outputDir, wiki)).rejects.toThrow("disk full");
+
+    const errorEvent = parseStderrLines().find(
+      (line) => line.event === "output.error",
+    );
+    expect(errorEvent?.message).toBe("disk full");
+    expect(errorEvent?.relativePath).toBe("html/index.html");
+    writeSpy.mockRestore();
+  });
+
+  it("emits output.error and rethrows on page write failure", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([sampleSpec()]);
+    const writeSpy = vi
+      .spyOn(fs, "writeFile")
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce("page write failed");
+
+    await expect(writeHtmlWiki(outputDir, wiki)).rejects.toBe(
+      "page write failed",
+    );
+
+    const errorEvent = parseStderrLines().find(
+      (line) => line.event === "output.error",
+    );
+    expect(errorEvent?.message).toBe("page write failed");
+    expect(errorEvent?.relativePath).toBe("html/spec.html");
+    writeSpy.mockRestore();
+  });
+
+  it("emits output.error and rethrows on mkdir failure", async () => {
+    const outputDir = path.join(os.tmpdir(), "specwiki-html-mkdir-fail");
+    const wiki = buildWiki([sampleSpec()]);
+    const mkdirSpy = vi
+      .spyOn(fs, "mkdir")
+      .mockRejectedValueOnce(new Error("permission denied"));
+
+    await expect(writeHtmlWiki(outputDir, wiki)).rejects.toThrow(
+      "permission denied",
+    );
+
+    const errorEvent = parseStderrLines().find(
+      (line) => line.event === "output.error",
+    );
+    expect(errorEvent?.message).toBe("permission denied");
+    expect(errorEvent?.relativePath).toBe("html");
+    mkdirSpy.mockRestore();
+  });
+
+  it("stringifies non-Error mkdir failures in output.error", async () => {
+    const outputDir = path.join(os.tmpdir(), "specwiki-html-mkdir-fail");
+    const wiki = buildWiki([sampleSpec()]);
+    const mkdirSpy = vi.spyOn(fs, "mkdir").mockRejectedValueOnce("mkdir boom");
+
+    await expect(writeHtmlWiki(outputDir, wiki)).rejects.toBe("mkdir boom");
+
+    const errorEvent = parseStderrLines().find(
+      (line) => line.event === "output.error",
+    );
+    expect(errorEvent?.message).toBe("mkdir boom");
+    expect(errorEvent?.relativePath).toBe("html");
+    mkdirSpy.mockRestore();
+  });
 });
 
 describe("writeWiki", () => {
