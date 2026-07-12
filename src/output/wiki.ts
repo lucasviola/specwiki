@@ -6,6 +6,33 @@ import { CATEGORY_LABELS } from "../config/patterns.js";
 import { renderMarkdown } from "../parse/markdown.js";
 import type { ParsedSpec, WikiOutput, WikiPage } from "../types.js";
 
+const PATH_ESCAPE_MESSAGE = "Path escapes output directory";
+
+export class PathTraversalError extends Error {
+  constructor(relativePath: string) {
+    super(`${PATH_ESCAPE_MESSAGE}: ${relativePath}`);
+    this.name = "PathTraversalError";
+  }
+}
+
+export function assertPathConfined(
+  outputDir: string,
+  targetPath: string,
+  relativePathForLog: string,
+): void {
+  const resolvedRoot = path.resolve(outputDir);
+  const resolvedTarget = path.resolve(targetPath);
+  const relative = path.relative(resolvedRoot, resolvedTarget);
+
+  if (relative.startsWith("..") || path.isAbsolute(relative)) {
+    log.error("output.error", {
+      relativePath: relativePathForLog,
+      message: PATH_ESCAPE_MESSAGE,
+    });
+    throw new PathTraversalError(relativePathForLog);
+  }
+}
+
 export function pageSlug(spec: ParsedSpec): string {
   const base = spec.file.relativePath
     .replace(/\.(md|mdc|txt)$/, "")
@@ -168,6 +195,7 @@ export async function writeWiki(
   const written: string[] = [];
 
   const indexPath = path.join(outputDir, "index.md");
+  assertPathConfined(outputDir, indexPath, "index.md");
   try {
     await fs.writeFile(indexPath, wiki.indexContent, "utf-8");
   } catch (err) {
@@ -183,6 +211,7 @@ export async function writeWiki(
   for (const page of wiki.pages) {
     const filePath = path.join(outputDir, `${page.slug}.md`);
     const relativePath = `${page.slug}.md`;
+    assertPathConfined(outputDir, filePath, relativePath);
     try {
       await fs.writeFile(filePath, page.content, "utf-8");
     } catch (err) {
@@ -218,6 +247,7 @@ export async function writeHtmlWiki(
 
   const indexHtml = wrapHtml("Spec Wiki", renderMarkdown(wiki.indexContent));
   const indexPath = path.join(htmlDir, "index.html");
+  assertPathConfined(outputDir, indexPath, "html/index.html");
   try {
     await fs.writeFile(indexPath, indexHtml, "utf-8");
   } catch (err) {
@@ -234,6 +264,7 @@ export async function writeHtmlWiki(
     const html = wrapHtml(page.title, renderMarkdown(page.content));
     const filePath = path.join(htmlDir, `${page.slug}.html`);
     const relativePath = `html/${page.slug}.html`;
+    assertPathConfined(outputDir, filePath, relativePath);
     try {
       await fs.writeFile(filePath, html, "utf-8");
     } catch (err) {

@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-12  
-**Current position:** E5 S5.1 complete — next: E5 S5.2 path traversal guard tests  
-**Test count:** 117 passing
+**Current position:** E5 S5.2 complete — next: E6 S6.1 command integration and lifecycle logging  
+**Test count:** 122 passing
 
 ## Deliverables
 
@@ -51,7 +51,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
   - [x] S4.2 — Write HTML wiki tree with path confinement _(review)_
 - [ ] **E5 — Trustworthy Generate Output** — slug collisions + path confinement
   - [x] S5.1 — Slug collision disambiguation _(review)_
-  - [ ] S5.2 — Path traversal guard tests
+  - [x] S5.2 — Path traversal guard tests _(review)_
 - [ ] **E6 — CLI Contracts & Command Polish** — flags, exit codes, lifecycle logging
   - [ ] S6.1 — Command integration and lifecycle logging
   - [ ] S6.2 — Exit code contracts
@@ -77,4 +77,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-12 | E4 S4.1  | `feat(output): HTML title escaping and render.error logging` — exported escapeHtml/wrapHtml; apostrophe escaping; render.error on marked.parse failure; 10 new tests; wiki.ts 100% lines                                     | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E4 S4.2  | `feat(output): HTML wiki write logging and path confinement tests` — output.write verbose for html/ paths; output.error on mkdir/write failure; 8 new writeHtmlWiki tests; generate integration updated for htmlFiles        | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E5 S5.1  | `feat(output): slug collision disambiguation with hash suffix` — assignUniqueSlugs in buildWiki; output.slug-collision verbose event; collision-project fixture; 7 new tests; generate integration for collisions            | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-12 | E5 S5.2  | `feat(output): path traversal guards on wiki writes` — assertPathConfined with path.resolve/relative check; output.error on rejection; 5 traversal tests for markdown and HTML writes                                       | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | _template_ | _E?_ S?_ | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                         |

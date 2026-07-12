@@ -12,7 +12,7 @@ import {
   writeHtmlWiki,
   writeWiki,
 } from "../../src/output/wiki.js";
-import type { ParsedSpec } from "../../src/types.js";
+import type { ParsedSpec, WikiOutput } from "../../src/types.js";
 
 const tempDirs: string[] = [];
 let stderrSpy: ReturnType<typeof vi.spyOn>;
@@ -61,6 +61,31 @@ function sampleSpec(overrides: Partial<ParsedSpec> = {}): ParsedSpec {
     rawContent: "## Requirements\n\nMust preserve markdown.",
     ...overrides,
   };
+}
+
+function maliciousWiki(slug: string): WikiOutput {
+  const spec = sampleSpec();
+  return {
+    indexContent: "# Spec Wiki\n",
+    pages: [
+      {
+        slug,
+        title: spec.title,
+        category: spec.file.category,
+        content: "# Malicious\n\nTraversal probe.",
+        sourcePath: spec.file.relativePath,
+      },
+    ],
+  };
+}
+
+async function pathExists(filePath: string): Promise<boolean> {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 describe("escapeHtml", () => {
@@ -850,5 +875,106 @@ describe("writeWiki", () => {
     expect(errorEvent?.message).toBe("mkdir boom");
     expect(errorEvent?.relativePath).toBe(".");
     mkdirSpy.mockRestore();
+  });
+});
+
+describe("path traversal guards", () => {
+  it("writeWiki rejects .. segment slugs and emits output.error", async () => {
+    const parentDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-traverse-parent-"),
+    );
+    tempDirs.push(parentDir);
+    const outputDir = path.join(parentDir, "wiki");
+    await fs.mkdir(outputDir);
+
+    const escapedPath = path.join(parentDir, "evil.md");
+    await expect(
+      writeWiki(outputDir, maliciousWiki("../evil")),
+    ).rejects.toThrow(/escapes output directory/);
+
+    expect(await pathExists(escapedPath)).toBe(false);
+
+    const errorEvent = parseStderrLines().find(
+      (line) => line.event === "output.error",
+    );
+    expect(errorEvent?.relativePath).toBe("../evil.md");
+    expect(errorEvent?.message).toMatch(/escapes output directory/);
+    expect(JSON.stringify(errorEvent)).not.toMatch(
+      /Traversal probe|rawContent/,
+    );
+  });
+
+  it("writeWiki rejects nested .. segment slugs", async () => {
+    const parentDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-traverse-nested-"),
+    );
+    tempDirs.push(parentDir);
+    const outputDir = path.join(parentDir, "wiki");
+    await fs.mkdir(outputDir);
+
+    const escapedPath = path.join(parentDir, "passwd");
+    await expect(
+      writeWiki(outputDir, maliciousWiki("foo/../../passwd")),
+    ).rejects.toThrow(/escapes output directory/);
+
+    expect(await pathExists(escapedPath)).toBe(false);
+  });
+
+  it("writeHtmlWiki rejects .. segment slugs and emits output.error", async () => {
+    const parentDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-traverse-"),
+    );
+    tempDirs.push(parentDir);
+    const outputDir = path.join(parentDir, "wiki");
+    await fs.mkdir(outputDir);
+
+    const escapedPath = path.join(parentDir, "evil.html");
+    await expect(
+      writeHtmlWiki(outputDir, maliciousWiki("../../evil")),
+    ).rejects.toThrow(/escapes output directory/);
+
+    expect(await pathExists(escapedPath)).toBe(false);
+
+    const errorEvent = parseStderrLines().find(
+      (line) => line.event === "output.error",
+    );
+    expect(errorEvent?.relativePath).toBe("html/../../evil.html");
+    expect(errorEvent?.message).toMatch(/escapes output directory/);
+    expect(JSON.stringify(errorEvent)).not.toMatch(
+      /Traversal probe|rawContent/,
+    );
+  });
+
+  it("writeHtmlWiki rejects nested .. segment slugs", async () => {
+    const parentDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-nested-"),
+    );
+    tempDirs.push(parentDir);
+    const outputDir = path.join(parentDir, "wiki");
+    await fs.mkdir(outputDir);
+
+    const escapedPath = path.join(parentDir, "passwd.html");
+    await expect(
+      writeHtmlWiki(outputDir, maliciousWiki("foo/../../../passwd")),
+    ).rejects.toThrow(/escapes output directory/);
+
+    expect(await pathExists(escapedPath)).toBe(false);
+  });
+
+  it("emits output.error when verbose is disabled", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-traverse-quiet-"),
+    );
+    tempDirs.push(outputDir);
+    log.setVerbose(false);
+
+    await expect(
+      writeWiki(outputDir, maliciousWiki("../evil")),
+    ).rejects.toThrow();
+
+    const errorEvents = parseStderrLines().filter(
+      (line) => line.event === "output.error",
+    );
+    expect(errorEvents.length).toBeGreaterThan(0);
   });
 });
