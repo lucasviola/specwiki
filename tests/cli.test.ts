@@ -134,6 +134,109 @@ describe("cli list zero-match", () => {
   });
 });
 
+describe("dogfood — sample-project fixture", () => {
+  const REQUIRED_PIPELINE_EVENTS = [
+    "cli.command",
+    "discover.start",
+    "discover.complete",
+    "parse.file",
+    "output.write",
+    "generate.summary",
+  ] as const;
+
+  it("generates categorized markdown + HTML wiki with full verbose pipeline logs in < 60s", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-dogfood-"),
+    );
+
+    try {
+      const startedAt = Date.now();
+      const { stdout, stderr } = await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "generate",
+          "--verbose",
+          "--project",
+          fixtureRoot,
+          "--output",
+          outputDir,
+        ],
+        { cwd: projectRoot },
+      );
+      const elapsedMs = Date.now() - startedAt;
+
+      expect(stdout).toContain("Generated wiki");
+      expect(elapsedMs).toBeLessThan(60_000);
+
+      const lines = stderr
+        .trim()
+        .split("\n")
+        .filter(Boolean)
+        .map((line) => JSON.parse(line) as Record<string, unknown>);
+      const events = lines.map((line) => line.event);
+
+      expect(events[0]).toBe("cli.command");
+      expect(events[1]).toBe("discover.start");
+      expect(events).toContain("discover.complete");
+      expect(events).toContain("generate.summary");
+
+      const matchCount = lines.filter(
+        (line) => line.event === "discover.match",
+      ).length;
+      const parseCount = lines.filter(
+        (line) => line.event === "parse.file",
+      ).length;
+      const writeEvents = lines.filter((line) => line.event === "output.write");
+      const summary = lines.find((line) => line.event === "generate.summary");
+
+      expect(matchCount).toBeGreaterThanOrEqual(5);
+      expect(parseCount).toBe(matchCount);
+      expect(summary?.pageCount).toBeGreaterThanOrEqual(5);
+
+      for (const eventName of REQUIRED_PIPELINE_EVENTS) {
+        expect(events).toContain(eventName);
+      }
+
+      expect(events.indexOf("discover.complete")).toBeLessThan(
+        events.indexOf("parse.file"),
+      );
+      expect(events.indexOf("parse.file")).toBeLessThan(
+        events.indexOf("output.write"),
+      );
+      expect(events.indexOf("output.write")).toBeLessThan(
+        events.indexOf("generate.summary"),
+      );
+
+      const indexContent = await fs.readFile(
+        path.join(outputDir, "index.md"),
+        "utf-8",
+      );
+      const htmlIndexContent = await fs.readFile(
+        path.join(outputDir, "html", "index.html"),
+        "utf-8",
+      );
+
+      expect(indexContent).toContain("# Spec Wiki");
+      expect(indexContent).toMatch(/## Cursor Rules/);
+      expect(indexContent).toMatch(/## (Project Root|root)/i);
+      expect(htmlIndexContent).toContain("<html");
+      expect(htmlIndexContent).toContain("Spec Wiki");
+
+      expect(
+        writeEvents.some((event) => event.relativePath === "index.md"),
+      ).toBe(true);
+      expect(
+        writeEvents.some((event) => event.relativePath === "html/index.html"),
+      ).toBe(true);
+    } finally {
+      await fs.rm(outputDir, { force: true, recursive: true });
+    }
+  });
+});
+
 describe("cli generate --verbose", () => {
   it("emits cli.command before discover.start on stderr", async () => {
     const outputDir = await fs.mkdtemp(

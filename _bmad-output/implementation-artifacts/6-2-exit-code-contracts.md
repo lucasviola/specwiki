@@ -136,16 +136,16 @@ Commander subcommands copy `_exitCallback` at creation time — `exitOverride()`
 
 ### AC coverage
 
-| AC | Status | Evidence |
-| -- | ------ | -------- |
-| #1 Usage → 2 | ✓ | CLI tests: unknown option, unknown command, missing --project value |
-| #2 Runtime → 1 | ✓ | Existing write-failure test unchanged |
-| #3 Success → 0 | ✓ | Empty list + successful generate tests |
-| #4 Documented | ✓ | IMPLEMENTATION.md exit code table |
-| #5 cli.error usage | ✓ | All usage-error tests assert cli.error JSON |
-| #6 cli.error runtime | ✓ | S6.1 boundary preserved |
-| #7 Quality gate | ✓ | Full §0.2 green |
-| #8 Tests | ✓ | 4 new exit code tests |
+| AC                   | Status | Evidence                                                            |
+| -------------------- | ------ | ------------------------------------------------------------------- |
+| #1 Usage → 2         | ✓      | CLI tests: unknown option, unknown command, missing --project value |
+| #2 Runtime → 1       | ✓      | Existing write-failure test unchanged                               |
+| #3 Success → 0       | ✓      | Empty list + successful generate tests                              |
+| #4 Documented        | ✓      | IMPLEMENTATION.md exit code table                                   |
+| #5 cli.error usage   | ✓      | All usage-error tests assert cli.error JSON                         |
+| #6 cli.error runtime | ✓      | S6.1 boundary preserved                                             |
+| #7 Quality gate      | ✓      | Full §0.2 green                                                     |
+| #8 Tests             | ✓      | 4 new exit code tests                                               |
 
 ### Regression risks
 

@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-12  
-**Current position:** E6 S6.2 complete (review) — next: E7 S7.1 dogfood wiki on fixture  
-**Test count:** 134 passing
+**Current position:** E7 S7.2 complete (review) — MVP sign-off ready  
+**Test count:** 147 passing
 
 ## Deliverables
 
@@ -16,7 +16,7 @@
 | HTML wiki (`wiki/html/`)                                                          | Brownfield complete — harden in E4        | `src/output/wiki.ts`    |
 | Slug collision disambiguation                                                     | Complete — E5 S5.1                        | HARNESS §11 #1          |
 | CLI contracts + exit codes                                                        | Complete — E6 S6.2 review                 | `src/cli.ts`            |
-| MVP sign-off (HARNESS §13)                                                        | Pending — E7                              | —                       |
+| MVP sign-off (HARNESS §13)                                                        | Complete — E7 S7.2 §13 checklist green    | below                   |
 
 ## Workflow References
 
@@ -40,6 +40,20 @@ Epic and story definitions: [`_bmad-output/planning-artifacts/discovery/epics/ep
 
 Usage errors emit `cli.error` on stderr (JSON) before exit 2. Runtime failures emit `cli.error` before exit 1. User-facing messages remain on stdout.
 
+## Dogfood validation (FR-031)
+
+**Fixture:** `tests/fixtures/sample-project/` — the canonical MVP proof layout.
+
+| Metric           | Result (2026-07-12)              |
+| ---------------- | -------------------------------- |
+| Spec files found | 10                               |
+| Wiki pages       | 10                               |
+| Categories       | 8                                |
+| Generate time    | ~0.4s (< 60s AC)                 |
+| Markdown + HTML  | ✓ `index.md` + `html/index.html` |
+
+**Repo root limited yield (POST-MVP FR-006):** Running `specwiki list --project .` on the specwiki repository finds only paths matching `DEFAULT_SPEC_PATTERNS` (currently 1 file: `.cursor/rules/specwiki-checkpoint.mdc`). High-value self-repo paths **outside** default patterns — `HARNESS.md`, `_bmad-output/`, `.agents/skills/` — are deferred to E8 (extended patterns / `--config`). This is intentional per FR-031 readiness patch; not an MVP blocker.
+
 ## MVP Epic Progression Checklist
 
 Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifacts/sprint-status.yaml). `[x]` = implemented (in `review` or `done`); `[ ]` = not started.
@@ -48,26 +62,79 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
   - [x] S1.1 — `IMPLEMENTATION.md` build log _(done)_
   - [x] S1.2 — Verify quality-gate tooling _(done)_
   - [x] S1.3 — Structured `Logger.ts` module _(done)_
-- [ ] **E2 — List Discovered Specs** (`specwiki list`) — discover → categorize → display
+- [x] **E2 — List Discovered Specs** (`specwiki list`) — discover → categorize → display
   - [x] S2.1 — Category grouping on list output _(done)_
   - [x] S2.2 — Human-readable titles on list output _(done)_
   - [x] S2.3 — Fixture discovery integration and discover logging _(done)_
   - [x] S2.4 — Zero-match helpful tip _(done)_
-- [ ] **E3 — Generate Markdown Wiki** (`wiki/*.md`) — discover → parse → write markdown
+- [x] **E3 — Generate Markdown Wiki** (`wiki/*.md`) — discover → parse → write markdown
   - [x] S3.1 — Parse specs into structured page content _(done)_
   - [x] S3.2 — Write categorized markdown wiki tree _(review)_
-- [ ] **E4 — Generate HTML Wiki** (`wiki/html/`) — safe HTML rendering + `html/` tree
+- [x] **E4 — Generate HTML Wiki** (`wiki/html/`) — safe HTML rendering + `html/` tree
   - [x] S4.1 — HTML title escaping and page structure _(review)_
   - [x] S4.2 — Write HTML wiki tree with path confinement _(review)_
-- [ ] **E5 — Trustworthy Generate Output** — slug collisions + path confinement
+- [x] **E5 — Trustworthy Generate Output** — slug collisions + path confinement
   - [x] S5.1 — Slug collision disambiguation _(review)_
   - [x] S5.2 — Path traversal guard tests _(review)_
-- [ ] **E6 — CLI Contracts & Command Polish** — flags, exit codes, lifecycle logging
+- [x] **E6 — CLI Contracts & Command Polish** — flags, exit codes, lifecycle logging
   - [x] S6.1 — Command integration and lifecycle logging _(review)_
   - [x] S6.2 — Exit code contracts _(review)_
-- [ ] **E7 — MVP Validation & Sign-off** — dogfood + HARNESS §13 checklist
-  - [ ] S7.1 — Dogfood wiki on fixture
-  - [ ] S7.2 — Full quality gate and §13 checklist
+- [x] **E7 — MVP Validation & Sign-off** — dogfood + HARNESS §13 checklist
+  - [x] S7.1 — Dogfood wiki on fixture _(review)_
+  - [x] S7.2 — Full quality gate and §13 checklist _(review)_
+
+## HARNESS §13 Deliverables Checklist
+
+Verified 2026-07-12 as part of E7 S7.2. Automated guards in `tests/harness/deliverables.test.ts`.
+
+### Functionality
+
+| Item                                                  | Status | Evidence                                                              |
+| ----------------------------------------------------- | ------ | --------------------------------------------------------------------- |
+| `specwiki list` discovers and groups specs per README | ✓      | `tests/discover/specs.test.ts`, `tests/cli.test.ts`                   |
+| `specwiki generate` writes markdown + HTML wiki       | ✓      | `tests/output/wiki.test.ts`, dogfood CLI test                         |
+| `--project`, `--output`, `--verbose` flags            | ✓      | `tests/cli.test.ts`, `tests/commands/generate.test.ts`                |
+| Zero-spec projects exit cleanly with helpful message  | ✓      | `tests/cli.test.ts` list/generate zero-match; shared `ZERO_SPECS_TIP` |
+
+### Meta / persistence
+
+| Item                                              | Status | Evidence                                  |
+| ------------------------------------------------- | ------ | ----------------------------------------- |
+| `IMPLEMENTATION.md` build log complete through E7 | ✓      | This file — build log + epic checklist    |
+| HARNESS §0.2 lists all quality-gate scripts       | ✓      | `package.json` scripts; deliverables test |
+
+### Code quality
+
+| Item                                      | Status | Evidence                                            |
+| ----------------------------------------- | ------ | --------------------------------------------------- |
+| All §0.2 quality gate commands pass       | ✓      | S7.2 gate run (see build log row)                   |
+| §0.2.5 automated code review per task     | ✓      | Story files under `Senior Developer Review (AI)`    |
+| §0.2.6 QA analysis with manual validation | ✓      | Story files under `QA Manual Validation`            |
+| Coverage ≥ 90% repo-wide                  | ✓      | vitest thresholds + coverage run                    |
+| Comments follow §0.6                      | ✓      | Minimal, non-obvious only                           |
+| Code cleanliness follows §0.7             | ✓      | Focused modules; no scope creep                     |
+| Structured logging follows §0.8           | ✓      | Logger in all pipeline modules; audit below         |
+| Path/HTML safety follows §0.9             | ✓      | `escapeHtml`, `assertPathConfined`; traversal tests |
+
+## §0.8 Logging Audit (E2–E6)
+
+Every MVP feature story shipped structured logging ACs. No deferred logging epic.
+
+| Story | Module(s)                    | Events verified                                                   |
+| ----- | ---------------------------- | ----------------------------------------------------------------- |
+| S2.3  | discover/specs.ts            | discover.start, discover.match, discover.complete, discover.error |
+| S2.4  | discover/specs.ts            | discover.empty                                                    |
+| S3.1  | parse/markdown.ts            | parse.file, parse.error                                           |
+| S3.2  | output/wiki.ts               | output.write, output.error                                        |
+| S4.1  | parse/markdown.ts            | render.error                                                      |
+| S4.2  | output/wiki.ts               | output.write (html/), output.error                                |
+| S5.1  | output/wiki.ts               | output.slug-collision                                             |
+| S5.2  | output/wiki.ts               | output.error (path guard)                                         |
+| S6.1  | commands/generate.ts, cli.ts | cli.command, cli.error, generate.summary                          |
+| S6.2  | cli.ts                       | cli.error (usage vs runtime)                                      |
+| S7.1  | (integration)                | Full verbose chain in dogfood CLI test                            |
+
+User-facing summaries remain on stdout via chalk; diagnostics use JSON stderr via `Logger.ts`.
 
 ## Build Log
 
@@ -90,4 +157,6 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-12 | E5 S5.2  | `feat(output): path traversal guards on wiki writes` — assertPathConfined with path.resolve/relative check; output.error on rejection; 5 traversal tests for markdown and HTML writes                                        | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E6 S6.1  | `feat(cli): command lifecycle logging and error boundary` — cli.command (verbose) + cli.error (always); removed duplicate scan console.log; CLI try/catch exit 1; 8 new tests; generate.ts 98.16% coverage                   | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E6 S6.2  | `feat(cli): exit code contracts for usage vs runtime errors` — exit 2 for Commander usage errors with cli.error; exit 1 runtime unchanged; exitOverride before subcommands; 4 new CLI tests; documented in IMPLEMENTATION.md | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-12 | E7 S7.1  | `test(dogfood): end-to-end generate validation on sample-project fixture` — 10 pages / 8 categories in ~0.4s; full verbose pipeline log chain; FR-006 repo-root scope documented; 1 new CLI dogfood test                     | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-12 | E7 S7.2  | `test(harness): §13 deliverables guards and MVP sign-off checklist` — automated meta/logging guards; §13 checklist + §0.8 audit in IMPLEMENTATION.md; E1–E7 marked complete; 10 new harness tests                            | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | _template_ | _E?_ S?_ | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                         |

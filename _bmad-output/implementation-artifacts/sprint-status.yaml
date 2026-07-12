@@ -45,7 +45,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-07-12
-last_updated: 2026-07-12T18:30:00
+last_updated: 2026-07-12T21:10:00
 project: specwiki
 project_key: NOKEY
 tracking_system: file-system
@@ -79,9 +79,9 @@ development_status:
   6-1-command-integration-and-lifecycle-logging: review
   6-2-exit-code-contracts: review
   epic-6-retrospective: optional
-  epic-7: backlog
-  7-1-dogfood-wiki-on-fixture: backlog
-  7-2-full-quality-gate-and-13-checklist: backlog
+  epic-7: done
+  7-1-dogfood-wiki-on-fixture: review
+  7-2-full-quality-gate-and-13-checklist: review
   epic-7-retrospective: optional
   epic-8: backlog
   8-1-patterns-cli-flag: backlog
