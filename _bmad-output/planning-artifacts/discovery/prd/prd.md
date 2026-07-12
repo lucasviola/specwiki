@@ -138,6 +138,7 @@ POST-MVP begins at HARNESS Phase 4 and expansion epics. Capabilities deferred wi
 | **Plugins / extension API**                  | POST-MVP           | Custom category rules after config API stabilizes                                                    |
 | **MCP manifest indexing**                    | POST-MVP           | Document `.cursor/mcp.json` and similar configs                                                      |
 | **VS Code / Cursor extension**               | POST-MVP           | IDE-integrated wiki panel                                                                            |
+| **Wikipedia-style HTML wiki skin**           | E16                | Vector-inspired layout, navigation chrome, search; extends FR-015 presentation POST-MVP              |
 
 **Expansion path:** Persona A (solo local generate) → Persona B (CI-regenerated wiki) → Persona C (published OSS docs) → Persona D (enterprise inventory).
 
@@ -169,16 +170,19 @@ Requirements use stable `FR-xxx` IDs. Tag indicates MVP or POST-MVP delivery.
 
 ### Wiki Output
 
-| ID     | Tag      | Requirement                                                                                                                                                             |
-| ------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| FR-011 | MVP      | `specwiki generate` SHALL write `wiki/index.md` grouped by `CATEGORY_LABELS` with links to per-spec pages.                                                              |
-| FR-012 | MVP      | `specwiki generate` SHALL write `wiki/{slug}.md` for each spec containing title, source path blockquote, optional description, TOC, and full content.                   |
-| FR-013 | MVP      | Slugs SHALL be derived from relative path: lowercase, `/` → `-`, strip `.md`/`.mdc`/`.txt` extension.                                                                   |
-| FR-014 | MVP      | When distinct relative paths produce identical slugs, the CLI SHALL disambiguate slugs (path suffix or hash) so no silent overwrites occur.                             |
-| FR-015 | MVP      | `specwiki generate` SHALL write `wiki/html/index.html` and `wiki/html/{slug}.html` with minimal styled HTML, navigation back to index, and `escapeHtml` on page titles. |
-| FR-016 | MVP      | `specwiki generate` SHALL print a stdout summary with file counts and output paths upon completion.                                                                     |
-| FR-017 | POST-MVP | `specwiki generate` MAY emit `wiki/llms.txt` indexed by category with descriptions from `extractDescription()`.                                                         |
-| FR-018 | POST-MVP | `specwiki export --format vitepress\|mkdocs` SHALL scaffold SSG configuration pointing at generated `wiki/` directory.                                                  |
+| ID     | Tag      | Requirement                                                                                                                                                                                                              |
+| ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| FR-011 | MVP      | `specwiki generate` SHALL write `wiki/index.md` grouped by `CATEGORY_LABELS` with links to per-spec pages.                                                                                                               |
+| FR-012 | MVP      | `specwiki generate` SHALL write `wiki/{slug}.md` for each spec containing title, source path blockquote, optional description, TOC, and full content.                                                                    |
+| FR-013 | MVP      | Slugs SHALL be derived from relative path: lowercase, `/` → `-`, strip `.md`/`.mdc`/`.txt` extension.                                                                                                                    |
+| FR-014 | MVP      | When distinct relative paths produce identical slugs, the CLI SHALL disambiguate slugs (path suffix or hash) so no silent overwrites occur.                                                                              |
+| FR-015 | MVP      | `specwiki generate` SHALL write `wiki/html/index.html` and `wiki/html/{slug}.html` with minimal styled HTML, navigation back to index, and `escapeHtml` on page titles.                                                  |
+| FR-016 | MVP      | `specwiki generate` SHALL print a stdout summary with file counts and output paths upon completion.                                                                                                                      |
+| FR-017 | POST-MVP | `specwiki generate` MAY emit `wiki/llms.txt` indexed by category with descriptions from `extractDescription()`.                                                                                                          |
+| FR-018 | POST-MVP | `specwiki export --format vitepress\|mkdocs` SHALL scaffold SSG configuration pointing at generated `wiki/` directory.                                                                                                   |
+| FR-032 | POST-MVP | `specwiki generate` SHALL render `wiki/html/` using a Wikipedia Vector-inspired skin: Mustache templates, shared static assets under `html/assets/`, and `wikimedia-ui-base` design tokens (owner-approved per NFR-013). |
+| FR-033 | POST-MVP | HTML article pages SHALL include category sidebar navigation, infobox (source path, category, description), section TOC from parsed headings, and breadcrumbs; index styled as category portal.                          |
+| FR-034 | POST-MVP | HTML output SHALL support GFM content rendering with heading anchors and syntax-highlighted code blocks; MAY emit client-side search (`html/search-index.json` + lunr) with optional `--no-search`.                      |
 
 ### CLI Interface
 
@@ -280,7 +284,7 @@ This PRD defines **what** specwiki must deliver and **for whom**. HARNESS §9 de
 | **Phase 1**        | PRD FR-001–FR-004 map to discovery module; FR-002 category/title rules; NFR-006 logging in discover paths.                                                    |
 | **Phase 2**        | PRD FR-007–FR-009, FR-011–FR-015 map to parse/output modules; NFR-003 HTML tests; NFR-008–NFR-011 path/HTML safety.                                           |
 | **Phase 3**        | PRD FR-014 (slug collisions), FR-021 (verbose), NFR-006 (Logger.ts), NFR-004 (full quality gate) — remaining MVP hardening.                                   |
-| **Phase 4+**       | PRD POST-MVP FRs (FR-005–FR-006, FR-017–FR-029) — not required for MVP sign-off per §13 checklist.                                                            |
+| **Phase 4+**       | PRD POST-MVP FRs (FR-005–FR-006, FR-017–FR-034) — not required for MVP sign-off per §13 checklist.                                                            |
 | **§13 checklist**  | PRD MVP success = all §13 deliverables true. Architecture and epics steps translate FRs into module-level design and sprint stories without redefining scope. |
 | **Checkpoints**    | HARNESS §0.3 owner review checkpoints govern implementation cadence; PRD does not alter that workflow.                                                        |
 

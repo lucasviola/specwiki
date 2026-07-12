@@ -4,7 +4,7 @@ baseline_commit: 141caaa59f00d452188976eb9ee90f64ec6e755d
 
 # Story 6.1: Command integration and lifecycle logging
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 

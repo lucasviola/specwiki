@@ -45,7 +45,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-07-12
-last_updated: 2026-07-12T21:10:00
+last_updated: 2026-07-12T22:00:00
 project: specwiki
 project_key: NOKEY
 tracking_system: file-system
@@ -57,31 +57,31 @@ development_status:
   1-2-verify-quality-gate-tooling: done
   1-3-structured-logger-module: done
   epic-1-retrospective: optional
-  epic-2: in-progress
+  epic-2: done
   2-1-category-grouping-on-list-output: done
   2-2-human-readable-titles-on-list-output: done
   2-3-fixture-discovery-integration-and-discover-logging: done
   2-4-zero-match-helpful-tip: done
   epic-2-retrospective: optional
-  epic-3: in-progress
+  epic-3: done
   3-1-parse-specs-into-structured-page-content: done
-  3-2-write-categorized-markdown-wiki-tree: review
+  3-2-write-categorized-markdown-wiki-tree: done
   epic-3-retrospective: optional
-  epic-4: in-progress
-  4-1-html-title-escaping-and-page-structure: review
-  4-2-write-html-wiki-tree-with-path-confinement: review
+  epic-4: done
+  4-1-html-title-escaping-and-page-structure: done
+  4-2-write-html-wiki-tree-with-path-confinement: done
   epic-4-retrospective: optional
-  epic-5: in-progress
-  5-1-slug-collision-disambiguation: review
-  5-2-path-traversal-guard-tests: review
+  epic-5: done
+  5-1-slug-collision-disambiguation: done
+  5-2-path-traversal-guard-tests: done
   epic-5-retrospective: optional
-  epic-6: in-progress
-  6-1-command-integration-and-lifecycle-logging: review
-  6-2-exit-code-contracts: review
+  epic-6: done
+  6-1-command-integration-and-lifecycle-logging: done
+  6-2-exit-code-contracts: done
   epic-6-retrospective: optional
   epic-7: done
-  7-1-dogfood-wiki-on-fixture: review
-  7-2-full-quality-gate-and-13-checklist: review
+  7-1-dogfood-wiki-on-fixture: done
+  7-2-full-quality-gate-and-13-checklist: done
   epic-7-retrospective: optional
   epic-8: backlog
   8-1-patterns-cli-flag: backlog
@@ -116,3 +116,13 @@ development_status:
   epic-15: backlog
   15-1-ide-wiki-panel-extension: backlog
   epic-15-retrospective: optional
+  epic-16: in-progress
+  16-1-mustache-html-renderer-and-wikimedia-assets: ready-for-dev
+  16-2-wikipedia-layout-chrome-and-navigation: ready-for-dev
+  16-3-rich-html-content-rendering: ready-for-dev
+  16-4-client-side-wiki-search: ready-for-dev
+  epic-16-retrospective: optional
+
+# MVP formally closed 2026-07-12 — all E1–E7 stories done; POST-MVP begins at E8
+mvp_status: closed
+mvp_closed: 2026-07-12

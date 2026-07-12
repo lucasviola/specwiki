@@ -4,7 +4,7 @@ baseline_commit: f8aac39b49d400e838f3a04459f12f9b6e7d08a9
 
 # Story 3.2: Write categorized markdown wiki tree
 
-Status: review
+Status: done
 
 ## Story
 

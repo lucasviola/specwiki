@@ -81,3 +81,23 @@ Subagent-resolved questions and arbitrator outcomes. No owner input was solicite
 **Resolution:** Dogfood MVP validation uses `tests/fixtures/sample-project/` (10 specs) as primary benchmark. Self-repo full indexing is POST-MVP FR-006. Patched `prd/prd.md` FR-031 and success-metrics row; patched `epics/epics-and-stories.md` S6.3 acceptance criteria.
 
 **QA lead verdict:** Planning artifacts now consistent with code and PRD POST-MVP assumptions. No change to frozen `DEFAULT_SPEC_PATTERNS` in readiness pass.
+
+### 2026-07-12 — E16 Wikipedia-style HTML wiki skin (post-MVP UX)
+
+**Decision:** Add POST-MVP Epic E16 with four vertical-slice stories (S16.1–S16.4) for Vector-inspired HTML output using OSS libraries (`mustache`, `wikimedia-ui-base`, `highlight.js`, `lunr`). New FRs: FR-032 (skin + assets), FR-033 (navigation chrome), FR-034 (rich content + search).
+
+**Rationale:** MVP `wrapHtml()` minimal CSS does not meet user expectation of a "real wiki." Prefer MIT-licensed Wikimedia design tokens over vendoring GPL Vector skin CSS in v1. Frozen `wiki/html/` paths preserved (NFR-013 extend-only); owner approval required before implementation.
+
+**Sequencing:** Recommended after E4; independent of E8; implement before E8 S8.3 so expanded self-repo discovery yields a browsable wiki at scale.
+
+**Artifacts updated:** `epics/epics-and-stories.md`, `prd/prd.md`, `POST-MVP-ROADMAP.md`, `sprint-status.yaml`, `IMPLEMENTATION.md`.
+
+### 2026-07-12 — MVP formally closed (owner sign-off)
+
+**Decision:** MVP (E1–E7) is formally closed. All 18 stories promoted from `review` to `done`. `mvp_status: closed` recorded in sprint-status.
+
+**Evidence:** 147 tests passing; §13 checklist green; dogfood fixture 10 specs / ~0.4s; full §0.2 gate verified at closure.
+
+**Next:** POST-MVP per roadmap — E8 (extended discovery) or E16 (Wikipedia HTML skin) at owner discretion.
+
+**Artifacts updated:** `sprint-status.yaml`, all E1–E7 story files, `IMPLEMENTATION.md`, `HARNESS.md`, `epics/epics-and-stories.md`, `decisions.md`.

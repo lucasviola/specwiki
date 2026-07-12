@@ -4,7 +4,7 @@ baseline_commit: 921c2f8a8f0e8b3c4d5e6f7a8b9c0d1e2f3a4b5c
 
 # Story 2.2: Human-readable titles on list output
 
-Status: review
+Status: done
 
 ## Story
 

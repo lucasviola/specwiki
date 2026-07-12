@@ -4,7 +4,7 @@ baseline_commit: 1d1ca3d843f61e08f67dc6df6e453cd093e20cb7
 
 # Story 7.1: Dogfood wiki on fixture
 
-Status: review
+Status: done
 
 ## Story
 

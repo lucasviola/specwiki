@@ -4,7 +4,7 @@ baseline_commit: 38dbf572e371ae509caf1e4953d20a56f97024e1
 
 # Story 4.2: Write HTML wiki tree with path confinement
 
-Status: review
+Status: done
 
 ## Story
 

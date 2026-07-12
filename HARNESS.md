@@ -2,7 +2,7 @@
 
 You are building **a CLI that transforms AI specs in any project into structured, wiki-like documentation**. The tool scans for agent instructions, spec-driven development files, and AI-generated specs, then emits a browsable markdown wiki with optional HTML output.
 
-**MVP in progress.** Active work is governed by **`IMPLEMENTATION.md`** (create this file before Phase 0 if missing — phases below were drafted from README and current code).
+**MVP complete (closed 2026-07-12).** Active work is governed by **`IMPLEMENTATION.md`**. POST-MVP epics (E8+) begin per [`POST-MVP-ROADMAP.md`](./_bmad-output/planning-artifacts/discovery/POST-MVP-ROADMAP.md).
 
 Read every section before writing a single line. This document is the ground truth for architecture and acceptance.
 

@@ -4,7 +4,7 @@ baseline_commit: d70f4b183a2a90eda26928cb445d3874ea7ce49b
 
 # Story 4.1: HTML title escaping and page structure
 
-Status: review
+Status: done
 
 ## Story
 

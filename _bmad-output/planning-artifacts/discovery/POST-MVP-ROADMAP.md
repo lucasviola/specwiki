@@ -56,9 +56,10 @@ Reduce friction for frequent rule editors and improve browsing beyond opening st
 
 | Capability                               | Epic        | Phase          |
 | ---------------------------------------- | ----------- | -------------- |
-| `generate --watch` debounced rebuild     | E8 / S8.2   | D              |
-| `specwiki serve` localhost static server | E8 / S8.3   | D              |
-| Cursor/VS Code wiki panel                | E12 / S12.1 | G (future bet) |
+| Wikipedia-style HTML wiki skin           | E16         | UX (post-MVP)  |
+| `generate --watch` debounced rebuild     | E11 / S11.1 | D              |
+| `specwiki serve` localhost static server | E11 / S11.2 | D              |
+| Cursor/VS Code wiki panel                | E15 / S15.1 | G (future bet) |
 
 ### Ecosystem
 

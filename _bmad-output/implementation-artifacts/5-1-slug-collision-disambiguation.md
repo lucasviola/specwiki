@@ -4,7 +4,7 @@ baseline_commit: 8d8b25de58456463a3646538eb97f2c0c9111938
 
 # Story 5.1: Slug collision disambiguation
 
-Status: review
+Status: done
 
 ## Story
 

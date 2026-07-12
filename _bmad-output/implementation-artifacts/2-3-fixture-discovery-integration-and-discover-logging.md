@@ -4,7 +4,7 @@ baseline_commit: d5563be074dbda2b5576e1f1193bdb038ed3fe6c
 
 # Story 2.3: Fixture discovery integration and discover logging
 
-Status: review
+Status: done
 
 ## Story
 

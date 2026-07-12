@@ -4,7 +4,7 @@ baseline_commit: 8bd0ad0f937e6c3814e559a0e20e4fbd7be313de
 
 # Story 6.2: Exit code contracts
 
-Status: review
+Status: done
 
 ## Story
 

@@ -4,7 +4,7 @@ baseline_commit: e8fc5469c097d987b8d0779e7ab488fd2a1deefc
 
 # Story 5.2: Path traversal guard tests
 
-Status: review
+Status: done
 
 ## Story
 
