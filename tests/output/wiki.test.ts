@@ -1,11 +1,13 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { createHash } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { log } from "../../src/core/Logger.js";
 import {
   buildWiki,
   escapeHtml,
+  pageSlug,
   wrapHtml,
   writeHtmlWiki,
   writeWiki,
@@ -257,6 +259,267 @@ describe("buildWiki", () => {
     expect(html).toContain(
       "<title>Tom &amp; Jerry&#39;s Rules — Spec Wiki</title>",
     );
+  });
+});
+
+describe("slug collision", () => {
+  function hashSuffix(relativePath: string): string {
+    return createHash("sha256").update(relativePath).digest("hex").slice(0, 8);
+  }
+
+  it("disambiguates duplicate slugs with hash suffix on later paths", () => {
+    const flat = sampleSpec({
+      title: "Flat Bar",
+      file: {
+        path: "/tmp/specs/foo-bar.md",
+        relativePath: "specs/foo-bar.md",
+        category: "specs",
+        title: "Flat Bar",
+      },
+    });
+    const nested = sampleSpec({
+      title: "Nested Bar",
+      file: {
+        path: "/tmp/specs/foo/bar.md",
+        relativePath: "specs/foo/bar.md",
+        category: "specs",
+        title: "Nested Bar",
+      },
+    });
+
+    const wiki = buildWiki([flat, nested]);
+    const slugs = wiki.pages.map((page) => page.slug).sort();
+
+    expect(slugs).toEqual([
+      "specs-foo-bar",
+      `specs-foo-bar-${hashSuffix("specs/foo/bar.md")}`,
+    ]);
+  });
+
+  it("disambiguates three-way slug collisions with unique hash suffixes", () => {
+    const paths = [
+      "specs/a-b/c.md",
+      "specs/a/b-c.md",
+      "specs/a/b/c.md",
+    ] as const;
+
+    const wiki = buildWiki(
+      paths.map((relativePath, index) =>
+        sampleSpec({
+          title: `Spec ${index + 1}`,
+          file: {
+            path: `/tmp/${relativePath}`,
+            relativePath,
+            category: "specs",
+            title: `Spec ${index + 1}`,
+          },
+        }),
+      ),
+    );
+
+    const slugs = wiki.pages.map((page) => page.slug).sort();
+    expect(slugs).toEqual([
+      "specs-a-b-c",
+      `specs-a-b-c-${hashSuffix("specs/a/b/c.md")}`,
+      `specs-a-b-c-${hashSuffix("specs/a/b-c.md")}`,
+    ]);
+    expect(new Set(slugs).size).toBe(3);
+  });
+
+  it("emits output.slug-collision for each disambiguated path in a three-way collision", () => {
+    log.setVerbose(true);
+
+    buildWiki([
+      sampleSpec({
+        title: "Spec 1",
+        file: {
+          path: "/tmp/specs/a-b/c.md",
+          relativePath: "specs/a-b/c.md",
+          category: "specs",
+          title: "Spec 1",
+        },
+      }),
+      sampleSpec({
+        title: "Spec 2",
+        file: {
+          path: "/tmp/specs/a/b-c.md",
+          relativePath: "specs/a/b-c.md",
+          category: "specs",
+          title: "Spec 2",
+        },
+      }),
+      sampleSpec({
+        title: "Spec 3",
+        file: {
+          path: "/tmp/specs/a/b/c.md",
+          relativePath: "specs/a/b/c.md",
+          category: "specs",
+          title: "Spec 3",
+        },
+      }),
+    ]);
+
+    const events = parseStderrLines().filter(
+      (line) => line.event === "output.slug-collision",
+    );
+
+    expect(events).toHaveLength(2);
+    expect(events.map((event) => event.sourcePath).sort()).toEqual([
+      "specs/a/b-c.md",
+      "specs/a/b/c.md",
+    ]);
+  });
+
+  it("keeps index links aligned with disambiguated slugs", () => {
+    const flat = sampleSpec({
+      title: "Flat Bar",
+      file: {
+        path: "/tmp/specs/foo-bar.md",
+        relativePath: "specs/foo-bar.md",
+        category: "specs",
+        title: "Flat Bar",
+      },
+    });
+    const nested = sampleSpec({
+      title: "Nested Bar",
+      file: {
+        path: "/tmp/specs/foo/bar.md",
+        relativePath: "specs/foo/bar.md",
+        category: "specs",
+        title: "Nested Bar",
+      },
+    });
+
+    const wiki = buildWiki([nested, flat]);
+    const nestedSlug = `specs-foo-bar-${hashSuffix("specs/foo/bar.md")}`;
+
+    expect(wiki.indexContent).toContain("[Flat Bar](specs-foo-bar.md)");
+    expect(wiki.indexContent).toContain(`[Nested Bar](${nestedSlug}.md)`);
+  });
+
+  it("preserves base slug algorithm for non-colliding paths", () => {
+    const spec = sampleSpec({
+      file: {
+        path: "/tmp/docs/specs/architecture.md",
+        relativePath: "docs/specs/architecture.md",
+        category: "docs-specs",
+        title: "Architecture",
+      },
+    });
+    const wiki = buildWiki([spec]);
+
+    expect(pageSlug(spec)).toBe("docs-specs-architecture");
+    expect(wiki.pages[0].slug).toBe("docs-specs-architecture");
+  });
+
+  it("emits output.slug-collision when verbose and collision occurs", () => {
+    log.setVerbose(true);
+
+    buildWiki([
+      sampleSpec({
+        title: "Flat Bar",
+        file: {
+          path: "/tmp/specs/foo-bar.md",
+          relativePath: "specs/foo-bar.md",
+          category: "specs",
+          title: "Flat Bar",
+        },
+      }),
+      sampleSpec({
+        title: "Nested Bar",
+        file: {
+          path: "/tmp/specs/foo/bar.md",
+          relativePath: "specs/foo/bar.md",
+          category: "specs",
+          title: "Nested Bar",
+        },
+      }),
+    ]);
+
+    const events = parseStderrLines().filter(
+      (line) => line.event === "output.slug-collision",
+    );
+
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
+      originalSlug: "specs-foo-bar",
+      disambiguatedSlug: `specs-foo-bar-${hashSuffix("specs/foo/bar.md")}`,
+      sourcePath: "specs/foo/bar.md",
+    });
+  });
+
+  it("does not emit output.slug-collision when verbose is disabled", () => {
+    buildWiki([
+      sampleSpec({
+        title: "Flat Bar",
+        file: {
+          path: "/tmp/specs/foo-bar.md",
+          relativePath: "specs/foo-bar.md",
+          category: "specs",
+          title: "Flat Bar",
+        },
+      }),
+      sampleSpec({
+        title: "Nested Bar",
+        file: {
+          path: "/tmp/specs/foo/bar.md",
+          relativePath: "specs/foo/bar.md",
+          category: "specs",
+          title: "Nested Bar",
+        },
+      }),
+    ]);
+
+    const events = parseStderrLines().filter(
+      (line) => line.event === "output.slug-collision",
+    );
+    expect(events).toHaveLength(0);
+  });
+
+  it("writes distinct markdown and HTML files for colliding specs", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-collision-"),
+    );
+    tempDirs.push(outputDir);
+
+    const flat = sampleSpec({
+      title: "Flat Bar",
+      file: {
+        path: "/tmp/specs/foo-bar.md",
+        relativePath: "specs/foo-bar.md",
+        category: "specs",
+        title: "Flat Bar",
+      },
+      rawContent: "Flat body",
+    });
+    const nested = sampleSpec({
+      title: "Nested Bar",
+      file: {
+        path: "/tmp/specs/foo/bar.md",
+        relativePath: "specs/foo/bar.md",
+        category: "specs",
+        title: "Nested Bar",
+      },
+      rawContent: "Nested body",
+    });
+
+    const wiki = buildWiki([flat, nested]);
+    await writeWiki(outputDir, wiki);
+    await writeHtmlWiki(outputDir, wiki);
+
+    const nestedSlug = `specs-foo-bar-${hashSuffix("specs/foo/bar.md")}`;
+    expect(
+      await fs.readFile(path.join(outputDir, "specs-foo-bar.md"), "utf-8"),
+    ).toContain("Flat body");
+    expect(
+      await fs.readFile(path.join(outputDir, `${nestedSlug}.md`), "utf-8"),
+    ).toContain("Nested body");
+    expect(
+      await fs.readFile(
+        path.join(outputDir, "html", `${nestedSlug}.html`),
+        "utf-8",
+      ),
+    ).toContain("Nested Bar");
   });
 });
 

@@ -1,11 +1,12 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { createHash } from "node:crypto";
 import { log } from "../core/Logger.js";
 import { CATEGORY_LABELS } from "../config/patterns.js";
 import { renderMarkdown } from "../parse/markdown.js";
 import type { ParsedSpec, WikiOutput, WikiPage } from "../types.js";
 
-function pageSlug(spec: ParsedSpec): string {
+export function pageSlug(spec: ParsedSpec): string {
   const base = spec.file.relativePath
     .replace(/\.(md|mdc|txt)$/, "")
     .replace(/[/\\]/g, "-")
@@ -13,6 +14,55 @@ function pageSlug(spec: ParsedSpec): string {
     .toLowerCase();
 
   return base || "untitled";
+}
+
+function slugHash(relativePath: string): string {
+  return createHash("sha256").update(relativePath).digest("hex").slice(0, 8);
+}
+
+function assignUniqueSlugs(specs: ParsedSpec[]): Map<string, string> {
+  const entries = specs.map((spec) => ({
+    spec,
+    base: pageSlug(spec),
+  }));
+
+  const byBase = new Map<string, typeof entries>();
+  for (const entry of entries) {
+    const list = byBase.get(entry.base) ?? [];
+    list.push(entry);
+    byBase.set(entry.base, list);
+  }
+
+  const slugByPath = new Map<string, string>();
+
+  for (const [, group] of byBase) {
+    if (group.length === 1) {
+      slugByPath.set(group[0].spec.file.relativePath, group[0].base);
+      continue;
+    }
+
+    const sorted = [...group].sort((a, b) =>
+      a.spec.file.relativePath.localeCompare(b.spec.file.relativePath),
+    );
+
+    for (let i = 0; i < sorted.length; i++) {
+      const { spec, base } = sorted[i];
+      if (i === 0) {
+        slugByPath.set(spec.file.relativePath, base);
+        continue;
+      }
+
+      const disambiguated = `${base}-${slugHash(spec.file.relativePath)}`;
+      log.info("output.slug-collision", {
+        originalSlug: base,
+        disambiguatedSlug: disambiguated,
+        sourcePath: spec.file.relativePath,
+      });
+      slugByPath.set(spec.file.relativePath, disambiguated);
+    }
+  }
+
+  return slugByPath;
 }
 
 function buildPageContent(spec: ParsedSpec): string {
@@ -85,8 +135,10 @@ function buildIndex(pages: WikiPage[]): string {
 }
 
 export function buildWiki(specs: ParsedSpec[]): WikiOutput {
+  const slugByPath = assignUniqueSlugs(specs);
+
   const pages: WikiPage[] = specs.map((spec) => ({
-    slug: pageSlug(spec),
+    slug: slugByPath.get(spec.file.relativePath) ?? pageSlug(spec),
     title: spec.title,
     category: spec.file.category,
     content: buildPageContent(spec),

@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-12  
-**Current position:** E4 S4.2 complete — next: E5 S5.1 slug collision disambiguation  
-**Test count:** 108 passing
+**Current position:** E5 S5.1 complete — next: E5 S5.2 path traversal guard tests  
+**Test count:** 117 passing
 
 ## Deliverables
 
@@ -14,7 +14,7 @@
 | `specwiki list` + discover logging                                                | Complete — E2 S2.3 discover logging wired | `src/discover/specs.ts` |
 | Markdown wiki (`wiki/*.md`)                                                       | Brownfield complete — harden in E3        | `src/output/wiki.ts`    |
 | HTML wiki (`wiki/html/`)                                                          | Brownfield complete — harden in E4        | `src/output/wiki.ts`    |
-| Slug collision disambiguation                                                     | Pending — E5 S5.1                         | HARNESS §11 #1          |
+| Slug collision disambiguation                                                     | Complete — E5 S5.1                        | HARNESS §11 #1          |
 | CLI contracts + exit codes                                                        | Pending — E6                              | `src/commands/`         |
 | MVP sign-off (HARNESS §13)                                                        | Pending — E7                              | —                       |
 
@@ -50,7 +50,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
   - [x] S4.1 — HTML title escaping and page structure _(review)_
   - [x] S4.2 — Write HTML wiki tree with path confinement _(review)_
 - [ ] **E5 — Trustworthy Generate Output** — slug collisions + path confinement
-  - [ ] S5.1 — Slug collision disambiguation
+  - [x] S5.1 — Slug collision disambiguation _(review)_
   - [ ] S5.2 — Path traversal guard tests
 - [ ] **E6 — CLI Contracts & Command Polish** — flags, exit codes, lifecycle logging
   - [ ] S6.1 — Command integration and lifecycle logging
@@ -75,5 +75,6 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-12 | E3 S3.1  | `feat(parse): structured parse logging and hardened parse tests` — parse.file verbose event; parse.error on read/parse failure; 12 parse tests; generate verbose parse.file integration; code review patches applied         | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E3 S3.2  | `feat(output): structured output logging and hardened wiki tests` — output.write verbose event; output.error on mkdir/write failure; generate.summary in command layer; 11 new wiki tests; generate output.write integration | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E4 S4.1  | `feat(output): HTML title escaping and render.error logging` — exported escapeHtml/wrapHtml; apostrophe escaping; render.error on marked.parse failure; 10 new tests; wiki.ts 100% lines                                     | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
-| 2026-07-12 | E4 S4.2  | `feat(output): HTML wiki write logging and path confinement tests` — output.write verbose for html/ paths; output.error on mkdir/write failure; 8 new writeHtmlWiki tests; generate integration updated for htmlFiles          | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-12 | E4 S4.2  | `feat(output): HTML wiki write logging and path confinement tests` — output.write verbose for html/ paths; output.error on mkdir/write failure; 8 new writeHtmlWiki tests; generate integration updated for htmlFiles        | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-12 | E5 S5.1  | `feat(output): slug collision disambiguation with hash suffix` — assignUniqueSlugs in buildWiki; output.slug-collision verbose event; collision-project fixture; 7 new tests; generate integration for collisions            | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | _template_ | _E?_ S?_ | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                         |

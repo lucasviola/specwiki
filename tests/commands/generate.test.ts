@@ -11,6 +11,11 @@ const fixtureRoot = path.resolve(
   "../fixtures/sample-project",
 );
 
+const collisionFixtureRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../fixtures/collision-project",
+);
+
 const tempDirs: string[] = [];
 let logSpy: ReturnType<typeof vi.spyOn>;
 let stderrSpy: ReturnType<typeof vi.spyOn>;
@@ -137,6 +142,43 @@ describe("generateWiki", () => {
     expect(output).toContain(
       "Tip: specwiki looks for AGENTS.md, SPEC.md, .cursor/rules/",
     );
+  });
+
+  it("disambiguates slug collisions and emits output.slug-collision when verbose", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-collision-out-"),
+    );
+    tempDirs.push(outputDir);
+
+    await generateWiki({
+      projectRoot: collisionFixtureRoot,
+      outputDir,
+      verbose: true,
+    });
+
+    const lines = parseStderrLines();
+    const collisionEvents = lines.filter(
+      (line) => line.event === "output.slug-collision",
+    );
+    expect(collisionEvents).toHaveLength(1);
+    expect(collisionEvents[0]?.sourcePath).toBe("specs/foo/bar.md");
+    expect(collisionEvents[0]?.originalSlug).toBe("specs-foo-bar");
+
+    const mdFiles = (await fs.readdir(outputDir)).filter((name) =>
+      name.endsWith(".md"),
+    );
+    const pageFiles = mdFiles.filter((name) => name !== "index.md");
+    expect(pageFiles).toHaveLength(3);
+    expect(new Set(pageFiles).size).toBe(3);
+    expect(pageFiles).toContain("specs-foo-bar.md");
+
+    const indexContent = await fs.readFile(
+      path.join(outputDir, "index.md"),
+      "utf-8",
+    );
+    for (const fileName of pageFiles) {
+      expect(indexContent).toContain(`](${fileName})`);
+    }
   });
 });
 
