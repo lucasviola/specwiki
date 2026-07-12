@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-12  
-**Current position:** E5 S5.2 complete — next: E6 S6.1 command integration and lifecycle logging  
-**Test count:** 122 passing
+**Current position:** E6 S6.1 complete (review) — next: E6 S6.2 exit code contracts  
+**Test count:** 130 passing
 
 ## Deliverables
 
@@ -15,7 +15,7 @@
 | Markdown wiki (`wiki/*.md`)                                                       | Brownfield complete — harden in E3        | `src/output/wiki.ts`    |
 | HTML wiki (`wiki/html/`)                                                          | Brownfield complete — harden in E4        | `src/output/wiki.ts`    |
 | Slug collision disambiguation                                                     | Complete — E5 S5.1                        | HARNESS §11 #1          |
-| CLI contracts + exit codes                                                        | Pending — E6                              | `src/commands/`         |
+| CLI contracts + exit codes                                                        | In progress — E6 S6.1 review              | `src/commands/`         |
 | MVP sign-off (HARNESS §13)                                                        | Pending — E7                              | —                       |
 
 ## Workflow References
@@ -53,7 +53,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
   - [x] S5.1 — Slug collision disambiguation _(review)_
   - [x] S5.2 — Path traversal guard tests _(review)_
 - [ ] **E6 — CLI Contracts & Command Polish** — flags, exit codes, lifecycle logging
-  - [ ] S6.1 — Command integration and lifecycle logging
+  - [x] S6.1 — Command integration and lifecycle logging _(review)_
   - [ ] S6.2 — Exit code contracts
 - [ ] **E7 — MVP Validation & Sign-off** — dogfood + HARNESS §13 checklist
   - [ ] S7.1 — Dogfood wiki on fixture
@@ -77,5 +77,6 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-12 | E4 S4.1  | `feat(output): HTML title escaping and render.error logging` — exported escapeHtml/wrapHtml; apostrophe escaping; render.error on marked.parse failure; 10 new tests; wiki.ts 100% lines                                     | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E4 S4.2  | `feat(output): HTML wiki write logging and path confinement tests` — output.write verbose for html/ paths; output.error on mkdir/write failure; 8 new writeHtmlWiki tests; generate integration updated for htmlFiles        | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E5 S5.1  | `feat(output): slug collision disambiguation with hash suffix` — assignUniqueSlugs in buildWiki; output.slug-collision verbose event; collision-project fixture; 7 new tests; generate integration for collisions            | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
-| 2026-07-12 | E5 S5.2  | `feat(output): path traversal guards on wiki writes` — assertPathConfined with path.resolve/relative check; output.error on rejection; 5 traversal tests for markdown and HTML writes                                       | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-12 | E5 S5.2  | `feat(output): path traversal guards on wiki writes` — assertPathConfined with path.resolve/relative check; output.error on rejection; 5 traversal tests for markdown and HTML writes                                        | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-12 | E6 S6.1  | `feat(cli): command lifecycle logging and error boundary` — cli.command (verbose) + cli.error (always); removed duplicate scan console.log; CLI try/catch exit 1; 8 new tests; generate.ts 98.16% coverage                   | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | _template_ | _E?_ S?_ | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                         |

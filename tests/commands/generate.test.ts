@@ -3,8 +3,10 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { DEFAULT_SPEC_PATTERNS } from "../../src/config/patterns.js";
 import { log } from "../../src/core/Logger.js";
 import { generateWiki, listSpecs } from "../../src/commands/generate.js";
+import * as wikiModule from "../../src/output/wiki.js";
 
 const fixtureRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -144,6 +146,90 @@ describe("generateWiki", () => {
     );
   });
 
+  it("emits cli.command on stderr when verbose is enabled", async () => {
+    const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-out-"));
+    tempDirs.push(outputDir);
+
+    await generateWiki({
+      projectRoot: fixtureRoot,
+      outputDir,
+      verbose: true,
+    });
+
+    const lines = parseStderrLines();
+    const commandEvent = lines.find((line) => line.event === "cli.command");
+
+    expect(commandEvent).toMatchObject({
+      event: "cli.command",
+      level: "info",
+      command: "generate",
+      projectRoot: fixtureRoot,
+      outputDir: path.resolve(fixtureRoot, outputDir),
+      verbose: true,
+      patternCount: DEFAULT_SPEC_PATTERNS.length,
+    });
+    expect(
+      lines.findIndex((line) => line.event === "cli.command"),
+    ).toBeLessThan(lines.findIndex((line) => line.event === "discover.start"));
+  });
+
+  it("does not emit cli.command when verbose is disabled", async () => {
+    const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-out-"));
+    tempDirs.push(outputDir);
+
+    await generateWiki({
+      projectRoot: fixtureRoot,
+      outputDir,
+      verbose: false,
+    });
+
+    const lines = parseStderrLines();
+    expect(lines.some((line) => line.event === "cli.command")).toBe(false);
+  });
+
+  it("does not print verbose scan diagnostics on stdout when verbose", async () => {
+    const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-out-"));
+    tempDirs.push(outputDir);
+
+    await generateWiki({
+      projectRoot: fixtureRoot,
+      outputDir,
+      verbose: true,
+    });
+
+    const output = logSpy.mock.calls.flat().join(" ");
+    expect(output).not.toContain("Scanning");
+    expect(output).not.toContain("Found 6 spec file(s):");
+    expect(output).toContain("Generated wiki");
+  });
+
+  it("emits cli.error and rethrows when writeWiki fails", async () => {
+    const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-out-"));
+    tempDirs.push(outputDir);
+
+    vi.spyOn(wikiModule, "writeWiki").mockRejectedValueOnce(
+      new Error("disk full"),
+    );
+
+    await expect(
+      generateWiki({
+        projectRoot: fixtureRoot,
+        outputDir,
+        verbose: true,
+      }),
+    ).rejects.toThrow("disk full");
+
+    const lines = parseStderrLines();
+    const cliError = lines.find((line) => line.event === "cli.error");
+    expect(cliError).toMatchObject({
+      event: "cli.error",
+      level: "error",
+      command: "generate",
+      message: "disk full",
+    });
+    expect(JSON.stringify(cliError)).not.toMatch(/stack/);
+  });
+
   it("disambiguates slug collisions and emits output.slug-collision when verbose", async () => {
     const outputDir = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-collision-out-"),
@@ -247,7 +333,7 @@ describe("listSpecs", () => {
     );
   });
 
-  it("emits discover diagnostics on stderr when verbose is enabled", async () => {
+  it("emits cli.command and discover diagnostics on stderr when verbose is enabled", async () => {
     await listSpecs({
       projectRoot: fixtureRoot,
       outputDir: "wiki",
@@ -262,10 +348,55 @@ describe("listSpecs", () => {
     const completeLine = lines.find(
       (line) => line.event === "discover.complete",
     );
+    const commandEvent = lines.find((line) => line.event === "cli.command");
 
-    expect(events[0]).toBe("discover.start");
+    expect(commandEvent).toMatchObject({
+      event: "cli.command",
+      level: "info",
+      command: "list",
+      projectRoot: fixtureRoot,
+      verbose: true,
+      patternCount: DEFAULT_SPEC_PATTERNS.length,
+    });
+    expect(events[0]).toBe("cli.command");
+    expect(events[1]).toBe("discover.start");
     expect(events.at(-1)).toBe("discover.complete");
     expect(matchCount).toBeGreaterThan(0);
     expect(completeLine?.matchCount).toBe(matchCount);
+  });
+
+  it("does not emit cli.command when verbose is disabled", async () => {
+    await listSpecs({
+      projectRoot: fixtureRoot,
+      outputDir: "wiki",
+      verbose: false,
+    });
+
+    const lines = parseStderrLines();
+    expect(lines.some((line) => line.event === "cli.command")).toBe(false);
+  });
+
+  it("emits cli.error and rethrows when discoverSpecs fails", async () => {
+    const discoverModule = await import("../../src/discover/specs.js");
+    vi.spyOn(discoverModule, "discoverSpecs").mockRejectedValueOnce(
+      new Error("discover boom"),
+    );
+
+    await expect(
+      listSpecs({
+        projectRoot: fixtureRoot,
+        outputDir: "wiki",
+        verbose: true,
+      }),
+    ).rejects.toThrow("discover boom");
+
+    const lines = parseStderrLines();
+    const cliError = lines.find((line) => line.event === "cli.error");
+    expect(cliError).toMatchObject({
+      event: "cli.error",
+      level: "error",
+      command: "list",
+      message: "discover boom",
+    });
   });
 });

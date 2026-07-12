@@ -2,7 +2,12 @@
 
 import { Command } from "commander";
 import path from "node:path";
-import { generateWiki, listSpecs } from "./commands/generate.js";
+import {
+  generateWiki,
+  isCliErrorLogged,
+  listSpecs,
+} from "./commands/generate.js";
+import { log } from "./core/Logger.js";
 
 const program = new Command();
 
@@ -22,11 +27,22 @@ program
   )
   .option("-v, --verbose", "Show detailed output")
   .action(async (opts) => {
-    await generateWiki({
-      projectRoot: path.resolve(opts.project),
-      outputDir: opts.output,
-      verbose: opts.verbose,
-    });
+    try {
+      log.setVerbose(Boolean(opts.verbose));
+      await generateWiki({
+        projectRoot: path.resolve(opts.project),
+        outputDir: opts.output,
+        verbose: opts.verbose,
+      });
+    } catch (err) {
+      if (!isCliErrorLogged(err)) {
+        log.error("cli.error", {
+          command: "generate",
+          message: err instanceof Error ? err.message : String(err),
+        });
+      }
+      process.exit(1);
+    }
   });
 
 program
@@ -35,11 +51,22 @@ program
   .option("-p, --project <path>", "Project root to scan", process.cwd())
   .option("-v, --verbose", "Show detailed discover diagnostics on stderr")
   .action(async (opts) => {
-    await listSpecs({
-      projectRoot: path.resolve(opts.project),
-      outputDir: "wiki",
-      verbose: opts.verbose,
-    });
+    try {
+      log.setVerbose(Boolean(opts.verbose));
+      await listSpecs({
+        projectRoot: path.resolve(opts.project),
+        outputDir: "wiki",
+        verbose: opts.verbose,
+      });
+    } catch (err) {
+      if (!isCliErrorLogged(err)) {
+        log.error("cli.error", {
+          command: "list",
+          message: err instanceof Error ? err.message : String(err),
+        });
+      }
+      process.exit(1);
+    }
   });
 
 program.parse();

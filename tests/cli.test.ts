@@ -41,7 +41,8 @@ describe("cli list --verbose", () => {
       .map((line) => JSON.parse(line) as Record<string, unknown>);
     const events = lines.map((line) => line.event);
 
-    expect(events[0]).toBe("discover.start");
+    expect(events[0]).toBe("cli.command");
+    expect(events[1]).toBe("discover.start");
     expect(events.at(-1)).toBe("discover.complete");
     expect(lines.filter((line) => line.event === "discover.match").length).toBe(
       lines.find((line) => line.event === "discover.complete")?.matchCount,
@@ -105,11 +106,12 @@ describe("cli list zero-match", () => {
       const events = lines.map((line) => line.event);
 
       expect(events).toEqual([
+        "cli.command",
         "discover.start",
         "discover.empty",
         "discover.complete",
       ]);
-      expect(lines[1]).toMatchObject({
+      expect(lines[2]).toMatchObject({
         event: "discover.empty",
         level: "info",
         patternCount: expect.any(Number),
@@ -120,6 +122,96 @@ describe("cli list zero-match", () => {
       });
     } finally {
       await fs.rm(emptyRoot, { force: true, recursive: true });
+    }
+  });
+});
+
+describe("cli generate --verbose", () => {
+  it("emits cli.command before discover.start on stderr", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-generate-"),
+    );
+
+    try {
+      const { stdout, stderr } = await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "generate",
+          "--verbose",
+          "--project",
+          fixtureRoot,
+          "--output",
+          outputDir,
+        ],
+        { cwd: projectRoot },
+      );
+
+      expect(stdout).toContain("Generated wiki");
+      expect(stdout).not.toContain("Scanning");
+
+      const lines = stderr
+        .trim()
+        .split("\n")
+        .filter(Boolean)
+        .map((line) => JSON.parse(line) as Record<string, unknown>);
+      const events = lines.map((line) => line.event);
+
+      expect(events[0]).toBe("cli.command");
+      expect(events[1]).toBe("discover.start");
+      expect(lines[0]).toMatchObject({
+        event: "cli.command",
+        level: "info",
+        command: "generate",
+      });
+    } finally {
+      await fs.rm(outputDir, { force: true, recursive: true });
+    }
+  });
+});
+
+describe("cli generate failure", () => {
+  it("exits 1 and emits cli.error when output path is not writable", async () => {
+    const blockedOutput = "AGENTS.md";
+
+    try {
+      await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "generate",
+          "--project",
+          fixtureRoot,
+          "--output",
+          blockedOutput,
+        ],
+        { cwd: projectRoot },
+      );
+      expect.fail("expected generate to exit non-zero");
+    } catch (err) {
+      const execError = err as {
+        code?: number;
+        stderr?: string;
+      };
+      expect(execError.code).toBe(1);
+
+      const lines = String(execError.stderr ?? "")
+        .trim()
+        .split("\n")
+        .filter(Boolean)
+        .map((line) => JSON.parse(line) as Record<string, unknown>);
+
+      const cliError = lines.find((line) => line.event === "cli.error");
+      expect(cliError).toMatchObject({
+        event: "cli.error",
+        level: "error",
+        command: "generate",
+      });
+      expect(cliError?.message).toBeTruthy();
     }
   });
 });
