@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import matter from "gray-matter";
 import { marked } from "marked";
+import { log } from "../core/Logger.js";
 import type { ParsedSpec, SpecFile, SpecSection } from "../types.js";
 
 function slugify(text: string): string {
@@ -52,20 +53,37 @@ function extractDescription(content: string): string {
 }
 
 export async function parseSpecFile(file: SpecFile): Promise<ParsedSpec> {
-  const raw = await fs.readFile(file.path, "utf-8");
-  const { data: frontmatter, content } = matter(raw);
+  try {
+    const raw = await fs.readFile(file.path, "utf-8");
+    const { data: frontmatter, content } = matter(raw);
 
-  const title =
-    (typeof frontmatter.title === "string" && frontmatter.title) || file.title;
+    const title =
+      (typeof frontmatter.title === "string" && frontmatter.title) ||
+      file.title;
 
-  return {
-    file,
-    frontmatter,
-    title,
-    description: extractDescription(content),
-    sections: extractSections(content),
-    rawContent: content,
-  };
+    const sections = extractSections(content);
+    const parsed: ParsedSpec = {
+      file,
+      frontmatter,
+      title,
+      description: extractDescription(content),
+      sections,
+      rawContent: content,
+    };
+
+    log.info("parse.file", {
+      relativePath: file.relativePath,
+      sectionCount: sections.length,
+    });
+
+    return parsed;
+  } catch (err) {
+    log.error("parse.error", {
+      path: file.relativePath,
+      message: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
 }
 
 export function renderMarkdown(markdown: string): string {

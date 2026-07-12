@@ -58,6 +58,30 @@ describe("generateWiki", () => {
     expect(logSpy).toHaveBeenCalled();
   });
 
+  it("emits parse.file diagnostics on stderr when verbose is enabled", async () => {
+    const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-out-"));
+    tempDirs.push(outputDir);
+
+    await generateWiki({
+      projectRoot: fixtureRoot,
+      outputDir,
+      verbose: true,
+    });
+
+    const lines = parseStderrLines();
+    const parseEvents = lines.filter((line) => line.event === "parse.file");
+    const matchCount = lines.filter(
+      (line) => line.event === "discover.match",
+    ).length;
+
+    expect(parseEvents.length).toBe(matchCount);
+    expect(parseEvents.length).toBeGreaterThan(0);
+    for (const event of parseEvents) {
+      expect(event.relativePath).toBeTruthy();
+      expect(JSON.stringify(event)).not.toMatch(/rawContent|frontmatter/);
+    }
+  });
+
   it("prints a helpful message when no specs are found", async () => {
     const emptyRoot = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-empty-"),

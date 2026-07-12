@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-12  
-**Current position:** E2 S2.4 complete — next: E3 S3.1 parse specs into structured page content  
-**Test count:** 64 passing
+**Current position:** E3 S3.1 complete — next: E3 S3.2 write categorized markdown wiki tree  
+**Test count:** 76 passing
 
 ## Deliverables
 
@@ -42,7 +42,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
   - [x] S2.3 — Fixture discovery integration and discover logging _(done)_
   - [x] S2.4 — Zero-match helpful tip _(done)_
 - [ ] **E3 — Generate Markdown Wiki** (`wiki/*.md`) — discover → parse → write markdown
-  - [ ] S3.1 — Parse specs into structured page content
+  - [x] S3.1 — Parse specs into structured page content _(done)_
   - [ ] S3.2 — Write categorized markdown wiki tree
 - [ ] **E4 — Generate HTML Wiki** (`wiki/html/`) — safe HTML rendering + `html/` tree
   - [ ] S4.1 — HTML title escaping and page structure
@@ -70,4 +70,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-12 | E2 S2.2  | `feat(list): show human-readable titles in list output` — exported deriveTitle; 12 unit tests; list lines formatted as `{title} — {path}`                                                                                    | d5563be               | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E2 S2.3  | `feat(discover): structured discover logging and list --verbose` — discover.start/match/complete/error events; CLI and command verbose wiring; 8 new tests; discover branch coverage 100%                                    | 9e5c1e1               | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E2 S2.4  | `feat(list): zero-match helpful tip and discover.empty logging` — list tip parity with generate; discover.empty verbose event; 3 new tests; CLI e2e for empty list exit 0                                                    | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-12 | E3 S3.1  | `feat(parse): structured parse logging and hardened parse tests` — parse.file verbose event; parse.error on read/parse failure; 12 parse tests; generate verbose parse.file integration; code review patches applied         | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | _template_ | _E?_ S?_ | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                         |
