@@ -3,7 +3,8 @@ import path from "node:path";
 import { DEFAULT_SPEC_PATTERNS } from "../config/patterns.js";
 import type { DiscoverOptions, SpecFile } from "../types.js";
 
-function deriveCategory(relativePath: string): string {
+/** Path-prefix category for discovery and list grouping. Exported for tests. */
+export function deriveCategory(relativePath: string): string {
   const normalized = relativePath.replace(/\\/g, "/");
 
   if (!normalized.includes("/")) return "root";
@@ -21,7 +22,8 @@ function deriveCategory(relativePath: string): string {
   return "other";
 }
 
-function deriveTitle(relativePath: string): string {
+/** Human-readable title from basename; special cases for agent/skill files. Exported for tests. */
+export function deriveTitle(relativePath: string): string {
   const basename = path.basename(relativePath, path.extname(relativePath));
 
   if (basename === "SKILL") {

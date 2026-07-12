@@ -3,7 +3,11 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
-import { discoverSpecs } from "../../src/discover/specs.js";
+import {
+  deriveCategory,
+  deriveTitle,
+  discoverSpecs,
+} from "../../src/discover/specs.js";
 
 const fixtureRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -18,6 +22,58 @@ afterEach(async () => {
       .splice(0)
       .map((dir) => fs.rm(dir, { force: true, recursive: true })),
   );
+});
+
+describe("deriveCategory", () => {
+  it.each([
+    ["AGENTS.md", "root"],
+    ["SPEC.md", "root"],
+    [".cursor\\rules\\example.mdc", "cursor-rules"],
+    [".cursor/rules/nested/rule.mdc", "cursor-rules"],
+    [".cursor/skills/my-skill/SKILL.md", "cursor-skills"],
+    ["specs/feature.md", "specs"],
+    ["spec/feature.md", "spec"],
+    ["openspec/change.md", "openspec"],
+    [".kiro/specs/design.md", "kiro"],
+    ["docs/specs/architecture.md", "docs-specs"],
+    ["docs/plans/roadmap.md", "plans"],
+    ["requirements/req-001.md", "requirements"],
+    [".github/copilot-instructions.md", "github"],
+    ["src/lib/internal.md", "other"],
+    [".cursor/other/file.md", "other"],
+  ])("maps %s to category %s", (relativePath, expected) => {
+    expect(deriveCategory(relativePath)).toBe(expected);
+  });
+
+  it("checks prefix order before falling back to other", () => {
+    expect(deriveCategory(".cursor/rules/foo.mdc")).toBe("cursor-rules");
+    expect(deriveCategory(".cursor/skills/foo/SKILL.md")).toBe("cursor-skills");
+    expect(deriveCategory("docs/specs/arch.md")).toBe("docs-specs");
+    expect(deriveCategory("docs/plans/plan.md")).toBe("plans");
+  });
+});
+
+describe("deriveTitle", () => {
+  it.each([
+    [".cursor/skills/my-skill/SKILL.md", "My Skill"],
+    ["AGENTS.md", "Agent Instructions"],
+    ["SPEC.md", "Project Specification"],
+    ["CLAUDE.md", "Claude Instructions"],
+    ["GEMINI.md", "Gemini Instructions"],
+    [".cursor/rules/example.mdc", "Example"],
+    ["specs/feature.md", "Feature"],
+    ["requirements/req-001.md", "Req 001"],
+    ["docs/specs/my_architecture.md", "My Architecture"],
+    ["openspec/change-proposal.md", "Change Proposal"],
+  ])("maps %s to title %s", (relativePath, expected) => {
+    expect(deriveTitle(relativePath)).toBe(expected);
+  });
+
+  it("title-cases multi-word SKILL parent directories", () => {
+    expect(deriveTitle(".cursor/skills/code-review/SKILL.md")).toBe(
+      "Code Review",
+    );
+  });
 });
 
 describe("discoverSpecs", () => {

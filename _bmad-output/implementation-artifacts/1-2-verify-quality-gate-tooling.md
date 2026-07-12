@@ -4,7 +4,7 @@ baseline_commit: ec535e220177cfc300a866f760d97ae2fca1e8a3
 
 # Story 1.2: Verify quality-gate tooling
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 

@@ -75,7 +75,7 @@ export async function listSpecs(options: GenerateOptions): Promise<void> {
   for (const [category, files] of [...byCategory.entries()].sort()) {
     console.log(chalk.cyan(category));
     for (const file of files) {
-      console.log(`  ${file.relativePath}`);
+      console.log(`  ${file.title} — ${file.relativePath}`);
     }
     console.log();
   }

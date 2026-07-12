@@ -60,17 +60,51 @@ describe("generateWiki", () => {
   });
 });
 
+const stripAnsi = (value: string) =>
+  // eslint-disable-next-line no-control-regex -- strip chalk ANSI codes in test assertions
+  value.replace(/\u001b\[[0-9;]*m/g, "");
+
 describe("listSpecs", () => {
-  it("groups discovered specs by category", async () => {
+  it("groups discovered specs by category with headers", async () => {
     await listSpecs({
       projectRoot: fixtureRoot,
       outputDir: "wiki",
     });
 
-    const output = logSpy.mock.calls.flat().join("\n");
+    const lines = logSpy.mock.calls.map(([line]) => stripAnsi(String(line)));
+    const output = lines.join("\n");
+
     expect(output).toContain("Found");
-    expect(output).toContain("cursor-rules");
-    expect(output).toContain("AGENTS.md");
+    expect(output).toMatch(/cursor-rules/);
+    expect(output).toMatch(/openspec/);
+    expect(output).toMatch(/root/);
+
+    const cursorRulesIndex = lines.findIndex((line) => line === "cursor-rules");
+    const openspecIndex = lines.findIndex((line) => line === "openspec");
+    const rootIndex = lines.findIndex((line) => line === "root");
+
+    expect(cursorRulesIndex).toBeGreaterThan(-1);
+    expect(openspecIndex).toBeGreaterThan(-1);
+    expect(rootIndex).toBeGreaterThan(-1);
+
+    expect(lines[cursorRulesIndex + 1]).toContain("Example — .cursor/rules/");
+    expect(lines[openspecIndex + 1]).toContain("Change — openspec/");
+    expect(lines[rootIndex + 1]).toContain("Agent Instructions — AGENTS.md");
+  });
+
+  it("shows human-readable titles for SKILL and agent files", async () => {
+    await listSpecs({
+      projectRoot: fixtureRoot,
+      outputDir: "wiki",
+    });
+
+    const output = logSpy.mock.calls
+      .map(([line]) => stripAnsi(String(line)))
+      .join("\n");
+
+    expect(output).toContain("Agent Instructions — AGENTS.md");
+    expect(output).toContain("Project Specification — SPEC.md");
+    expect(output).toContain("My Skill — .cursor/skills/my-skill/SKILL.md");
   });
 
   it("prints a message when no specs are found", async () => {
