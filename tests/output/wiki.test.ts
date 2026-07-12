@@ -752,11 +752,14 @@ describe("writeHtmlWiki", () => {
       (line) => line.event === "output.write",
     );
 
-    expect(events).toHaveLength(4);
+    expect(events).toHaveLength(7);
     expect(events.map((event) => event.relativePath).sort()).toEqual([
       "html/assets/highlight.css",
+      "html/assets/lunr.min.js",
+      "html/assets/search.js",
       "html/assets/specwiki.css",
       "html/index.html",
+      "html/search-index.json",
       "html/spec.html",
     ]);
     for (const event of events) {
@@ -786,11 +789,15 @@ describe("writeHtmlWiki", () => {
     tempDirs.push(outputDir);
 
     const wiki = buildWiki([sampleSpec()]);
+    const originalWriteFile = fs.writeFile.bind(fs);
     const writeSpy = vi
       .spyOn(fs, "writeFile")
-      .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce(undefined)
-      .mockRejectedValueOnce(new Error("disk full"));
+      .mockImplementation(async (filePath, data, options) => {
+        if (String(filePath).endsWith("index.html")) {
+          throw new Error("disk full");
+        }
+        return originalWriteFile(filePath, data, options);
+      });
 
     await expect(writeHtmlWiki(outputDir, wiki)).rejects.toThrow("disk full");
 
@@ -809,14 +816,17 @@ describe("writeHtmlWiki", () => {
     tempDirs.push(outputDir);
 
     const wiki = buildWiki([sampleSpec()]);
+    const originalWriteFile = fs.writeFile.bind(fs);
     const writeSpy = vi
       .spyOn(fs, "writeFile")
-      .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce(undefined)
-      .mockResolvedValueOnce(undefined)
-      .mockRejectedValueOnce("page write failed");
+      .mockImplementation(async (filePath, data, options) => {
+        if (String(filePath).endsWith("spec.html")) {
+          throw new Error("page write failed");
+        }
+        return originalWriteFile(filePath, data, options);
+      });
 
-    await expect(writeHtmlWiki(outputDir, wiki)).rejects.toBe(
+    await expect(writeHtmlWiki(outputDir, wiki)).rejects.toThrow(
       "page write failed",
     );
 
@@ -860,6 +870,144 @@ describe("writeHtmlWiki", () => {
     expect(errorEvent?.message).toBe("mkdir boom");
     expect(errorEvent?.relativePath).toBe("html");
     mkdirSpy.mockRestore();
+  });
+
+  it("writes search-index.json and search assets by default", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-search-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([sampleSpec()]);
+    await writeHtmlWiki(outputDir, wiki);
+
+    const searchIndexRaw = await fs.readFile(
+      path.join(outputDir, "html", "search-index.json"),
+      "utf-8",
+    );
+    const searchIndex = JSON.parse(searchIndexRaw) as {
+      version: number;
+      documents: Array<{ slug: string; title: string }>;
+    };
+
+    expect(searchIndex.version).toBe(1);
+    expect(searchIndex.documents).toHaveLength(wiki.pages.length);
+    expect(searchIndex.documents[0]).toMatchObject({
+      slug: "spec",
+      title: "Custom Spec Title",
+    });
+
+    await expect(
+      fs.readFile(
+        path.join(outputDir, "html", "assets", "lunr.min.js"),
+        "utf-8",
+      ),
+    ).resolves.toContain("lunr");
+    await expect(
+      fs.readFile(path.join(outputDir, "html", "assets", "search.js"), "utf-8"),
+    ).resolves.toContain("specwiki-search-input");
+  });
+
+  it("embeds search UI and inline index in HTML when search enabled", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-search-ui-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([sampleSpec()]);
+    await writeHtmlWiki(outputDir, wiki);
+
+    const indexHtml = await fs.readFile(
+      path.join(outputDir, "html", "index.html"),
+      "utf-8",
+    );
+
+    expect(indexHtml).toContain('id="specwiki-search-input"');
+    expect(indexHtml).toContain('id="search-index"');
+    expect(indexHtml).toContain('src="assets/lunr.min.js"');
+    expect(indexHtml).toContain('src="assets/search.js"');
+    expect(indexHtml).toContain('"slug":"spec"');
+    expect(indexHtml).toContain('id="all-pages"');
+    expect(indexHtml).toContain("All pages");
+  });
+
+  it("omits search index and assets when noSearch is set", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-nosearch-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([sampleSpec()]);
+    await writeHtmlWiki(outputDir, wiki, { noSearch: true });
+
+    await expect(
+      fs.access(path.join(outputDir, "html", "search-index.json")),
+    ).rejects.toThrow();
+
+    await expect(
+      fs.access(path.join(outputDir, "html", "assets", "lunr.min.js")),
+    ).rejects.toThrow();
+
+    await expect(
+      fs.access(path.join(outputDir, "html", "assets", "search.js")),
+    ).rejects.toThrow();
+
+    const indexHtml = await fs.readFile(
+      path.join(outputDir, "html", "index.html"),
+      "utf-8",
+    );
+    expect(indexHtml).not.toContain("specwiki-search-input");
+    expect(indexHtml).not.toContain("search-index");
+    expect(indexHtml).toContain('id="all-pages"');
+  });
+
+  it("emits output.search-index when verbose", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-search-log-"),
+    );
+    tempDirs.push(outputDir);
+    log.setVerbose(true);
+
+    const wiki = buildWiki([sampleSpec()]);
+    await writeHtmlWiki(outputDir, wiki);
+
+    const searchIndexEvent = parseStderrLines().find(
+      (line) => line.event === "output.search-index",
+    );
+    expect(searchIndexEvent).toMatchObject({
+      documentCount: wiki.pages.length,
+    });
+  });
+
+  it("emits output.error when search index build fails", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-search-fail-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([sampleSpec()]);
+    const originalWriteFile = fs.writeFile.bind(fs);
+    const failingWrite = vi
+      .spyOn(fs, "writeFile")
+      .mockImplementation(async (filePath, data, options) => {
+        if (String(filePath).endsWith("search-index.json")) {
+          throw new Error("search index write failed");
+        }
+        return originalWriteFile(filePath, data, options);
+      });
+
+    await expect(writeHtmlWiki(outputDir, wiki)).rejects.toThrow(
+      "search index write failed",
+    );
+
+    const errorEvent = parseStderrLines().find(
+      (line) => line.event === "output.error",
+    );
+    expect(errorEvent).toMatchObject({
+      relativePath: "html/search-index.json",
+      message: "search index write failed",
+    });
+    failingWrite.mockRestore();
   });
 });
 

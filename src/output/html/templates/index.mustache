@@ -29,6 +29,14 @@
         </ul>
       </section>
       {{/categories}}
+      <section id="all-pages" class="specwiki-all-pages">
+        <h2>All pages</h2>
+        <ul class="specwiki-portal-pages">
+          {{#allPages}}
+          <li><a href="{{href}}">{{title}}</a></li>
+          {{/allPages}}
+        </ul>
+      </section>
     </article>
   </div>
 </div>

@@ -41,6 +41,17 @@ interface BreadcrumbSegment {
   first: boolean;
 }
 
+export interface HtmlRenderOptions {
+  includeSearch?: boolean;
+  searchIndexJson?: string;
+}
+
+interface AllPagesEntry {
+  title: string;
+  slug: string;
+  href: string;
+}
+
 export class HtmlRenderer {
   private readonly layoutTemplate: string;
   private readonly indexTemplate: string;
@@ -61,18 +72,25 @@ export class HtmlRenderer {
     return new HtmlRenderer(layout, index, article);
   }
 
-  renderIndex(pages: WikiPage[]): string {
+  renderIndex(
+    pages: WikiPage[],
+    renderOptions: HtmlRenderOptions = {},
+  ): string {
     const categories = buildNavCategories(pages);
     const pageCount = pages.length;
+    const allPages = buildAllPagesList(pages);
     const body = Mustache.render(this.indexTemplate, {
       categories,
       pageCount,
       pageCountLabel: pageCount === 1 ? "spec file" : "spec files",
+      allPages,
     });
     return Mustache.render(this.layoutTemplate, {
       pageTitle: "Spec Wiki",
       body,
       includeHighlightCss: false,
+      includeSearch: Boolean(renderOptions.includeSearch),
+      searchIndexJson: renderOptions.searchIndexJson ?? "",
     });
   }
 
@@ -80,6 +98,7 @@ export class HtmlRenderer {
     page: WikiPage,
     allPages: WikiPage[],
     contentHtml: string,
+    renderOptions: HtmlRenderOptions = {},
   ): string {
     validateArticlePage(page);
 
@@ -105,6 +124,8 @@ export class HtmlRenderer {
       pageTitle: page.title,
       body,
       includeHighlightCss: true,
+      includeSearch: Boolean(renderOptions.includeSearch),
+      searchIndexJson: renderOptions.searchIndexJson ?? "",
     });
   }
 
@@ -139,6 +160,16 @@ function categoryLabelFor(category: string): string {
 
 function categoryAnchor(category: string): string {
   return `category-${category}`;
+}
+
+function buildAllPagesList(pages: WikiPage[]): AllPagesEntry[] {
+  return [...pages]
+    .sort((a, b) => a.title.localeCompare(b.title))
+    .map((page) => ({
+      title: page.title,
+      slug: page.slug,
+      href: `${page.slug}.html`,
+    }));
 }
 
 function buildNavCategories(

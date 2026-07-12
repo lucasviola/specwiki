@@ -37,4 +37,16 @@ export default tseslint.config(
       },
     },
   },
+  {
+    files: ["src/output/html/assets/search.js"],
+    languageOptions: {
+      globals: {
+        document: "readonly",
+        lunr: "readonly",
+      },
+    },
+    rules: {
+      "no-unused-vars": ["error", { caughtErrors: "none" }],
+    },
+  },
 );

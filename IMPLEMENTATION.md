@@ -113,7 +113,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
   - [x] S16.1 — Mustache HTML renderer and Wikimedia assets _(review)_
   - [x] S16.2 — Wikipedia layout chrome and navigation
   - [x] S16.3 — Rich HTML content rendering
-  - [ ] S16.4 — Client-side wiki search
+  - [x] S16.4 — Client-side wiki search _(review)_
 
 ## HARNESS §13 Deliverables Checklist
 
@@ -152,19 +152,21 @@ Verified 2026-07-12 as part of E7 S7.2. Automated guards in `tests/harness/deliv
 
 Every MVP feature story shipped structured logging ACs. No deferred logging epic.
 
-| Story | Module(s)                    | Events verified                                                   |
-| ----- | ---------------------------- | ----------------------------------------------------------------- |
-| S2.3  | discover/specs.ts            | discover.start, discover.match, discover.complete, discover.error |
-| S2.4  | discover/specs.ts            | discover.empty                                                    |
-| S3.1  | parse/markdown.ts            | parse.file, parse.error                                           |
-| S3.2  | output/wiki.ts               | output.write, output.error                                        |
-| S4.1  | parse/markdown.ts            | render.error                                                      |
-| S4.2  | output/wiki.ts               | output.write (html/), output.error                                |
-| S5.1  | output/wiki.ts               | output.slug-collision                                             |
-| S5.2  | output/wiki.ts               | output.error (path guard)                                         |
-| S6.1  | commands/generate.ts, cli.ts | cli.command, cli.error, generate.summary                          |
-| S6.2  | cli.ts                       | cli.error (usage vs runtime)                                      |
-| S7.1  | (integration)                | Full verbose chain in dogfood CLI test                            |
+| Story | Module(s)                    | Events verified                                                     |
+| ----- | ---------------------------- | ------------------------------------------------------------------- |
+| S2.3  | discover/specs.ts            | discover.start, discover.match, discover.complete, discover.error   |
+| S2.4  | discover/specs.ts            | discover.empty                                                      |
+| S3.1  | parse/markdown.ts            | parse.file, parse.error                                             |
+| S3.2  | output/wiki.ts               | output.write, output.error                                          |
+| S4.1  | parse/markdown.ts            | render.error                                                        |
+| S4.2  | output/wiki.ts               | output.write (html/), output.error                                  |
+| S5.1  | output/wiki.ts               | output.slug-collision                                               |
+| S5.2  | output/wiki.ts               | output.error (path guard)                                           |
+| S6.1  | commands/generate.ts, cli.ts | cli.command, cli.error, generate.summary                            |
+| S6.2  | cli.ts                       | cli.error (usage vs runtime)                                        |
+| S7.1  | (integration)                | Full verbose chain in dogfood CLI test                              |
+| S16.3 | parse/markdown.ts            | render.error (unchanged)                                            |
+| S16.4 | output/wiki.ts, search-index | output.write (search-index.json), output.search-index, output.error |
 
 User-facing summaries remain on stdout via chalk; diagnostics use JSON stderr via `Logger.ts`.
 
@@ -195,4 +197,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-12 | E16 S16.1 | `feat(output): Mustache HTML renderer with Wikimedia design tokens` — HtmlRenderer + mustache templates; bundled specwiki.css; wrapHtml removed; mustache + wikimedia-ui-base deps (AD-11); 9 renderer tests; renderer.ts 100% coverage                                | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E16 S16.2 | `feat(output): Wikipedia layout chrome and navigation` — WikiPage description/sections metadata; three-column Mustache chrome (category nav, infobox, TOC rail); Main Page index portal; output.render verbose event; 15 new/updated tests; renderer.ts 98.8% coverage | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E16 S16.3 | `feat(parse): rich HTML content rendering with GFM and highlight.js` — exported slugify; heading ids h2–h6 matching TOC anchors; highlight.js fenced code blocks; highlight.css asset; `.mw-parser-output` wrapper; 10 new tests; markdown.ts 100% coverage            | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-12 | E16 S16.4 | `feat(output): client-side wiki search with lunr index` — buildSearchIndex at generate time; inline JSON for file://; header search UI; `--no-search` flag; All pages index section; lunr@^2.3.9 dep; 14 new tests; 194 tests total; repo coverage 95.79%              | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | _template_ | _E?_ S?_  | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                | _hash or uncommitted_ | _full §0.2 gate result_                                         |

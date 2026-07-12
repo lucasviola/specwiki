@@ -67,6 +67,7 @@ program
     "wiki",
   )
   .option("-v, --verbose", "Show detailed output")
+  .option("--no-search", "Skip client-side search index and JS")
   .action(async (opts) => {
     try {
       log.setVerbose(Boolean(opts.verbose));
@@ -74,6 +75,7 @@ program
         projectRoot: path.resolve(opts.project),
         outputDir: opts.output,
         verbose: opts.verbose,
+        noSearch: opts.search === false,
       });
     } catch (err) {
       if (!isCliErrorLogged(err)) {

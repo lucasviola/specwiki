@@ -41,6 +41,11 @@ export interface GenerateOptions {
   outputDir: string;
   patterns?: string[];
   verbose?: boolean;
+  noSearch?: boolean;
+}
+
+export interface WriteHtmlWikiOptions {
+  noSearch?: boolean;
 }
 
 export interface DiscoverOptions {

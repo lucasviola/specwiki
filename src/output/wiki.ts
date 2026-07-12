@@ -1,11 +1,25 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
+import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
 import { log } from "../core/Logger.js";
 import { CATEGORY_LABELS } from "../config/patterns.js";
 import { renderMarkdown } from "../parse/markdown.js";
 import { getHtmlRenderer, HtmlRenderer } from "./html/renderer.js";
-import type { ParsedSpec, WikiOutput, WikiPage } from "../types.js";
+import {
+  buildSearchIndex,
+  serializeSearchIndexForInlineScript,
+} from "./html/search-index.js";
+import type {
+  ParsedSpec,
+  WikiOutput,
+  WikiPage,
+  WriteHtmlWikiOptions,
+} from "../types.js";
+
+const require = createRequire(import.meta.url);
+const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 
 const PATH_ESCAPE_MESSAGE = "Path escapes output directory";
 
@@ -234,7 +248,9 @@ export async function writeWiki(
 export async function writeHtmlWiki(
   outputDir: string,
   wiki: WikiOutput,
+  options: WriteHtmlWikiOptions = {},
 ): Promise<string[]> {
+  const searchEnabled = !options.noSearch;
   const htmlDir = path.join(outputDir, "html");
   try {
     await fs.mkdir(htmlDir, { recursive: true });
@@ -325,10 +341,63 @@ export async function writeHtmlWiki(
   written.push(highlightCssPath);
   log.info("output.write", { relativePath: highlightCssRelativePath });
 
+  let searchIndexJson = "";
+  if (searchEnabled) {
+    try {
+      const searchIndex = buildSearchIndex(wiki.pages);
+      searchIndexJson = serializeSearchIndexForInlineScript(searchIndex);
+
+      const searchIndexPath = path.join(htmlDir, "search-index.json");
+      const searchIndexRelativePath = "html/search-index.json";
+      assertPathConfined(outputDir, searchIndexPath, searchIndexRelativePath);
+      await fs.writeFile(
+        searchIndexPath,
+        `${JSON.stringify(searchIndex, null, 2)}\n`,
+        "utf-8",
+      );
+      written.push(searchIndexPath);
+      log.info("output.write", { relativePath: searchIndexRelativePath });
+      log.info("output.search-index", {
+        documentCount: searchIndex.documents.length,
+      });
+
+      const lunrSourcePath = require.resolve("lunr/lunr.min.js");
+      const lunrDestPath = path.join(assetsDir, "lunr.min.js");
+      const lunrRelativePath = "html/assets/lunr.min.js";
+      assertPathConfined(outputDir, lunrDestPath, lunrRelativePath);
+      await fs.copyFile(lunrSourcePath, lunrDestPath);
+      written.push(lunrDestPath);
+      log.info("output.write", { relativePath: lunrRelativePath });
+
+      const searchJsSourcePath = path.join(
+        moduleDir,
+        "html",
+        "assets",
+        "search.js",
+      );
+      const searchJsDestPath = path.join(assetsDir, "search.js");
+      const searchJsRelativePath = "html/assets/search.js";
+      assertPathConfined(outputDir, searchJsDestPath, searchJsRelativePath);
+      await fs.copyFile(searchJsSourcePath, searchJsDestPath);
+      written.push(searchJsDestPath);
+      log.info("output.write", { relativePath: searchJsRelativePath });
+    } catch (err) {
+      log.error("output.error", {
+        relativePath: "html/search-index.json",
+        message: err instanceof Error ? err.message : String(err),
+      });
+      throw err;
+    }
+  }
+
+  const renderOptions = searchEnabled
+    ? { includeSearch: true, searchIndexJson }
+    : { includeSearch: false };
+
   let indexHtml: string;
   try {
     log.info("output.render", { kind: "index", slug: "index" });
-    indexHtml = renderer.renderIndex(wiki.pages);
+    indexHtml = renderer.renderIndex(wiki.pages, renderOptions);
   } catch (err) {
     log.error("output.error", {
       relativePath: "html/index.html",
@@ -359,6 +428,7 @@ export async function writeHtmlWiki(
         page,
         wiki.pages,
         renderMarkdown(page.content),
+        renderOptions,
       );
     } catch (err) {
       log.error("output.error", {

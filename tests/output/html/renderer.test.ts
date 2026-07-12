@@ -56,8 +56,31 @@ describe("HtmlRenderer", () => {
     expect(html).toContain('id="content"');
     expect(html).toContain("<h1>Main Page</h1>");
     expect(html).toContain('href="spec.html"');
+    expect(html).toContain('id="all-pages"');
+    expect(html).toContain("All pages");
     expect(html).not.toMatch(/href="[^"]*\.md"/);
     expect(html).not.toContain("<style>");
+  });
+
+  it("renders search chrome when includeSearch is enabled", () => {
+    const html = renderer.renderIndex([samplePage()], {
+      includeSearch: true,
+      searchIndexJson: '{"version":1,"documents":[]}',
+    });
+
+    expect(html).toContain('id="specwiki-search-input"');
+    expect(html).toContain('id="search-index"');
+    expect(html).toContain('src="assets/lunr.min.js"');
+    expect(html).toContain('src="assets/search.js"');
+  });
+
+  it("omits search chrome when includeSearch is disabled", () => {
+    const html = renderer.renderIndex([samplePage()], {
+      includeSearch: false,
+    });
+
+    expect(html).not.toContain("specwiki-search-input");
+    expect(html).not.toContain("search-index");
   });
 
   it("renders article page with infobox, breadcrumb, TOC, and category nav", () => {

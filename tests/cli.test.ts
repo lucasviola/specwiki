@@ -237,6 +237,45 @@ describe("dogfood — sample-project fixture", () => {
   });
 });
 
+describe("cli generate --no-search", () => {
+  it("omits search-index.json when --no-search is passed", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-nosearch-"),
+    );
+
+    try {
+      const { stdout } = await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "generate",
+          "--project",
+          fixtureRoot,
+          "--output",
+          outputDir,
+          "--no-search",
+        ],
+        { cwd: projectRoot },
+      );
+
+      expect(stdout).toContain("Generated wiki");
+      await expect(
+        fs.stat(path.join(outputDir, "html", "search-index.json")),
+      ).rejects.toMatchObject({ code: "ENOENT" });
+
+      const indexHtml = await fs.readFile(
+        path.join(outputDir, "html", "index.html"),
+        "utf-8",
+      );
+      expect(indexHtml).not.toContain("specwiki-search-input");
+    } finally {
+      await fs.rm(outputDir, { force: true, recursive: true });
+    }
+  });
+});
+
 describe("cli generate --verbose", () => {
   it("emits cli.command before discover.start on stderr", async () => {
     const outputDir = await fs.mkdtemp(

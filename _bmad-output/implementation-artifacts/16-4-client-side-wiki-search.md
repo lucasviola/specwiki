@@ -1,10 +1,10 @@
 ---
-baseline_commit: e2debdf222d40cdc45230294d95f7ec7dc95c056
+baseline_commit: 424975e4f8dfe3bef053d653ec33e890b24ea9fd
 ---
 
 # Story 16.4: Client-side wiki search
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -40,29 +40,29 @@ INVEST: I✓ N✓ V✓ E✓ S✓ T✓
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Add `lunr` and build search index at generate time (AC: #1, #6, #7, #8)
-  - [ ] Add `lunr@^2.3.9` as runtime dep (owner-approved); copy `lunr.min.js` to `html/assets/` for browser use
-  - [ ] New `src/output/html/search-index.ts` — build JSON from `WikiPage[]` fields
-  - [ ] Index fields: `slug`, `title`, `category`, `description`, `body` (plain-text excerpt from content, capped ~2000 chars)
-  - [ ] Write `html/search-index.json` in `writeHtmlWiki`; log `output.search-index` with `{ documentCount }`
-- [ ] Task 2: Header search UI (AC: #2, #3)
-  - [ ] Add search input + results dropdown to `layout.mustache` header bar
-  - [ ] `src/output/html/assets/search.js` — load lunr index from relative `search-index.json`, render result links to `{slug}.html`
-  - [ ] All asset paths relative for `file://` compatibility
-  - [ ] Graceful degradation: if `--no-search`, omit search UI and scripts
-- [ ] Task 3: `--no-search` CLI flag (AC: #4)
-  - [ ] Add `--no-search` to `generate` command in `src/cli.ts`
-  - [ ] Thread through `GenerateOptions` in `src/types.ts` → `generateWiki` → `writeHtmlWiki`
-  - [ ] When set: skip `search-index.json`, `search.js`, lunr asset copy
-  - [ ] CLI test: `--no-search` produces HTML without `search-index.json`
-- [ ] Task 4: "All pages" index link (AC: #5)
-  - [ ] Add collapsible or dedicated section on index page listing all slugs alphabetically
-  - [ ] Links use relative `{slug}.html` paths
-- [ ] Task 5: Tests and quality gate (AC: #9, #10, #11)
-  - [ ] Unit test: `buildSearchIndex(wiki)` returns N documents for N pages
-  - [ ] Unit test: JSON schema has required fields per document
-  - [ ] Integration test: default generate writes `html/search-index.json`; `--no-search` omits it
-  - [ ] Run full §0.2 gate; update `IMPLEMENTATION.md`
+- [x] Task 1: Add `lunr` and build search index at generate time (AC: #1, #6, #7, #8)
+  - [x] Add `lunr@^2.3.9` as runtime dep (owner-approved); copy `lunr.min.js` to `html/assets/` for browser use
+  - [x] New `src/output/html/search-index.ts` — build JSON from `WikiPage[]` fields
+  - [x] Index fields: `slug`, `title`, `category`, `description`, `body` (plain-text excerpt from content, capped ~2000 chars)
+  - [x] Write `html/search-index.json` in `writeHtmlWiki`; log `output.search-index` with `{ documentCount }`
+- [x] Task 2: Header search UI (AC: #2, #3)
+  - [x] Add search input + results dropdown to `layout.mustache` header bar
+  - [x] `src/output/html/assets/search.js` — load lunr index from relative `search-index.json`, render result links to `{slug}.html`
+  - [x] All asset paths relative for `file://` compatibility
+  - [x] Graceful degradation: if `--no-search`, omit search UI and scripts
+- [x] Task 3: `--no-search` CLI flag (AC: #4)
+  - [x] Add `--no-search` to `generate` command in `src/cli.ts`
+  - [x] Thread through `GenerateOptions` in `src/types.ts` → `generateWiki` → `writeHtmlWiki`
+  - [x] When set: skip `search-index.json`, `search.js`, lunr asset copy
+  - [x] CLI test: `--no-search` produces HTML without `search-index.json`
+- [x] Task 4: "All pages" index link (AC: #5)
+  - [x] Add collapsible or dedicated section on index page listing all slugs alphabetically
+  - [x] Links use relative `{slug}.html` paths
+- [x] Task 5: Tests and quality gate (AC: #9, #10, #11)
+  - [x] Unit test: `buildSearchIndex(wiki)` returns N documents for N pages
+  - [x] Unit test: JSON schema has required fields per document
+  - [x] Integration test: default generate writes `html/search-index.json`; `--no-search` omits it
+  - [x] Run full §0.2 gate; update `IMPLEMENTATION.md`
 
 ## Dev Notes
 
@@ -175,21 +175,59 @@ After S16.4, the full E16 gate is met: Wikipedia-like layout, navigation, highli
 
 ### Agent Model Used
 
+Composer
+
 ### Debug Log References
+
+- Commander `--no-search` maps to `opts.search === false` (negated boolean option)
+- Inline JSON in layout chosen over fetch for file:// reliability
 
 ### Completion Notes List
 
+- Added `lunr@^2.3.9` runtime dependency; copies `lunr.min.js` and `search.js` to `html/assets/` at generate time
+- `buildSearchIndex` strips markdown and caps body excerpts at 2000 chars; writes `html/search-index.json` plus inline embed in every HTML page
+- Header search UI with lunr-powered dropdown; `--no-search` skips index, assets, and chrome
+- Index page "All pages" section lists all slugs alphabetically with relative links
+- 194 tests passing; repo coverage 95.79%
+
 ### File List
+
+- package.json
+- package-lock.json
+- eslint.config.js
+- src/types.ts
+- src/cli.ts
+- src/commands/generate.ts
+- src/output/wiki.ts
+- src/output/html/search-index.ts
+- src/output/html/renderer.ts
+- src/output/html/assets/search.js
+- src/output/html/assets/specwiki.css
+- src/output/html/templates/layout.mustache
+- src/output/html/templates/index.mustache
+- tests/output/html/search-index.test.ts
+- tests/output/html/renderer.test.ts
+- tests/output/wiki.test.ts
+- tests/cli.test.ts
+- IMPLEMENTATION.md
+- _bmad-output/implementation-artifacts/sprint-status.yaml
+- _bmad-output/implementation-artifacts/16-4-client-side-wiki-search.md
 
 ## Senior Developer Review (AI)
 
-**Review date:**  
-**Review outcome:**  
-**Reviewer model:**
+**Review date:** 2026-07-12
+**Review outcome:** Approve with minor patch applied
+**Reviewer model:** Bugbot subagent
 
 ### Action Items
 
+- [x] Fix `WikiPage` import path in `search-index.test.ts` (medium)
+
 ### Review Findings
+
+| Severity | Finding                                                      | Resolution                       |
+| -------- | ------------------------------------------------------------ | -------------------------------- |
+| Medium   | Wrong relative import for `WikiPage` in search-index.test.ts | Fixed to `../../../src/types.js` |
 
 ## QA Manual Validation
 
@@ -205,3 +243,7 @@ After S16.4, the full E16 gate is met: Wikipedia-like layout, navigation, highli
 8. `test ! -f /tmp/specwiki-nosearch/html/search-index.json` — index omitted
 9. Index page shows "All pages" section with links to every slug
 10. `npm test` — full suite passes
+
+## Change Log
+
+- 2026-07-12 — Implemented client-side lunr search: generate-time index, header UI, `--no-search`, All pages section; 14 new tests

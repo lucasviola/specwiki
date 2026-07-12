@@ -68,7 +68,9 @@ export async function generateWiki(options: GenerateOptions): Promise<void> {
 
     const resolvedOutput = path.resolve(resolvedProjectRoot, outputDir);
     const written = await writeWiki(resolvedOutput, wiki);
-    const htmlWritten = await writeHtmlWiki(resolvedOutput, wiki);
+    const htmlWritten = await writeHtmlWiki(resolvedOutput, wiki, {
+      noSearch: options.noSearch,
+    });
 
     log.info("generate.summary", {
       pageCount: wiki.pages.length,
