@@ -1,0 +1,37 @@
+#!/usr/bin/env sh
+set -eu
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+if [ ! -d node_modules ]; then
+  echo "pre-commit: run npm install first (node_modules missing)" >&2
+  exit 1
+fi
+
+echo "pre-commit: checking for secrets..."
+node scripts/check-secrets.mjs
+
+echo "pre-commit: fixing formatting on staged files..."
+STAGED_FORMAT=$(git diff --cached --name-only --diff-filter=ACM \
+  | grep -E '\.(cjs|mjs|js|ts|json|md|yaml|yml|css)$' || true)
+if [ -n "$STAGED_FORMAT" ]; then
+  # shellcheck disable=SC2086
+  npx prettier --write $STAGED_FORMAT
+  # shellcheck disable=SC2086
+  git add $STAGED_FORMAT
+fi
+
+echo "pre-commit: running linter..."
+npm run lint
+
+echo "pre-commit: running type check..."
+npm run typecheck
+
+echo "pre-commit: running tests..."
+npm run test
+
+echo "pre-commit: running build..."
+npm run build
+
+echo "pre-commit: all checks passed"
