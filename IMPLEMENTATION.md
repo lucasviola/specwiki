@@ -66,7 +66,7 @@ Usage errors emit `cli.error` on stderr (JSON) before exit 2. Runtime failures e
 | Generate time    | ~0.4s (< 60s AC)                 |
 | Markdown + HTML  | ✓ `index.md` + `html/index.html` |
 
-**Repo root limited yield (POST-MVP FR-006):** Running `specwiki list --project .` on the specwiki repository finds only paths matching `DEFAULT_SPEC_PATTERNS` (currently 1 file: `.cursor/rules/specwiki-checkpoint.mdc`). High-value self-repo paths **outside** default patterns — `HARNESS.md`, `_bmad-output/`, `.agents/skills/` — are deferred to E8 (extended patterns / `--config`). This is intentional per FR-031 readiness patch; not an MVP blocker.
+**Repo root limited yield (POST-MVP FR-006):** Running `specwiki list --project .` on the specwiki repository finds only paths matching `DEFAULT_SPEC_PATTERNS` (currently 1 file: `.cursor/rules/specwiki-checkpoint.mdc`). High-value self-repo paths **outside** default patterns — `README.md`, `HARNESS.md`, `_bmad-output/`, `.agents/skills/` — are deferred to E8 (extended patterns / `--config`). Folder README index behaviour (FR-035) is also E8.
 
 ## MVP Epic Progression Checklist
 
@@ -101,7 +101,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
 
 Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifacts/sprint-status.yaml). POST-MVP work begins after MVP sign-off (E7).
 
-- [ ] **E8 — Custom Discovery Configuration** — `--patterns`, config loader, extended defaults
+- [ ] **E8 — Custom Discovery Configuration** — `--patterns`, config loader, extended defaults, `README.md` discovery and folder index pages
 - [ ] **E9 — Agent Interoperability** — `--json`, `llms.txt`
 - [ ] **E10 — Team CI Freshness** — `generate --check`
 - [ ] **E11 — Live Developer Loop** — `--watch`, `serve`

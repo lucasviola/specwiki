@@ -84,7 +84,7 @@ Phases are ordered for **persona unlock** and **technical dependency**. Each pha
 ### Phase A: Configurability & Extended Discovery
 
 **Epics / stories:** E7 — S7.1 (`--patterns`), S7.2 (config loader), S7.3 (extended default patterns)  
-**Functional requirements:** FR-005, FR-006  
+**Functional requirements:** FR-005, FR-006, FR-035  
 **HARNESS mapping:** Phase 4.1 (partial — flag + config; extended patterns beyond harness minimum)
 
 **Why deferred from MVP:**
@@ -106,8 +106,9 @@ Phases are ordered for **persona unlock** and **technical dependency**. Each pha
 
 - `specwiki list --patterns "custom/**/*.md"` discovers files defaults miss
 - `specwiki.config.js` in project root loads with precedence: CLI > env > config > defaults
-- Default patterns extended to include `**/AGENTS.md`, `_bmad-output/**/*.md`, `.agents/skills/**/SKILL.md` (with owner approval per NFR-013)
-- Fixture tests cover BMAD output tree and nested AGENTS.md
+- Default patterns extended to include `**/AGENTS.md`, `_bmad-output/**/*.md`, `.agents/skills/**/SKILL.md`, `**/README.md` (with owner approval per NFR-013)
+- Fixture tests cover BMAD output tree, nested AGENTS.md, and README discovery
+- Folder and root `README.md` content used as category index introductions on `wiki/index.md` and `wiki/html/index.html` (FR-035)
 - specwiki repo self-dogfood discovers `.agents/skills/` and `_bmad-output/` paths (closes FR-006 gap from FR-031 readiness patch)
 - Full §0.2 quality gate passes
 

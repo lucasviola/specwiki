@@ -95,25 +95,25 @@ MVP completes when HARNESS Phases 0–3 deliverables pass the §13 checklist: wo
 
 ### Out of scope
 
-| Area                                                                        | Rationale                                                    |
-| --------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| Hosted wiki SaaS                                                            | Local CLI product; no account or hosting infrastructure      |
-| Spec authoring, validation, or enforcement                                  | Complementary to OpenSpec/BMAD; read-only aggregator         |
-| Real-time watch/regenerate                                                  | Manual re-run sufficient for Persona A MVP validation        |
-| Bundled dev server (`specwiki serve`)                                       | Static HTML files browsable directly; decision 2026-07-12    |
-| Custom pattern config (`--patterns`, config file)                           | Zero-config MVP; Phase 4.1 POST-MVP                          |
-| npm publish / CI workflow                                                   | Distribution after hardening; Phase 4.2–4.3 POST-MVP         |
-| `--json` machine output                                                     | Agent/script consumers POST-MVP                              |
-| `wiki/llms.txt` export                                                      | High value but not required to prove synthesis for Persona A |
-| Extended discovery (`**/AGENTS.md`, `_bmad-output/**`, `.agents/skills/**`) | Default patterns sufficient for Persona A; POST-MVP Epic A   |
-| Semantic parsing (OpenSpec deltas, BMAD kernels, Cursor frontmatter badges) | Treat all inputs as markdown-with-frontmatter for MVP        |
-| Cross-repo / OpenSpec Stores scanning                                       | Enterprise/team scope                                        |
-| Team admin, rule enforcement, analytics                                     | Persona D; not MVP                                           |
-| Semantic search or AI Q&A over specs                                        | Future exploration                                           |
-| SSG export (VitePress, MkDocs scaffold)                                     | Users can point SSG at generated `wiki/` manually            |
-| Spec drift detection / duplicate diffing                                    | POST-MVP value add                                           |
-| Plugins / extension API                                                     | Premature before config API stable                           |
-| E2E / browser tests                                                         | HARNESS §0.2.1 default skip unless owner requests            |
+| Area                                                                                        | Rationale                                                    |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Hosted wiki SaaS                                                                            | Local CLI product; no account or hosting infrastructure      |
+| Spec authoring, validation, or enforcement                                                  | Complementary to OpenSpec/BMAD; read-only aggregator         |
+| Real-time watch/regenerate                                                                  | Manual re-run sufficient for Persona A MVP validation        |
+| Bundled dev server (`specwiki serve`)                                                       | Static HTML files browsable directly; decision 2026-07-12    |
+| Custom pattern config (`--patterns`, config file)                                           | Zero-config MVP; Phase 4.1 POST-MVP                          |
+| npm publish / CI workflow                                                                   | Distribution after hardening; Phase 4.2–4.3 POST-MVP         |
+| `--json` machine output                                                                     | Agent/script consumers POST-MVP                              |
+| `wiki/llms.txt` export                                                                      | High value but not required to prove synthesis for Persona A |
+| Extended discovery (`**/AGENTS.md`, `_bmad-output/**`, `.agents/skills/**`, `**/README.md`) | Default patterns sufficient for Persona A; POST-MVP Epic A   |
+| Semantic parsing (OpenSpec deltas, BMAD kernels, Cursor frontmatter badges)                 | Treat all inputs as markdown-with-frontmatter for MVP        |
+| Cross-repo / OpenSpec Stores scanning                                                       | Enterprise/team scope                                        |
+| Team admin, rule enforcement, analytics                                                     | Persona D; not MVP                                           |
+| Semantic search or AI Q&A over specs                                                        | Future exploration                                           |
+| SSG export (VitePress, MkDocs scaffold)                                                     | Users can point SSG at generated `wiki/` manually            |
+| Spec drift detection / duplicate diffing                                                    | POST-MVP value add                                           |
+| Plugins / extension API                                                                     | Premature before config API stable                           |
+| E2E / browser tests                                                                         | HARNESS §0.2.1 default skip unless owner requests            |
 
 ---
 
@@ -121,24 +121,25 @@ MVP completes when HARNESS Phases 0–3 deliverables pass the §13 checklist: wo
 
 POST-MVP begins at HARNESS Phase 4 and expansion epics. Capabilities deferred with rationale:
 
-| Capability                                   | Phase / Epic       | Rationale                                                                                            |
-| -------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------- |
-| **`--patterns` flag / `specwiki.config.js`** | Phase 4.1 / Epic B | Monorepos and org-specific layouts need overrides; zero-config MVP must prove default patterns first |
-| **npm publish (`npx specwiki`)**             | Phase 4.2 / Epic D | Distribution unlocks Personas B/C; requires slug fix and quality gate stability                      |
-| **CI workflow (GitHub Actions)**             | Phase 4.3 / Epic D | Package-level quality gate; consumer CI docs (`generate --check`) follow                             |
-| **`specwiki serve`**                         | Epic B             | Local static server on `127.0.0.1` via Node built-in `http`; browsing works without it today         |
-| **`generate --watch`**                       | Epic B             | Debounced rebuild reduces friction for frequent rule editors; not needed to prove core value         |
-| **`generate --check`**                       | Epic B             | CI freshness (exit 1 if wiki stale); depends on stable generate contract                             |
-| **`--json` output**                          | Epic A             | Machine-readable summaries for agent/script consumers                                                |
-| **`wiki/llms.txt` export**                   | Epic A             | Agent-oriented index from discovered specs; high value, low MVP urgency                              |
-| **Extended discovery patterns**              | Epic A             | `**/AGENTS.md`, `_bmad-output/**/*.md`, `.agents/skills/**/SKILL.md` for BMAD-heavy repos            |
-| **Semantic enrichment**                      | Epic C             | Cursor rule badges, OpenSpec change-set grouping, BMAD kernel cards                                  |
-| **SSG export**                               | Epic D             | `specwiki export --format vitepress\|mkdocs` scaffold                                                |
-| **Spec drift detection**                     | POST-MVP           | Compare duplicate instruction files; flag stale wiki                                                 |
-| **Plugins / extension API**                  | POST-MVP           | Custom category rules after config API stabilizes                                                    |
-| **MCP manifest indexing**                    | POST-MVP           | Document `.cursor/mcp.json` and similar configs                                                      |
-| **VS Code / Cursor extension**               | POST-MVP           | IDE-integrated wiki panel                                                                            |
-| **Wikipedia-style HTML wiki skin**           | E16                | Vector-inspired layout, navigation chrome, search; extends FR-015 presentation POST-MVP              |
+| Capability                                   | Phase / Epic       | Rationale                                                                                                 |
+| -------------------------------------------- | ------------------ | --------------------------------------------------------------------------------------------------------- |
+| **`--patterns` flag / `specwiki.config.js`** | Phase 4.1 / Epic B | Monorepos and org-specific layouts need overrides; zero-config MVP must prove default patterns first      |
+| **npm publish (`npx specwiki`)**             | Phase 4.2 / Epic D | Distribution unlocks Personas B/C; requires slug fix and quality gate stability                           |
+| **CI workflow (GitHub Actions)**             | Phase 4.3 / Epic D | Package-level quality gate; consumer CI docs (`generate --check`) follow                                  |
+| **`specwiki serve`**                         | Epic B             | Local static server on `127.0.0.1` via Node built-in `http`; browsing works without it today              |
+| **`generate --watch`**                       | Epic B             | Debounced rebuild reduces friction for frequent rule editors; not needed to prove core value              |
+| **`generate --check`**                       | Epic B             | CI freshness (exit 1 if wiki stale); depends on stable generate contract                                  |
+| **`--json` output**                          | Epic A             | Machine-readable summaries for agent/script consumers                                                     |
+| **`wiki/llms.txt` export**                   | Epic A             | Agent-oriented index from discovered specs; high value, low MVP urgency                                   |
+| **Extended discovery patterns**              | Epic A             | `**/AGENTS.md`, `_bmad-output/**/*.md`, `.agents/skills/**/SKILL.md`, `**/README.md` for BMAD-heavy repos |
+| **README.md as folder wiki index**           | Epic A / E8        | Folder and root README content drives category index sections on generated wiki index pages               |
+| **Semantic enrichment**                      | Epic C             | Cursor rule badges, OpenSpec change-set grouping, BMAD kernel cards                                       |
+| **SSG export**                               | Epic D             | `specwiki export --format vitepress\|mkdocs` scaffold                                                     |
+| **Spec drift detection**                     | POST-MVP           | Compare duplicate instruction files; flag stale wiki                                                      |
+| **Plugins / extension API**                  | POST-MVP           | Custom category rules after config API stabilizes                                                         |
+| **MCP manifest indexing**                    | POST-MVP           | Document `.cursor/mcp.json` and similar configs                                                           |
+| **VS Code / Cursor extension**               | POST-MVP           | IDE-integrated wiki panel                                                                                 |
+| **Wikipedia-style HTML wiki skin**           | E16                | Vector-inspired layout, navigation chrome, search; extends FR-015 presentation POST-MVP                   |
 
 **Expansion path:** Persona A (solo local generate) → Persona B (CI-regenerated wiki) → Persona C (published OSS docs) → Persona D (enterprise inventory).
 
@@ -150,14 +151,15 @@ Requirements use stable `FR-xxx` IDs. Tag indicates MVP or POST-MVP delivery.
 
 ### Discovery & Preview
 
-| ID     | Tag      | Requirement                                                                                                                                                                                 |
-| ------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| FR-001 | MVP      | The CLI SHALL scan `--project` (default: current working directory) using `DEFAULT_SPEC_PATTERNS` from `src/config/patterns.ts` and ignore `node_modules/`, `dist/`, `wiki/`, `.specwiki/`. |
-| FR-002 | MVP      | The CLI SHALL derive category from path prefix via `deriveCategory` and title from basename via `deriveTitle`, with special cases for `SKILL`, `AGENTS`, `SPEC`, `CLAUDE`, `GEMINI`.        |
-| FR-003 | MVP      | `specwiki list` SHALL group discovered file paths by category, print to stdout sorted by category then relative path, and exit 0.                                                           |
-| FR-004 | MVP      | When zero spec files match, `specwiki list` SHALL exit 0 and print a helpful tip suggesting the user verify patterns or project path.                                                       |
-| FR-005 | POST-MVP | The CLI SHALL accept `--patterns` (comma-separated globs) or load patterns from `specwiki.config.js` / `specwiki.config.json` with precedence: CLI flags > env > project config > defaults. |
-| FR-006 | POST-MVP | The CLI SHALL discover nested `**/AGENTS.md`, `_bmad-output/**/*.md`, and `.agents/skills/**/SKILL.md` when included in extended or custom patterns.                                        |
+| ID     | Tag      | Requirement                                                                                                                                                                                                                                                                                                                                                                        |
+| ------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| FR-001 | MVP      | The CLI SHALL scan `--project` (default: current working directory) using `DEFAULT_SPEC_PATTERNS` from `src/config/patterns.ts` and ignore `node_modules/`, `dist/`, `wiki/`, `.specwiki/`.                                                                                                                                                                                        |
+| FR-002 | MVP      | The CLI SHALL derive category from path prefix via `deriveCategory` and title from basename via `deriveTitle`, with special cases for `SKILL`, `AGENTS`, `SPEC`, `CLAUDE`, `GEMINI`.                                                                                                                                                                                               |
+| FR-003 | MVP      | `specwiki list` SHALL group discovered file paths by category, print to stdout sorted by category then relative path, and exit 0.                                                                                                                                                                                                                                                  |
+| FR-004 | MVP      | When zero spec files match, `specwiki list` SHALL exit 0 and print a helpful tip suggesting the user verify patterns or project path.                                                                                                                                                                                                                                              |
+| FR-005 | POST-MVP | The CLI SHALL accept `--patterns` (comma-separated globs) or load patterns from `specwiki.config.js` / `specwiki.config.json` with precedence: CLI flags > env > project config > defaults.                                                                                                                                                                                        |
+| FR-006 | POST-MVP | The CLI SHALL discover nested `**/AGENTS.md`, `_bmad-output/**/*.md`, `.agents/skills/**/SKILL.md`, and `**/README.md` when included in extended or custom patterns.                                                                                                                                                                                                               |
+| FR-035 | POST-MVP | When a directory containing discovered spec files also has `README.md`, `specwiki generate` SHALL use that README's parsed body as the introductory index content for that folder's category section on `wiki/index.md` and `wiki/html/index.html`. Root `README.md` SHALL replace the auto-generated main-index boilerplate. README files SHALL still emit standalone wiki pages. |
 
 ### Parsing & Content
 
@@ -284,7 +286,7 @@ This PRD defines **what** specwiki must deliver and **for whom**. HARNESS §9 de
 | **Phase 1**        | PRD FR-001–FR-004 map to discovery module; FR-002 category/title rules; NFR-006 logging in discover paths.                                                    |
 | **Phase 2**        | PRD FR-007–FR-009, FR-011–FR-015 map to parse/output modules; NFR-003 HTML tests; NFR-008–NFR-011 path/HTML safety.                                           |
 | **Phase 3**        | PRD FR-014 (slug collisions), FR-021 (verbose), NFR-006 (Logger.ts), NFR-004 (full quality gate) — remaining MVP hardening.                                   |
-| **Phase 4+**       | PRD POST-MVP FRs (FR-005–FR-006, FR-017–FR-034) — not required for MVP sign-off per §13 checklist.                                                            |
+| **Phase 4+**       | PRD POST-MVP FRs (FR-005–FR-006, FR-017–FR-035) — not required for MVP sign-off per §13 checklist.                                                            |
 | **§13 checklist**  | PRD MVP success = all §13 deliverables true. Architecture and epics steps translate FRs into module-level design and sprint stories without redefining scope. |
 | **Checkpoints**    | HARNESS §0.3 owner review checkpoints govern implementation cadence; PRD does not alter that workflow.                                                        |
 

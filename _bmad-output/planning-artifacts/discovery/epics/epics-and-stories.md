@@ -3,7 +3,7 @@ title: specwiki Epics and Stories
 product: specwiki
 status: final
 created: 2026-07-12
-updated: 2026-07-12T21:40:00
+updated: 2026-07-12T23:15:00
 author: Discovery loop (vertical slicing; logging woven per story)
 sources:
   - _bmad-output/planning-artifacts/discovery/prd/prd.md
@@ -607,13 +607,16 @@ POST-MVP stories use the same three AC groups (Functional, Logging & diagnostics
 
 ### E8 — Custom Discovery Configuration
 
-**Binds:** FR-005, FR-006
+**Binds:** FR-005, FR-006, FR-035
 
-| Story | Summary                    |
-| ----- | -------------------------- |
-| S8.1  | `--patterns` CLI flag      |
-| S8.2  | Project config file loader |
-| S8.3  | Extended default patterns  |
+**Scope note:** Extended discovery includes `**/README.md` so project and folder README files are scanned alongside spec/agent files. When a directory containing discovered specs also has a `README.md`, that file's content is used as the index introduction for that folder's category section on the wiki index page (markdown and HTML). Root `README.md` content replaces the auto-generated boilerplate on the main wiki index.
+
+| Story | Summary                              |
+| ----- | ------------------------------------ |
+| S8.1  | `--patterns` CLI flag                |
+| S8.2  | Project config file loader           |
+| S8.3  | Extended default patterns            |
+| S8.4  | README.md discovery and folder index |
 
 #### S8.1 — --patterns CLI flag
 
@@ -629,9 +632,35 @@ POST-MVP stories use the same three AC groups (Functional, Logging & diagnostics
 
 #### S8.3 — Extended default patterns
 
-**Functional:** BMAD/nested AGENTS patterns (owner-approved); fixture tests.  
+**Functional:** BMAD/nested AGENTS patterns plus `**/README.md` (owner-approved); fixture tests verify README and nested AGENTS discovery.  
 **Logging & diagnostics:** `discover.match` for new pattern types (verbose); match count in `discover.start`.  
 **Quality measures:** Full §0.2 gate; discover coverage ≥ 90%.
+
+#### S8.4 — README.md discovery and folder index
+
+**As** a project maintainer, **I want** `README.md` files discovered and used as folder index content on the wiki, **so that** category sections reflect project-authored folder documentation instead of link-only lists.
+
+**INVEST:** I✓ N✓ V✓ E✓ S✓ T✓  
+**Demo path:** `specwiki generate --project tests/fixtures/sample-project` — root or folder `README.md` appears in `list` output; `wiki/index.md` and `wiki/html/index.html` use README body as the introductory content for the matching category section; root `README.md` replaces the default index boilerplate.
+
+**Binds:** FR-035 | **Depends:** S8.3 (README in extended patterns)
+
+**Functional:**
+
+- [ ] When `README.md` is discovered in a directory that also contains other spec files, its parsed body is rendered as the introductory content for that category section on `wiki/index.md` and `wiki/html/index.html` (above the page link list for that category)
+- [ ] Root `README.md` (`category: root`) replaces the auto-generated "Structured documentation generated from…" boilerplate on the main wiki index; category link lists still follow
+- [ ] `README.md` remains a normal wiki page (`wiki/{slug}.md` / `wiki/html/{slug}.html`) in addition to its index role — no silent omission from page output
+- [ ] Folders with `README.md` but no other discovered specs in that category: README still indexed as a standalone page; no empty category section
+- [ ] Fixture test covers at least one folder README driving category index content and one root README driving main index intro
+
+**Logging & diagnostics (§0.8):**
+
+- [ ] `parse.readme-index` when a README is bound to a category index section (verbose); `{ relativePath, category }`
+- [ ] `output.index` summary includes `readmeIndexCount` (verbose)
+
+**Quality measures:**
+
+- [ ] Full §0.2 gate; `buildIndex` / HTML index renderer coverage on touched paths
 
 ---
 
@@ -883,17 +912,17 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 
 ### POST-MVP epics (E8–E16) — **backlog**
 
-| Epic                | Stories     | FR binding     | Status  |
-| ------------------- | ----------- | -------------- | ------- |
-| E8 Custom discovery | S8.1–S8.3   | FR-005, FR-006 | backlog |
-| E9 Agent I/O        | S9.1–S9.2   | FR-017, FR-023 | backlog |
-| E10 Team CI         | S10.1       | FR-024         | backlog |
-| E11 Live loop       | S11.1–S11.2 | FR-025, FR-026 | backlog |
-| E12 Semantic        | S12.1–S12.3 | FR-010         | backlog |
-| E13 Distribution    | S13.1–S13.2 | FR-027, FR-028 | backlog |
-| E14 Ecosystem       | S14.1–S14.3 | FR-018, FR-029 | backlog |
-| E15 IDE             | S15.1       | —              | backlog |
-| E16 Wiki HTML skin  | S16.1–S16.4 | FR-032–FR-034  | backlog |
+| Epic                | Stories     | FR binding             | Status  |
+| ------------------- | ----------- | ---------------------- | ------- |
+| E8 Custom discovery | S8.1–S8.4   | FR-005, FR-006, FR-035 | backlog |
+| E9 Agent I/O        | S9.1–S9.2   | FR-017, FR-023         | backlog |
+| E10 Team CI         | S10.1       | FR-024                 | backlog |
+| E11 Live loop       | S11.1–S11.2 | FR-025, FR-026         | backlog |
+| E12 Semantic        | S12.1–S12.3 | FR-010                 | backlog |
+| E13 Distribution    | S13.1–S13.2 | FR-027, FR-028         | backlog |
+| E14 Ecosystem       | S14.1–S14.3 | FR-018, FR-029         | backlog |
+| E15 IDE             | S15.1       | —                      | backlog |
+| E16 Wiki HTML skin  | S16.1–S16.4 | FR-032–FR-034          | backlog |
 
 ---
 
