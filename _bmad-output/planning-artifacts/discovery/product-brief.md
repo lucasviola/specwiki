@@ -34,13 +34,13 @@ Solo developers feel this pain first and most often:
 
 ### What exists today does not solve this
 
-| Alternative | Gap |
-| ----------- | --- |
-| IDE rule browsers (Cursor settings) | Single-tool, not exportable, no cross-framework view |
-| SDD framework UIs (OpenSpec, BMAD, Kiro) | Workflow-centric, not documentation-centric; no cross-framework aggregation |
-| Static site generators (Docusaurus, MkDocs) | Require manual nav config; not discovery-aware of agent-spec layouts |
-| Agent-context authoring tools (Dewey, Ruler, agents-md) | Generate or distribute specs; do not aggregate what already exists |
-| Manual README curation | High friction, stale within days |
+| Alternative                                             | Gap                                                                         |
+| ------------------------------------------------------- | --------------------------------------------------------------------------- |
+| IDE rule browsers (Cursor settings)                     | Single-tool, not exportable, no cross-framework view                        |
+| SDD framework UIs (OpenSpec, BMAD, Kiro)                | Workflow-centric, not documentation-centric; no cross-framework aggregation |
+| Static site generators (Docusaurus, MkDocs)             | Require manual nav config; not discovery-aware of agent-spec layouts        |
+| Agent-context authoring tools (Dewey, Ruler, agents-md) | Generate or distribute specs; do not aggregate what already exists          |
+| Manual README curation                                  | High friction, stale within days                                            |
 
 ### The opportunity
 
@@ -50,7 +50,7 @@ No tool currently offers **cross-framework, zero-config discovery** of agent ins
 
 ## Product Vision
 
-> **For developers who use AI coding agents**, specwiki is a **CLI documentation synthesizer** that **discovers and unifies agent specs, rules, and skills into a browsable wiki**. Unlike SDD frameworks that *create* specs or IDEs that *run* agents, specwiki **makes existing agent instructions human-navigable** with one command.
+> **For developers who use AI coding agents**, specwiki is a **CLI documentation synthesizer** that **discovers and unifies agent specs, rules, and skills into a browsable wiki**. Unlike SDD frameworks that _create_ specs or IDEs that _run_ agents, specwiki **makes existing agent instructions human-navigable** with one command.
 
 ### Long-term direction
 
@@ -62,22 +62,22 @@ specwiki becomes the **readability layer** for the spec-driven development ecosy
 
 ### Primary — Persona A: Solo Cursor/AI Agent Developer ("Alex")
 
-| Attribute | Detail |
-| --------- | ------ |
-| **Profile** | Individual developer, indie hacker, or senior IC using Cursor, Claude Code, or Copilot on 1–3 active repos |
-| **Behavior** | Adopts BMAD or OpenSpec opportunistically; accumulates `.cursor/rules/`, skills, and root instruction files organically; rarely maintains formal docs |
-| **Environment** | Local machine, npm/Node.js ≥ 20, no team coordination required |
-| **Trigger** | "I added five rules last month — where are they all?" or returning to a repo after context loss |
+| Attribute       | Detail                                                                                                                                                |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Profile**     | Individual developer, indie hacker, or senior IC using Cursor, Claude Code, or Copilot on 1–3 active repos                                            |
+| **Behavior**    | Adopts BMAD or OpenSpec opportunistically; accumulates `.cursor/rules/`, skills, and root instruction files organically; rarely maintains formal docs |
+| **Environment** | Local machine, npm/Node.js ≥ 20, no team coordination required                                                                                        |
+| **Trigger**     | "I added five rules last month — where are they all?" or returning to a repo after context loss                                                       |
 
 **Why primary for MVP:** v0.1 is a local CLI with `list` and `generate` only. No auth, dashboards, CI hooks, or hosted publishing. Solo workflow = install → run → browse. Highest pain frequency and shortest time-to-value.
 
 ### Secondary (POST-MVP expansion)
 
-| Persona | Role | MVP fit | Unlock |
-| ------- | ---- | ------- | ------ |
-| **B — Small team tech lead** | Standardizes OpenSpec/BMAD; needs async onboarding | Deferred | CI regeneration, shared publishing |
-| **C — OSS maintainer** | Documents contributor agent conventions | Deferred | npm publish, GitHub Pages export |
-| **D — Enterprise platform engineer** | Monorepo rule inventory, compliance | Out of scope | Multi-repo scan, auth, dashboards |
+| Persona                              | Role                                               | MVP fit      | Unlock                             |
+| ------------------------------------ | -------------------------------------------------- | ------------ | ---------------------------------- |
+| **B — Small team tech lead**         | Standardizes OpenSpec/BMAD; needs async onboarding | Deferred     | CI regeneration, shared publishing |
+| **C — OSS maintainer**               | Documents contributor agent conventions            | Deferred     | npm publish, GitHub Pages export   |
+| **D — Enterprise platform engineer** | Monorepo rule inventory, compliance                | Out of scope | Multi-repo scan, auth, dashboards  |
 
 ---
 
@@ -116,41 +116,41 @@ specwiki becomes the **readability layer** for the spec-driven development ecosy
 
 Aligned with implementation phases that harden the brownfield v0.1 scaffold into a shippable product.
 
-| Feature | Description | HARNESS phase |
-| ------- | ----------- | ------------- |
-| **Spec discovery** | Scan project with `DEFAULT_SPEC_PATTERNS`; derive category and title from path conventions | Phase 1 (retrofit tests) |
-| **`specwiki list`** | Group and print discovered paths; exit 0 with helpful tip when zero matches | Existing + Phase 3 tests |
-| **`specwiki generate`** | Discover → parse → write markdown wiki + HTML subtree | Phase 2 (retrofit tests) |
-| **Categorized index** | `wiki/index.md` grouped by `CATEGORY_LABELS` (Cursor Rules, OpenSpec, Project Root, etc.) | Existing |
-| **Per-spec wiki pages** | Title, source path, description, TOC, full markdown content | Existing |
-| **HTML output** | Self-contained `wiki/html/*.html` with nav back to index; title escaping | Existing + Phase 2.4 tests |
-| **CLI flags** | `--project`, `--output`, `--verbose` | Existing |
-| **Test infrastructure** | Vitest, 90% coverage thresholds, fixture tree | Phase 0 |
-| **Structured logger** | `src/core/Logger.ts`; verbose-gated events to stderr | Phase 3.1–3.2 |
-| **Slug collision handling** | Disambiguate duplicate slugs from different paths | Phase 3.4 |
-| **Path safety** | Writes confined to resolved `--output`; no traversal | Phase 2.5 + §0.9 |
-| **Quality gate** | `test`, `lint`, `format`, `coverage`, `typecheck`, `build` all pass | Phase 3.5 |
-| **Build log** | `IMPLEMENTATION.md` with progression checklist and per-task log | Phase 0.1 |
+| Feature                     | Description                                                                                | HARNESS phase              |
+| --------------------------- | ------------------------------------------------------------------------------------------ | -------------------------- |
+| **Spec discovery**          | Scan project with `DEFAULT_SPEC_PATTERNS`; derive category and title from path conventions | Phase 1 (retrofit tests)   |
+| **`specwiki list`**         | Group and print discovered paths; exit 0 with helpful tip when zero matches                | Existing + Phase 3 tests   |
+| **`specwiki generate`**     | Discover → parse → write markdown wiki + HTML subtree                                      | Phase 2 (retrofit tests)   |
+| **Categorized index**       | `wiki/index.md` grouped by `CATEGORY_LABELS` (Cursor Rules, OpenSpec, Project Root, etc.)  | Existing                   |
+| **Per-spec wiki pages**     | Title, source path, description, TOC, full markdown content                                | Existing                   |
+| **HTML output**             | Self-contained `wiki/html/*.html` with nav back to index; title escaping                   | Existing + Phase 2.4 tests |
+| **CLI flags**               | `--project`, `--output`, `--verbose`                                                       | Existing                   |
+| **Test infrastructure**     | Vitest, 90% coverage thresholds, fixture tree                                              | Phase 0                    |
+| **Structured logger**       | `src/core/Logger.ts`; verbose-gated events to stderr                                       | Phase 3.1–3.2              |
+| **Slug collision handling** | Disambiguate duplicate slugs from different paths                                          | Phase 3.4                  |
+| **Path safety**             | Writes confined to resolved `--output`; no traversal                                       | Phase 2.5 + §0.9           |
+| **Quality gate**            | `test`, `lint`, `format`, `coverage`, `typecheck`, `build` all pass                        | Phase 3.5                  |
+| **Build log**               | `IMPLEMENTATION.md` with progression checklist and per-task log                            | Phase 0.1                  |
 
 **MVP explicitly excludes:** custom pattern config, npm publish, CI workflow, dev server, watch mode, `--json` output, semantic parsing of framework-specific structures.
 
 ### POST-MVP features (HARNESS Phase 4+ and beyond)
 
-| Feature | Description | Phase / epic |
-| ------- | ----------- | ------------ |
-| **`--patterns` / config file** | Override or extend default glob sets; `specwiki.config.js` | Phase 4.1 |
-| **npm publish** | `npx specwiki` on clean machine; `files` field, prepublish | Phase 4.2 |
-| **CI workflow** | GitHub Actions quality gate for the package | Phase 4.3 |
-| **`specwiki serve`** | Local static server on `127.0.0.1` (Node built-in `http`) | POST-MVP Epic B |
-| **`generate --watch`** | Debounced rebuild on spec file changes | POST-MVP Epic B |
-| **`generate --check`** | Exit 1 if wiki stale (CI freshness) | POST-MVP Epic B |
-| **`--json` output** | Machine-readable `list` and `generate` summaries | POST-MVP Epic A |
-| **`wiki/llms.txt` export** | Generate agent-oriented index from discovered specs | POST-MVP Epic A |
-| **Extended discovery** | `**/AGENTS.md`, `_bmad-output/**/*.md`, `.agents/skills/**/SKILL.md` | POST-MVP Epic A |
-| **Semantic enrichment** | Cursor rule frontmatter badges, OpenSpec change-set grouping, BMAD kernel cards | POST-MVP Epic C |
-| **SSG export** | `specwiki export --format vitepress\|mkdocs` scaffold | POST-MVP Epic D |
-| **Spec drift detection** | Compare duplicate instruction files; flag stale wiki | POST-MVP |
-| **Plugins / extension API** | Custom category rules for org-specific layouts | POST-MVP |
+| Feature                        | Description                                                                     | Phase / epic    |
+| ------------------------------ | ------------------------------------------------------------------------------- | --------------- |
+| **`--patterns` / config file** | Override or extend default glob sets; `specwiki.config.js`                      | Phase 4.1       |
+| **npm publish**                | `npx specwiki` on clean machine; `files` field, prepublish                      | Phase 4.2       |
+| **CI workflow**                | GitHub Actions quality gate for the package                                     | Phase 4.3       |
+| **`specwiki serve`**           | Local static server on `127.0.0.1` (Node built-in `http`)                       | POST-MVP Epic B |
+| **`generate --watch`**         | Debounced rebuild on spec file changes                                          | POST-MVP Epic B |
+| **`generate --check`**         | Exit 1 if wiki stale (CI freshness)                                             | POST-MVP Epic B |
+| **`--json` output**            | Machine-readable `list` and `generate` summaries                                | POST-MVP Epic A |
+| **`wiki/llms.txt` export**     | Generate agent-oriented index from discovered specs                             | POST-MVP Epic A |
+| **Extended discovery**         | `**/AGENTS.md`, `_bmad-output/**/*.md`, `.agents/skills/**/SKILL.md`            | POST-MVP Epic A |
+| **Semantic enrichment**        | Cursor rule frontmatter badges, OpenSpec change-set grouping, BMAD kernel cards | POST-MVP Epic C |
+| **SSG export**                 | `specwiki export --format vitepress\|mkdocs` scaffold                           | POST-MVP Epic D |
+| **Spec drift detection**       | Compare duplicate instruction files; flag stale wiki                            | POST-MVP        |
+| **Plugins / extension API**    | Custom category rules for org-specific layouts                                  | POST-MVP        |
 
 ---
 
@@ -184,28 +184,28 @@ specwiki wins MVP when a **solo developer** can run `specwiki generate` on their
 
 ### Falsification signals
 
-| Signal | Implication |
-| ------ | ----------- |
-| Users run `list`, see files, but never `generate` | Discovery without synthesis value — parsing/output UX broken |
-| Wiki generated once, never re-run | No habit loop — output not useful enough to maintain |
-| `--config` requested before basic generate works | Pattern coverage gap dominates; fix discovery before configurability |
-| Zero spec files in majority of target repos | Default patterns miss real-world layouts |
-| Users prefer maintaining README index manually | Synthesis value insufficient vs. friction |
+| Signal                                            | Implication                                                          |
+| ------------------------------------------------- | -------------------------------------------------------------------- |
+| Users run `list`, see files, but never `generate` | Discovery without synthesis value — parsing/output UX broken         |
+| Wiki generated once, never re-run                 | No habit loop — output not useful enough to maintain                 |
+| `--config` requested before basic generate works  | Pattern coverage gap dominates; fix discovery before configurability |
+| Zero spec files in majority of target repos       | Default patterns miss real-world layouts                             |
+| Users prefer maintaining README index manually    | Synthesis value insufficient vs. friction                            |
 
 ---
 
 ## Success Metrics (MVP)
 
-| Metric | Target | Measurement |
-| ------ | ------ | ----------- |
-| **Time to first wiki** | < 60 seconds from clone to browsable output | Benchmark on specwiki repo + fixture tree |
-| **Discovery yield** | Median project finds ≥ 5 spec files | `specwiki list` count on fixtures + dogfood repo |
-| **Zero-config rate** | ≥ 80% of BMAD/OpenSpec/Cursor sample repos need no custom patterns | Fixture coverage in `tests/fixtures/` |
-| **Dogfood validation** | specwiki repo generates complete wiki of its own specs | Self-host test after Phase 3 |
-| **Quality gate reliability** | 100% pass on full §0.2 gate | `npm run test/lint/format/coverage/typecheck/build` |
-| **Coverage threshold** | ≥ 90% lines/functions/branches/statements | Vitest enforced thresholds |
-| **Slug integrity** | Zero silent overwrites from path collisions | Phase 3.4 tests |
-| **Re-run habit** | [ASSUMPTION] ≥ 50% of activated users regenerate wiki at least once after initial run | No telemetry in MVP; validate via dogfood + early adopters |
+| Metric                       | Target                                                                                | Measurement                                                |
+| ---------------------------- | ------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| **Time to first wiki**       | < 60 seconds from clone to browsable output                                           | Benchmark on specwiki repo + fixture tree                  |
+| **Discovery yield**          | Median project finds ≥ 5 spec files                                                   | `specwiki list` count on fixtures + dogfood repo           |
+| **Zero-config rate**         | ≥ 80% of BMAD/OpenSpec/Cursor sample repos need no custom patterns                    | Fixture coverage in `tests/fixtures/`                      |
+| **Dogfood validation**       | specwiki repo generates complete wiki of its own specs                                | Self-host test after Phase 3                               |
+| **Quality gate reliability** | 100% pass on full §0.2 gate                                                           | `npm run test/lint/format/coverage/typecheck/build`        |
+| **Coverage threshold**       | ≥ 90% lines/functions/branches/statements                                             | Vitest enforced thresholds                                 |
+| **Slug integrity**           | Zero silent overwrites from path collisions                                           | Phase 3.4 tests                                            |
+| **Re-run habit**             | [ASSUMPTION] ≥ 50% of activated users regenerate wiki at least once after initial run | No telemetry in MVP; validate via dogfood + early adopters |
 
 ### Anti-metrics (do not optimize in MVP)
 
@@ -228,15 +228,15 @@ Awareness → Install (npm link / local) → list shows >0 files → generate �
 
 specwiki is a **read-only aggregator and renderer** — not a spec authoring framework, agent runtime, or full documentation platform.
 
-| Tool | Direction | vs specwiki |
-| ---- | --------- | ----------- |
-| **Dewey** | Docs → agent artifacts (+ optional site) | Expects controlled `docs/` tree; specwiki scans heterogeneous existing layouts |
-| **Ruler** | `.ruler/` → distribute to 30+ agents | Writes agent context; complementary — Ruler generates, specwiki aggregates |
-| **agents-md** | Fragments → compose AGENTS.md | Composition, not cross-framework discovery |
-| **OpenSpec CLI** | Creates/manages `openspec/` artifacts | Spec lifecycle owner; specwiki reflects output |
-| **BMAD Method** | Intent → PRD/UX/SPEC pipeline | Planning orchestration; specwiki dogfoods and indexes output |
-| **Docusaurus / VitePress / MkDocs** | Markdown → full SSG site | Require config and build pipeline; not agent-spec-aware |
-| **Cursor IDE** | Runs agents with rules/skills | No exportable cross-tool wiki |
+| Tool                                | Direction                                | vs specwiki                                                                    |
+| ----------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------ |
+| **Dewey**                           | Docs → agent artifacts (+ optional site) | Expects controlled `docs/` tree; specwiki scans heterogeneous existing layouts |
+| **Ruler**                           | `.ruler/` → distribute to 30+ agents     | Writes agent context; complementary — Ruler generates, specwiki aggregates     |
+| **agents-md**                       | Fragments → compose AGENTS.md            | Composition, not cross-framework discovery                                     |
+| **OpenSpec CLI**                    | Creates/manages `openspec/` artifacts    | Spec lifecycle owner; specwiki reflects output                                 |
+| **BMAD Method**                     | Intent → PRD/UX/SPEC pipeline            | Planning orchestration; specwiki dogfoods and indexes output                   |
+| **Docusaurus / VitePress / MkDocs** | Markdown → full SSG site                 | Require config and build pipeline; not agent-spec-aware                        |
+| **Cursor IDE**                      | Runs agents with rules/skills            | No exportable cross-tool wiki                                                  |
 
 ### Differentiation pillars
 
@@ -257,26 +257,26 @@ Breadth of discovery patterns across the SDD ecosystem + zero-config CLI trust. 
 
 From `project-context.md` and HARNESS — non-negotiable for MVP:
 
-| Constraint | Detail |
-| ---------- | ------ |
-| **Frozen contracts** | `DEFAULT_SPEC_PATTERNS` (extend only), wiki layout, `CATEGORY_LABELS`, HTML title escaping |
-| **Stack** | TypeScript 5.8 strict, Node ≥ 20, ESM; minimal runtime deps (commander, fast-glob, gray-matter, marked, chalk) |
-| **Security** | Path validation on `--project`/`--output`; writes only under resolved output dir; no secrets in logs |
-| **Output mode** | Static markdown + HTML only for MVP (decision: 2026-07-12) |
+| Constraint              | Detail                                                                                                                   |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **Frozen contracts**    | `DEFAULT_SPEC_PATTERNS` (extend only), wiki layout, `CATEGORY_LABELS`, HTML title escaping                               |
+| **Stack**               | TypeScript 5.8 strict, Node ≥ 20, ESM; minimal runtime deps (commander, fast-glob, gray-matter, marked, chalk)           |
+| **Security**            | Path validation on `--project`/`--output`; writes only under resolved output dir; no secrets in logs                     |
+| **Output mode**         | Static markdown + HTML only for MVP (decision: 2026-07-12)                                                               |
 | **Brownfield baseline** | v0.1 scaffold has working `list`/`generate`, 15 tests, ~99% coverage; gaps: logger, slug collisions, `IMPLEMENTATION.md` |
 
 ---
 
 ## Risks and Mitigations
 
-| Risk | Severity | Mitigation |
-| ---- | -------- | ---------- |
-| Slug collisions corrupt wiki | High | Phase 3.4 fix before npm publish |
-| Format fragmentation accelerates | Medium | Extend-only patterns; POST-MVP config overrides |
-| Competing AGENTS.md tools absorb aggregation | Medium | Differentiate on cross-framework scan; ship `llms.txt` export POST-MVP |
-| Monorepo nested AGENTS.md missed | Medium | POST-MVP `**/AGENTS.md`; document `--patterns` workaround |
-| marked XSS via embedded HTML | Low | Trusted local specs; document; sanitize POST-MVP |
-| HARNESS §4 gaps stale vs code | Low | `project-context.md` is authoritative for brownfield state |
+| Risk                                         | Severity | Mitigation                                                             |
+| -------------------------------------------- | -------- | ---------------------------------------------------------------------- |
+| Slug collisions corrupt wiki                 | High     | Phase 3.4 fix before npm publish                                       |
+| Format fragmentation accelerates             | Medium   | Extend-only patterns; POST-MVP config overrides                        |
+| Competing AGENTS.md tools absorb aggregation | Medium   | Differentiate on cross-framework scan; ship `llms.txt` export POST-MVP |
+| Monorepo nested AGENTS.md missed             | Medium   | POST-MVP `**/AGENTS.md`; document `--patterns` workaround              |
+| marked XSS via embedded HTML                 | Low      | Trusted local specs; document; sanitize POST-MVP                       |
+| HARNESS §4 gaps stale vs code                | Low      | `project-context.md` is authoritative for brownfield state             |
 
 ---
 
@@ -294,12 +294,12 @@ Tagged `[ASSUMPTION]` where inferred without owner confirmation:
 
 ## Downstream Handoff
 
-| Next step | Carry-forward |
-| --------- | ------------- |
-| **PRD (step-04)** | MVP features = list + generate + patterns + quality gate; defer team/CI/serve to POST-MVP roadmap |
-| **Architecture (step-05)** | Discovery module is core IP; frozen contracts in §12; logger in `src/core/` |
-| **Epics (step-06)** | Map HARNESS Phases 0–3 to MVP epics; Phase 4+ to distribution epics |
-| **Readiness (step-07)** | Dogfood wiki on specwiki repo; validate fixture trees for BMAD/OpenSpec/Cursor layouts |
+| Next step                  | Carry-forward                                                                                     |
+| -------------------------- | ------------------------------------------------------------------------------------------------- |
+| **PRD (step-04)**          | MVP features = list + generate + patterns + quality gate; defer team/CI/serve to POST-MVP roadmap |
+| **Architecture (step-05)** | Discovery module is core IP; frozen contracts in §12; logger in `src/core/`                       |
+| **Epics (step-06)**        | Map HARNESS Phases 0–3 to MVP epics; Phase 4+ to distribution epics                               |
+| **Readiness (step-07)**    | Dogfood wiki on specwiki repo; validate fixture trees for BMAD/OpenSpec/Cursor layouts            |
 
 ---
 

@@ -19,12 +19,12 @@ This discovery phase runs in a **fully autonomous loop**. The owner is not avail
 
 ### Hard rules
 
-| Rule | Detail |
-| ---- | ------ |
-| **Never ask the human** | Do not pause for owner input, approval, or clarification |
-| **Never halt on open questions** | Resolve or record and proceed |
-| **Prefer action over waiting** | Each loop iteration must advance at least one workflow step |
-| **Document everything** | Decisions, assumptions, and escalations go to the discovery workspace (see below) |
+| Rule                             | Detail                                                                            |
+| -------------------------------- | --------------------------------------------------------------------------------- |
+| **Never ask the human**          | Do not pause for owner input, approval, or clarification                          |
+| **Never halt on open questions** | Resolve or record and proceed                                                     |
+| **Prefer action over waiting**   | Each loop iteration must advance at least one workflow step                       |
+| **Document everything**          | Decisions, assumptions, and escalations go to the discovery workspace (see below) |
 
 ### When you would normally ask a human
 
@@ -44,6 +44,7 @@ You are a [DOMAIN EXPERT PERSONA]. The specwiki discovery loop cannot ask the hu
 **Decision needed:** [one sentence]
 
 **Context:**
+
 - Product: CLI that scans AI specs and generates wiki-like docs
 - Brownfield: v0.1 scaffold exists with list/generate commands
 - Constraint: [relevant HARNESS or PRD constraint]
@@ -72,15 +73,15 @@ When invoking BMad skills in this loop, operate in **headless mode**:
 
 ## Project context
 
-| Item | Value |
-| ---- | ----- |
-| **Project** | specwiki |
-| **One-liner** | CLI that transforms AI specs in any project into structured, wiki-like documentation |
-| **Repo root** | `/Users/lucas/Projects/specwiki` |
-| **BMad planning output** | `_bmad-output/planning-artifacts/` |
-| **Discovery workspace** | `_bmad-output/planning-artifacts/discovery/` |
-| **Project knowledge** | `docs/` |
-| **Communication language** | English |
+| Item                       | Value                                                                                |
+| -------------------------- | ------------------------------------------------------------------------------------ |
+| **Project**                | specwiki                                                                             |
+| **One-liner**              | CLI that transforms AI specs in any project into structured, wiki-like documentation |
+| **Repo root**              | `/Users/lucas/Projects/specwiki`                                                     |
+| **BMad planning output**   | `_bmad-output/planning-artifacts/`                                                   |
+| **Discovery workspace**    | `_bmad-output/planning-artifacts/discovery/`                                         |
+| **Project knowledge**      | `docs/`                                                                              |
+| **Communication language** | English                                                                              |
 
 ### Brownfield status
 
@@ -106,23 +107,23 @@ Code already exists: `src/cli.ts`, discovery, parsing, wiki output, tests, READM
 
 **Section map for agents:**
 
-| When working on… | Read HARNESS sections |
-| ---------------- | --------------------- |
-| Product / users / scope | §1, §4 (Core user flows, Invariants, Known gaps) |
-| Architecture | §2, §3, §4, §12 |
-| MVP epic breakdown | §9 (all phases), §10, §11, §13 |
-| POST-MVP features | §9 Phase 4+, §4 Known gaps (config, CI, publish) |
-| Story acceptance criteria | §0.1–§0.9, §4 output contract |
+| When working on…          | Read HARNESS sections                            |
+| ------------------------- | ------------------------------------------------ |
+| Product / users / scope   | §1, §4 (Core user flows, Invariants, Known gaps) |
+| Architecture              | §2, §3, §4, §12                                  |
+| MVP epic breakdown        | §9 (all phases), §10, §11, §13                   |
+| POST-MVP features         | §9 Phase 4+, §4 Known gaps (config, CI, publish) |
+| Story acceptance criteria | §0.1–§0.9, §4 output contract                    |
 
 ### Secondary inputs (load per step)
 
-| File / path | Use |
-| ----------- | --- |
-| `README.md` | User-facing commands, discovery patterns, output layout |
-| `src/**` | Actual implementation vs HARNESS gaps |
-| `tests/**`, `tests/fixtures/sample-project/` | Test coverage and fixture conventions |
-| `package.json` | Scripts, dependencies, bin entry |
-| `IMPLEMENTATION.md` | If present — build log and checklist (may not exist yet) |
+| File / path                                  | Use                                                      |
+| -------------------------------------------- | -------------------------------------------------------- |
+| `README.md`                                  | User-facing commands, discovery patterns, output layout  |
+| `src/**`                                     | Actual implementation vs HARNESS gaps                    |
+| `tests/**`, `tests/fixtures/sample-project/` | Test coverage and fixture conventions                    |
+| `package.json`                               | Scripts, dependencies, bin entry                         |
+| `IMPLEMENTATION.md`                          | If present — build log and checklist (may not exist yet) |
 
 ---
 
@@ -170,15 +171,36 @@ Create on first run if missing:
   "current_step": "step-00-init",
   "steps": {
     "step-00-init": { "status": "pending", "artifact": null },
-    "step-01-project-context": { "status": "pending", "artifact": "project-context.md" },
+    "step-01-project-context": {
+      "status": "pending",
+      "artifact": "project-context.md"
+    },
     "step-02-research": { "status": "pending", "artifact": "research/" },
-    "step-03-product-brief": { "status": "pending", "artifact": "product-brief.md" },
+    "step-03-product-brief": {
+      "status": "pending",
+      "artifact": "product-brief.md"
+    },
     "step-04-prd": { "status": "pending", "artifact": "prd/prd.md" },
-    "step-05-architecture": { "status": "pending", "artifact": "architecture/ARCHITECTURE-SPINE.md" },
-    "step-06-epics": { "status": "pending", "artifact": "epics/epics-and-stories.md" },
-    "step-07-readiness": { "status": "pending", "artifact": "readiness/readiness-report.md" },
-    "step-08-mvp-roadmap": { "status": "pending", "artifact": "MVP-ROADMAP.md" },
-    "step-09-post-mvp-roadmap": { "status": "pending", "artifact": "POST-MVP-ROADMAP.md" },
+    "step-05-architecture": {
+      "status": "pending",
+      "artifact": "architecture/ARCHITECTURE-SPINE.md"
+    },
+    "step-06-epics": {
+      "status": "pending",
+      "artifact": "epics/epics-and-stories.md"
+    },
+    "step-07-readiness": {
+      "status": "pending",
+      "artifact": "readiness/readiness-report.md"
+    },
+    "step-08-mvp-roadmap": {
+      "status": "pending",
+      "artifact": "MVP-ROADMAP.md"
+    },
+    "step-09-post-mvp-roadmap": {
+      "status": "pending",
+      "artifact": "POST-MVP-ROADMAP.md"
+    },
     "step-10-finalize": { "status": "pending", "artifact": null }
   },
   "blockers": [],
@@ -345,9 +367,11 @@ Split epics into two labeled sections in the document:
 
 ```markdown
 ## MVP Epics
+
 <!-- Epics and stories that deliver PRD MVP scope -->
 
 ## POST-MVP Epics
+
 <!-- Epics deferred from MVP; reference PRD POST-MVP requirements -->
 ```
 
@@ -386,19 +410,30 @@ Do **not** stop for human sign-off — subagent "QA lead" validates alignment in
 # specwiki — MVP Roadmap
 
 ## Executive summary
+
 ## MVP goal and success criteria (from PRD)
+
 ## Scope boundary (in / out)
+
 ## Prerequisites (brownfield state, tooling from HARNESS §0)
+
 ## Sequenced phases
+
 ### Phase 1: [name]
+
 - Epic / stories (IDs)
 - HARNESS §9 mapping
 - Dependencies
 - Definition of done
+
 ### Phase 2: ...
+
 ## Quality gate (HARNESS §0.2 commands — must pass before MVP ship)
+
 ## Risks and mitigations
+
 ## Assumptions (link to assumptions.md)
+
 ## Open items deferred to POST-MVP
 ```
 
@@ -418,16 +453,24 @@ Phases must be **ordered for implementation** — what to build first given exis
 # specwiki — POST-MVP Roadmap
 
 ## Executive summary
+
 ## Themes (e.g. extensibility, distribution, UX, ecosystem)
+
 ## Sequenced phases (POST-MVP Phase A, B, C…)
+
 ### Phase A: [name]
+
 - Epics / stories
 - Why deferred from MVP
 - Dependencies on MVP
 - Rough effort (S/M/L)
+
 ## HARNESS §9 Phase 4+ mapping
+
 ## Research-backed opportunities (from step 2)
+
 ## Assumptions
+
 ## Future bets (explicitly speculative)
 ```
 
@@ -455,25 +498,25 @@ Phases must be **ordered for implementation** — what to build first given exis
 
 ## BMad skill reference (discovery path)
 
-| Step | Menu | Skill | Required |
-| ---- | ---- | ----- | -------- |
-| 1 | GPC | `bmad-generate-project-context` | Yes |
-| 2 | TR / DR | `bmad-technical-research`, `bmad-domain-research` | TR yes, DR recommended |
-| 3 | CB or WB | `bmad-product-brief` or `bmad-prfaq` | Yes (one) |
-| 4 | PRD | `bmad-prd` | **Yes** |
-| 5 | CA | `bmad-architecture` | **Yes** |
-| 6 | CE | `bmad-create-epics-and-stories` | **Yes** |
-| 7 | IR | `bmad-check-implementation-readiness` | **Yes** |
-| 8–9 | — | Synthesis (this document) | **Yes** |
+| Step | Menu     | Skill                                             | Required               |
+| ---- | -------- | ------------------------------------------------- | ---------------------- |
+| 1    | GPC      | `bmad-generate-project-context`                   | Yes                    |
+| 2    | TR / DR  | `bmad-technical-research`, `bmad-domain-research` | TR yes, DR recommended |
+| 3    | CB or WB | `bmad-product-brief` or `bmad-prfaq`              | Yes (one)              |
+| 4    | PRD      | `bmad-prd`                                        | **Yes**                |
+| 5    | CA       | `bmad-architecture`                               | **Yes**                |
+| 6    | CE       | `bmad-create-epics-and-stories`                   | **Yes**                |
+| 7    | IR       | `bmad-check-implementation-readiness`             | **Yes**                |
+| 8–9  | —        | Synthesis (this document)                         | **Yes**                |
 
 **Optional anytime:** `bmad-forge-idea` (if concept weak after step 3), `bmad-document-project`
 
 **After discovery (implementation loop — separate from this doc):**
 
-| Menu | Skill | Purpose |
-| ---- | ----- | ------- |
-| SP | `bmad-sprint-planning` | Sprint plan from MVP epics |
-| CS → VS → DS → CR | story cycle | Build MVP |
+| Menu              | Skill                  | Purpose                    |
+| ----------------- | ---------------------- | -------------------------- |
+| SP                | `bmad-sprint-planning` | Sprint plan from MVP epics |
+| CS → VS → DS → CR | story cycle            | Build MVP                  |
 
 ---
 
@@ -540,13 +583,13 @@ TypeScript 5.8 strict, Node ≥20, Commander, fast-glob, gray-matter, marked, Vi
 
 ### HARNESS build phases → MVP mapping (§9)
 
-| HARNESS Phase | Focus |
-| ------------- | ----- |
-| Phase 0 | Scaffold, IMPLEMENTATION.md, Vitest/ESLint/Prettier |
-| Phase 1 | Discovery module tests + logging |
-| Phase 2 | Parse/output tests + HTML safety |
-| Phase 3 | Logger, slug collisions, full quality gate |
-| Phase 4 | Config override, npm publish, CI — **POST-MVP candidate** |
+| HARNESS Phase | Focus                                                     |
+| ------------- | --------------------------------------------------------- |
+| Phase 0       | Scaffold, IMPLEMENTATION.md, Vitest/ESLint/Prettier       |
+| Phase 1       | Discovery module tests + logging                          |
+| Phase 2       | Parse/output tests + HTML safety                          |
+| Phase 3       | Logger, slug collisions, full quality gate                |
+| Phase 4       | Config override, npm publish, CI — **POST-MVP candidate** |
 
 ### Known gaps at harness authoring time (§4, §11)
 

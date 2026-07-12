@@ -27,12 +27,12 @@ specwiki occupies a narrow but growing niche: **read-only aggregation of AI-faci
 
 AI spec artifacts fall into four families that specwiki must handle:
 
-| Family | Examples | Structure | Agent consumption |
-| ------ | -------- | --------- | ----------------- |
-| **Root instruction files** | `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `llms.txt` | Plain markdown; optional YAML frontmatter | Loaded by agent at session start; nearest-wins in monorepos |
-| **IDE rule/skill files** | `.cursor/rules/*.mdc`, `.cursor/skills/**/SKILL.md` | YAML frontmatter + markdown body; activation metadata | Scoped by globs, description relevance, or manual @-mention |
-| **Spec-driven dev trees** | `specs/`, `openspec/`, `.kiro/specs/`, `requirements/` | Folder conventions + structured headings | Read by agents during planning/implementation phases |
-| **Framework output artifacts** | `_bmad-output/**/SPEC.md`, `_bmad-output/planning-artifacts/**` | Kernel + companions + memlogs | Machine contracts for downstream agent skills |
+| Family                         | Examples                                                        | Structure                                             | Agent consumption                                           |
+| ------------------------------ | --------------------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------- |
+| **Root instruction files**     | `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `llms.txt`               | Plain markdown; optional YAML frontmatter             | Loaded by agent at session start; nearest-wins in monorepos |
+| **IDE rule/skill files**       | `.cursor/rules/*.mdc`, `.cursor/skills/**/SKILL.md`             | YAML frontmatter + markdown body; activation metadata | Scoped by globs, description relevance, or manual @-mention |
+| **Spec-driven dev trees**      | `specs/`, `openspec/`, `.kiro/specs/`, `requirements/`          | Folder conventions + structured headings              | Read by agents during planning/implementation phases        |
+| **Framework output artifacts** | `_bmad-output/**/SPEC.md`, `_bmad-output/planning-artifacts/**` | Kernel + companions + memlogs                         | Machine contracts for downstream agent skills               |
 
 specwiki's current `DEFAULT_SPEC_PATTERNS` in `src/config/patterns.ts` covers families 1–3 well. Family 4 (BMAD `_bmad-output/`) is **not yet discovered** — a deliberate gap worth addressing POST-MVP.
 
@@ -58,10 +58,10 @@ specwiki's current `DEFAULT_SPEC_PATTERNS` in `src/config/patterns.ts` covers fa
 
 Two distinct meanings collide:
 
-| Variant | Location | Purpose | Frontmatter |
-| ------- | -------- | ------- | ----------- |
-| **Project SPEC.md** | Repo root | Feature/work-order template: what to build, acceptance criteria | Informal |
-| **BMAD SPEC.md** | `{output_folder}/specs/spec-{slug}/SPEC.md` | Five-field kernel: Why, Capabilities, Constraints, Non-goals, Success signal | `companions:`, `sources:` arrays |
+| Variant             | Location                                    | Purpose                                                                      | Frontmatter                      |
+| ------------------- | ------------------------------------------- | ---------------------------------------------------------------------------- | -------------------------------- |
+| **Project SPEC.md** | Repo root                                   | Feature/work-order template: what to build, acceptance criteria              | Informal                         |
+| **BMAD SPEC.md**    | `{output_folder}/specs/spec-{slug}/SPEC.md` | Five-field kernel: Why, Capabilities, Constraints, Non-goals, Success signal | `companions:`, `sources:` arrays |
 
 BMAD explicitly warns that product `SPEC.md` with `Status: implementation-ready` is **not** authorization to edit source — Quick Dev requires a separate execution spec ([issue #2433](https://github.com/bmad-code-org/BMAD-METHOD/issues/2433)). specwiki should display these faithfully but not conflate them.
 
@@ -89,12 +89,12 @@ Rule body in markdown.
 
 **Activation modes (from frontmatter combination):**
 
-| Mode | `alwaysApply` | `globs` | `description` |
-| ---- | ------------- | ------- | --------------- |
-| Always | `true` | — | — |
-| Auto-attached | `false` | set | — |
-| Agent-requested | `false` | — | set |
-| Manual | `false` | — | — |
+| Mode            | `alwaysApply` | `globs` | `description` |
+| --------------- | ------------- | ------- | ------------- |
+| Always          | `true`        | —       | —             |
+| Auto-attached   | `false`       | set     | —             |
+| Agent-requested | `false`       | —       | set           |
+| Manual          | `false`       | —       | —             |
 
 Plain `.md` files in `.cursor/rules/` are **ignored** by Cursor (no frontmatter). specwiki correctly includes both `.md` and `.mdc`.
 
@@ -112,13 +112,14 @@ Plain `.md` files in `.cursor/rules/` are **ignored** by Cursor (no frontmatter)
 
 ```markdown
 ---
-name: my-skill          # required; must match parent folder
-description: ...        # required
-paths: "**/*.tsx"       # optional scope
+name: my-skill # required; must match parent folder
+description: ... # required
+paths: "**/*.tsx" # optional scope
 disable-model-invocation: false
 ---
 
 # Skill Title
+
 Instructions...
 ```
 
@@ -205,9 +206,11 @@ openspec/
 > Short summary in blockquote.
 
 ## Documentation
+
 - [Page name](https://example.com/docs/page): Notes
 
 ## Optional
+
 - [Changelog](...): Lower priority
 ```
 
@@ -221,15 +224,15 @@ Designed for LLM context windows; companion `llms-full.txt` concatenates full co
 
 ### 1.9 Other formats in the wild
 
-| Format | Location | Notes |
-| ------ | -------- | ----- |
-| `CLAUDE.md` | Root | Claude Code native; symlinked to AGENTS.md in many repos |
-| `GEMINI.md` | Root | Gemini CLI context file |
-| `.github/copilot-instructions.md` | `.github/` | GitHub Copilot repo instructions |
-| `.kiro/specs/**` | Kiro IDE | Discovered; category `kiro` |
-| `docs/plans/**`, `requirements/**` | Various | Planning/requirements trees |
-| `.ruler/**` | Ruler-managed | Source for distributed AGENTS.md; not end-agent artifact |
-| `HARNESS.md`, `IMPLEMENTATION.md` | Project root | Build harness / implementation logs; agent-facing |
+| Format                             | Location      | Notes                                                    |
+| ---------------------------------- | ------------- | -------------------------------------------------------- |
+| `CLAUDE.md`                        | Root          | Claude Code native; symlinked to AGENTS.md in many repos |
+| `GEMINI.md`                        | Root          | Gemini CLI context file                                  |
+| `.github/copilot-instructions.md`  | `.github/`    | GitHub Copilot repo instructions                         |
+| `.kiro/specs/**`                   | Kiro IDE      | Discovered; category `kiro`                              |
+| `docs/plans/**`, `requirements/**` | Various       | Planning/requirements trees                              |
+| `.ruler/**`                        | Ruler-managed | Source for distributed AGENTS.md; not end-agent artifact |
+| `HARNESS.md`, `IMPLEMENTATION.md`  | Project root  | Build harness / implementation logs; agent-facing        |
 
 ---
 
@@ -239,18 +242,18 @@ Designed for LLM context windows; companion `llms-full.txt` concatenates full co
 
 specwiki is a **read-only aggregator and renderer**, not a spec authoring framework or full documentation platform.
 
-| Tool | Direction | Overlap with specwiki | Differentiation |
-| ---- | --------- | --------------------- | --------------- |
-| **specwiki** | Scan → aggregate → static wiki | — | Zero-config discovery across heterogeneous AI spec layouts |
-| **Dewey** | Docs → agent artifacts (+ optional site) | Scans docs, generates AGENTS.md/llms.txt | Authoring/audit focus; optional static site scaffold |
-| **Ruler** | `.ruler/` → distribute to agents | Reads/writes AGENTS.md, rules, skills | Multi-agent config sync; not a wiki |
-| **agents-md** | Fragments → compose AGENTS.md | Markdown composition | Writes agent context; doesn't aggregate existing specs |
-| **OpenSpec CLI** | `/opsx:propose` → change artifacts | Markdown specs in `openspec/` | Creates and manages specs; doesn't cross-framework aggregate |
-| **BMAD skills** | Intent → SPEC.md/PRD/UX | Produces `_bmad-output/` artifacts | Planning pipeline; not a universal scanner |
-| **Docusaurus** | Markdown/MDX → React site | HTML output | Full SSG; requires config, build pipeline, React |
-| **VitePress** | Markdown → Vue site | HTML output | Full SSG; Vue ecosystem; local search |
-| **MkDocs** | Markdown → static site | HTML output | Python; Material theme in maintenance mode (Nov 2025) |
-| **TypeDoc** | TypeScript → API docs | CLI generate pattern | Code-structure-driven; not spec-file-driven |
+| Tool             | Direction                                | Overlap with specwiki                    | Differentiation                                              |
+| ---------------- | ---------------------------------------- | ---------------------------------------- | ------------------------------------------------------------ |
+| **specwiki**     | Scan → aggregate → static wiki           | —                                        | Zero-config discovery across heterogeneous AI spec layouts   |
+| **Dewey**        | Docs → agent artifacts (+ optional site) | Scans docs, generates AGENTS.md/llms.txt | Authoring/audit focus; optional static site scaffold         |
+| **Ruler**        | `.ruler/` → distribute to agents         | Reads/writes AGENTS.md, rules, skills    | Multi-agent config sync; not a wiki                          |
+| **agents-md**    | Fragments → compose AGENTS.md            | Markdown composition                     | Writes agent context; doesn't aggregate existing specs       |
+| **OpenSpec CLI** | `/opsx:propose` → change artifacts       | Markdown specs in `openspec/`            | Creates and manages specs; doesn't cross-framework aggregate |
+| **BMAD skills**  | Intent → SPEC.md/PRD/UX                  | Produces `_bmad-output/` artifacts       | Planning pipeline; not a universal scanner                   |
+| **Docusaurus**   | Markdown/MDX → React site                | HTML output                              | Full SSG; requires config, build pipeline, React             |
+| **VitePress**    | Markdown → Vue site                      | HTML output                              | Full SSG; Vue ecosystem; local search                        |
+| **MkDocs**       | Markdown → static site                   | HTML output                              | Python; Material theme in maintenance mode (Nov 2025)        |
+| **TypeDoc**      | TypeScript → API docs                    | CLI generate pattern                     | Code-structure-driven; not spec-file-driven                  |
 
 ### 2.2 Closest competitors (detailed)
 
@@ -264,11 +267,11 @@ specwiki is a **read-only aggregator and renderer**, not a spec authoring framew
 
 If specwiki's HTML output proves insufficient, users can point an SSG at the generated `wiki/` directory:
 
-| SSG | Integration effort | Fit |
-| --- | ------------------ | --- |
-| VitePress | Low — markdown in, default theme | Good for Vue teams; local search built-in |
-| Docusaurus | Medium — may need sidebar config | Good for React teams; versioning/i18n |
-| MkDocs | Low — `mkdocs.yml` + `docs_dir: wiki` | Good for Python teams; Material maintenance concern |
+| SSG        | Integration effort                    | Fit                                                 |
+| ---------- | ------------------------------------- | --------------------------------------------------- |
+| VitePress  | Low — markdown in, default theme      | Good for Vue teams; local search built-in           |
+| Docusaurus | Medium — may need sidebar config      | Good for React teams; versioning/i18n               |
+| MkDocs     | Low — `mkdocs.yml` + `docs_dir: wiki` | Good for Python teams; Material maintenance concern |
 
 **Recommendation:** specwiki should not bundle an SSG for MVP. The minimal inline HTML in `wrapHtml()` satisfies "open and read" without a build step. POST-MVP `specwiki export --format vitepress` could scaffold config.
 
@@ -287,13 +290,13 @@ No tool currently offers:
 
 ### 3.1 Reference tools and applicable patterns
 
-| Tool | Pattern | specwiki application |
-| ---- | ------- | -------------------- |
-| **ripgrep** | Fast default; `rg -l` (list); `--json` for machines; exit 0 on no match | `list` ≈ `rg -l`; empty discovery exits 0 with tip (already implemented) |
-| **eslint** | Config cascade; `--fix` vs check; clear error format | POST-MVP: `specwiki.config.js` cascade; `generate --check` for CI |
-| **prettier** | `--check` vs write; exit 1 on drift | POST-MVP: `generate --check` exits 1 if wiki stale |
-| **TypeDoc** | `typedoc --watch`; `--showConfig`; log levels | POST-MVP: `generate --watch`; `--show-config` |
-| **Prettier/Ripgrep** | Respect `NO_COLOR`; no output when piped | Use `chalk` with TTY check; `--no-color` flag |
+| Tool                 | Pattern                                                                 | specwiki application                                                     |
+| -------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| **ripgrep**          | Fast default; `rg -l` (list); `--json` for machines; exit 0 on no match | `list` ≈ `rg -l`; empty discovery exits 0 with tip (already implemented) |
+| **eslint**           | Config cascade; `--fix` vs check; clear error format                    | POST-MVP: `specwiki.config.js` cascade; `generate --check` for CI        |
+| **prettier**         | `--check` vs write; exit 1 on drift                                     | POST-MVP: `generate --check` exits 1 if wiki stale                       |
+| **TypeDoc**          | `typedoc --watch`; `--showConfig`; log levels                           | POST-MVP: `generate --watch`; `--show-config`                            |
+| **Prettier/Ripgrep** | Respect `NO_COLOR`; no output when piped                                | Use `chalk` with TTY check; `--no-color` flag                            |
 
 ### 3.2 Command shape (current and recommended)
 
@@ -318,20 +321,20 @@ specwiki init                      # scaffold specwiki.config.js
 
 Follow [CLI Guidelines](https://clig.dev/) and [Node.js CLI best practices](https://github.com/lirantal/nodejs-cli-apps-best-practices):
 
-| Code | Meaning | When |
-| ---- | ------- | ---- |
-| 0 | Success | Wiki generated; list printed; zero specs found (with tip) |
-| 1 | Runtime failure | I/O error, parse failure, write failure |
-| 2 | Usage error | Invalid flags, path outside project, traversal attempt |
+| Code | Meaning         | When                                                      |
+| ---- | --------------- | --------------------------------------------------------- |
+| 0    | Success         | Wiki generated; list printed; zero specs found (with tip) |
+| 1    | Runtime failure | I/O error, parse failure, write failure                   |
+| 2    | Usage error     | Invalid flags, path outside project, traversal attempt    |
 
 **Note:** v0.1 does not yet set explicit `process.exit()` codes on failure — MVP Phase 3 should add this.
 
 ### 3.4 Output streams
 
-| Stream | Content |
-| ------ | ------- |
+| Stream     | Content                                                  |
+| ---------- | -------------------------------------------------------- |
 | **stdout** | Results: file list, generation summary, `--json` payload |
-| **stderr** | Diagnostics: `--verbose` logs, errors, warnings |
+| **stderr** | Diagnostics: `--verbose` logs, errors, warnings          |
 
 Structured logger (`src/core/Logger.ts`, HARNESS §0.8) should write verbose events to stderr, not stdout.
 
@@ -361,14 +364,14 @@ Per [crouton-kit CLI design skill](https://github.com/crouton-labs/crouton-kit/b
 
 ### 4.1 Current stack assessment
 
-| Package | Version | Role | Verdict |
-| ------- | ------- | ---- | ------- |
-| `commander` | ^13.1 | CLI framework | Keep — thin wiring in `src/cli.ts` |
-| `fast-glob` | ^3.3.3 | Discovery | Keep — performant; dotfile support; ignore patterns |
-| `gray-matter` | ^4.0.3 | Frontmatter | Keep — handles `.mdc` YAML blocks |
-| `marked` | ^15.0.7 | MD→HTML | Keep for MVP — zero deps, 441 KB install |
-| `chalk` | ^5.4.1 | Terminal color | Keep — add TTY guard |
-| `vitest` | ^3.0.9 | Testing | Keep — 90% thresholds enforced |
+| Package       | Version | Role           | Verdict                                             |
+| ------------- | ------- | -------------- | --------------------------------------------------- |
+| `commander`   | ^13.1   | CLI framework  | Keep — thin wiring in `src/cli.ts`                  |
+| `fast-glob`   | ^3.3.3  | Discovery      | Keep — performant; dotfile support; ignore patterns |
+| `gray-matter` | ^4.0.3  | Frontmatter    | Keep — handles `.mdc` YAML blocks                   |
+| `marked`      | ^15.0.7 | MD→HTML        | Keep for MVP — zero deps, 441 KB install            |
+| `chalk`       | ^5.4.1  | Terminal color | Keep — add TTY guard                                |
+| `vitest`      | ^3.0.9  | Testing        | Keep — 90% thresholds enforced                      |
 
 HARNESS §12 rule: no new runtime deps without justification. Current graph is minimal (5 runtime packages).
 
@@ -388,9 +391,9 @@ ignore: [
   "**/dist/**",
   "**/wiki/**",
   "**/.specwiki/**",
-  "**/.git/**",        // POST-MVP
-  "**/coverage/**",    // POST-MVP
-]
+  "**/.git/**", // POST-MVP
+  "**/coverage/**", // POST-MVP
+];
 ```
 
 **Symlink policy:** Do not follow symlinks outside `projectRoot` (HARNESS §0.9). fast-glob's `followSymbolicLinks: false` (default) is correct.
@@ -449,11 +452,7 @@ const html = await unified()
 ```javascript
 /** @type {import('specwiki').Config} */
 export default {
-  patterns: [
-    ...DEFAULT_SPEC_PATTERNS,
-    "_bmad-output/**/*.md",
-    "**/AGENTS.md",
-  ],
+  patterns: [...DEFAULT_SPEC_PATTERNS, "_bmad-output/**/*.md", "**/AGENTS.md"],
   categories: {
     "bmad-planning": "BMAD Planning",
   },
@@ -481,19 +480,19 @@ If POST-MVP `specwiki serve` is added:
 
 ### 5.1 Decision table
 
-| Decision | MVP | POST-MVP | Rationale |
-| -------- | --- | -------- | --------- |
-| Output mode | Static MD + HTML files | Optional `serve`, optional SSG export | Core value is generation, not hosting |
-| Discovery patterns | `DEFAULT_SPEC_PATTERNS` frozen | `--config`, `--patterns`, `**/AGENTS.md` | Zero-config MVP; flexibility later |
-| Semantic parsing | Path-based categories + heading TOC | OpenSpec/BMAD field extraction | Heterogeneity too high for MVP |
-| Slug collisions | Known bug; fix in Phase 3.4 | Hash suffix disambiguation | Already in HARNESS plan |
-| Structured logging | `Logger.ts` in Phase 3.1 | — | HARNESS §0.8 requirement |
-| `--json` output | No | Yes | Agent/script consumers |
-| `llms.txt` export | No (input only) | Generate from index | High agent value, low effort |
-| Watch mode | No | `generate --watch` | TypeDoc precedent; CI doesn't need it |
-| HTML sanitization | Title escape only | `rehype-sanitize` if `--allow-html` | Trusted local specs for MVP |
-| npm publish | Phase 4.2 | CI workflow 4.3 | After MVP hardening |
-| Plugins | No | Evaluate after config API stable | Avoid premature abstraction |
+| Decision           | MVP                                 | POST-MVP                                 | Rationale                             |
+| ------------------ | ----------------------------------- | ---------------------------------------- | ------------------------------------- |
+| Output mode        | Static MD + HTML files              | Optional `serve`, optional SSG export    | Core value is generation, not hosting |
+| Discovery patterns | `DEFAULT_SPEC_PATTERNS` frozen      | `--config`, `--patterns`, `**/AGENTS.md` | Zero-config MVP; flexibility later    |
+| Semantic parsing   | Path-based categories + heading TOC | OpenSpec/BMAD field extraction           | Heterogeneity too high for MVP        |
+| Slug collisions    | Known bug; fix in Phase 3.4         | Hash suffix disambiguation               | Already in HARNESS plan               |
+| Structured logging | `Logger.ts` in Phase 3.1            | —                                        | HARNESS §0.8 requirement              |
+| `--json` output    | No                                  | Yes                                      | Agent/script consumers                |
+| `llms.txt` export  | No (input only)                     | Generate from index                      | High agent value, low effort          |
+| Watch mode         | No                                  | `generate --watch`                       | TypeDoc precedent; CI doesn't need it |
+| HTML sanitization  | Title escape only                   | `rehype-sanitize` if `--allow-html`      | Trusted local specs for MVP           |
+| npm publish        | Phase 4.2                           | CI workflow 4.3                          | After MVP hardening                   |
+| Plugins            | No                                  | Evaluate after config API stable         | Avoid premature abstraction           |
 
 ### 5.2 Custom config: MVP scope
 
@@ -587,12 +586,12 @@ Do not collapse discover + parse — discovery must stay testable without I/O pa
 
 ### 6.4 Testing strategy extensions
 
-| Area | MVP | POST-MVP |
-| ---- | --- | -------- |
-| HTML escaping | Title escape tests (exist) | Body XSS fixtures if `--allow-html` |
-| Config | — | Config loader precedence tests |
-| Snapshots | Avoid | Golden files for `llms.txt` format |
-| Fixtures | `sample-project/` (10 files) | Add BMAD, nested AGENTS.md, OpenSpec change set trees |
+| Area          | MVP                          | POST-MVP                                              |
+| ------------- | ---------------------------- | ----------------------------------------------------- |
+| HTML escaping | Title escape tests (exist)   | Body XSS fixtures if `--allow-html`                   |
+| Config        | —                            | Config loader precedence tests                        |
+| Snapshots     | Avoid                        | Golden files for `llms.txt` format                    |
+| Fixtures      | `sample-project/` (10 files) | Add BMAD, nested AGENTS.md, OpenSpec change set trees |
 
 ---
 
@@ -602,7 +601,7 @@ Do not collapse discover + parse — discovery must stay testable without I/O pa
 
 **MVP includes static markdown + HTML output only. No bundled local dev server.**
 
-Record as `decisions.md` entry: *2026-07-12 — MVP output mode: static files only.*
+Record as `decisions.md` entry: _2026-07-12 — MVP output mode: static files only._
 
 ### Rationale
 
@@ -648,14 +647,14 @@ python -m http.server 3456 --directory wiki/html
 
 ## 8. Risks and Open Questions
 
-| Risk | Severity | Mitigation |
-| ---- | -------- | ---------- |
-| Format fragmentation accelerates | Medium | Extend-only pattern list; config overrides POST-MVP |
-| Slug collisions corrupt wiki | High | Phase 3.4 fix before npm publish |
-| BMAD/OpenSpec semantic drift | Low | Treat as markdown for MVP; schema parsers optional later |
-| Competing AGENTS.md tools absorb aggregation | Medium | Differentiate on cross-framework scan; ship `llms.txt` export |
-| marked XSS via embedded HTML | Low | Trusted local specs; document; sanitize POST-MVP |
-| Monorepo nested AGENTS.md missed | Medium | Add `**/AGENTS.md` POST-MVP; document workaround (--patterns) |
+| Risk                                         | Severity | Mitigation                                                    |
+| -------------------------------------------- | -------- | ------------------------------------------------------------- |
+| Format fragmentation accelerates             | Medium   | Extend-only pattern list; config overrides POST-MVP           |
+| Slug collisions corrupt wiki                 | High     | Phase 3.4 fix before npm publish                              |
+| BMAD/OpenSpec semantic drift                 | Low      | Treat as markdown for MVP; schema parsers optional later      |
+| Competing AGENTS.md tools absorb aggregation | Medium   | Differentiate on cross-framework scan; ship `llms.txt` export |
+| marked XSS via embedded HTML                 | Low      | Trusted local specs; document; sanitize POST-MVP              |
+| Monorepo nested AGENTS.md missed             | Medium   | Add `**/AGENTS.md` POST-MVP; document workaround (--patterns) |
 
 **Open question (resolved for MVP):** Static vs server → **static only** (§7).
 

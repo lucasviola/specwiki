@@ -27,12 +27,12 @@ Spec-driven development is the practice of treating **structured specifications 
 
 Common SDD principles across frameworks:
 
-| Principle | Description |
-| --------- | ----------- |
-| Spec before code | Requirements, design, and tasks are written (or AI-drafted and human-approved) before implementation |
-| Persistent artifacts | Specs live in version control alongside code, surviving session boundaries |
-| Agent-consumable format | Markdown, YAML frontmatter, structured sections—formats agents can read and humans can review |
-| Delta-oriented change | Brownfield projects specify *what changes*, not re-document the entire system |
+| Principle               | Description                                                                                          |
+| ----------------------- | ---------------------------------------------------------------------------------------------------- |
+| Spec before code        | Requirements, design, and tasks are written (or AI-drafted and human-approved) before implementation |
+| Persistent artifacts    | Specs live in version control alongside code, surviving session boundaries                           |
+| Agent-consumable format | Markdown, YAML frontmatter, structured sections—formats agents can read and humans can review        |
+| Delta-oriented change   | Brownfield projects specify _what changes_, not re-document the entire system                        |
 
 The ecosystem splits into three layers that specwiki spans but does not replace:
 
@@ -116,13 +116,13 @@ flowchart TB
 
 ### 1.7 Ecosystem Comparison Matrix
 
-| Dimension | BMAD | OpenSpec | Kiro | Cursor rules/skills | AGENTS.md | specwiki |
-| --------- | ---- | -------- | ---- | ------------------- | --------- | -------- |
-| Primary job | Multi-agent agile workflow | Lightweight spec agreement | Spec-first agentic IDE | IDE agent customization | Cross-tool project context | Unified wiki from existing specs |
-| Spec authoring | Yes (extensive) | Yes (core) | Yes (core) | No (constraints only) | Minimal (pointers) | No |
-| Agent execution | Via skills/hooks | Via slash commands | Built-in IDE/CLI | Built-in Cursor Agent | Passive (loaded at session start) | No |
-| Output location | `_bmad-output/`, `docs/` | `openspec/` | `.kiro/specs/` | `.cursor/` | Repo root + nested | `wiki/` (generated) |
-| Best for | Complex projects needing full SDLC simulation | Brownfield teams wanting lightweight SDD | AWS/enterprise spec-first shops | Cursor-native workflows | Multi-tool portability | Anyone with scattered agent docs |
+| Dimension       | BMAD                                          | OpenSpec                                 | Kiro                            | Cursor rules/skills     | AGENTS.md                         | specwiki                         |
+| --------------- | --------------------------------------------- | ---------------------------------------- | ------------------------------- | ----------------------- | --------------------------------- | -------------------------------- |
+| Primary job     | Multi-agent agile workflow                    | Lightweight spec agreement               | Spec-first agentic IDE          | IDE agent customization | Cross-tool project context        | Unified wiki from existing specs |
+| Spec authoring  | Yes (extensive)                               | Yes (core)                               | Yes (core)                      | No (constraints only)   | Minimal (pointers)                | No                               |
+| Agent execution | Via skills/hooks                              | Via slash commands                       | Built-in IDE/CLI                | Built-in Cursor Agent   | Passive (loaded at session start) | No                               |
+| Output location | `_bmad-output/`, `docs/`                      | `openspec/`                              | `.kiro/specs/`                  | `.cursor/`              | Repo root + nested                | `wiki/` (generated)              |
+| Best for        | Complex projects needing full SDLC simulation | Brownfield teams wanting lightweight SDD | AWS/enterprise spec-first shops | Cursor-native workflows | Multi-tool portability            | Anyone with scattered agent docs |
 
 ---
 
@@ -208,11 +208,11 @@ BMAD and OpenSpec **produce** specs aggressively. The output volume grows faster
 
 specwiki sits at the intersection of three markets:
 
-| Market | Analogues | specwiki angle |
-| ------ | --------- | -------------- |
-| **Developer tools (CLI)** | `typedoc`, `jsdoc`, `mkdocs`, `mdbook` | Doc generator, but source = agent specs not APIs |
-| **Documentation** | Notion exports, GitBook, Docusaurus | Zero-config, repo-local, no SaaS |
-| **Agent infrastructure** | AGENTS.md, Cursor rules ecosystem, MCP | Read-only synthesis layer; complements runtime tools |
+| Market                    | Analogues                              | specwiki angle                                       |
+| ------------------------- | -------------------------------------- | ---------------------------------------------------- |
+| **Developer tools (CLI)** | `typedoc`, `jsdoc`, `mkdocs`, `mdbook` | Doc generator, but source = agent specs not APIs     |
+| **Documentation**         | Notion exports, GitBook, Docusaurus    | Zero-config, repo-local, no SaaS                     |
+| **Agent infrastructure**  | AGENTS.md, Cursor rules ecosystem, MCP | Read-only synthesis layer; complements runtime tools |
 
 ### 4.2 Competitive Landscape
 
@@ -230,7 +230,7 @@ specwiki sits at the intersection of three markets:
 
 ### 4.3 Positioning Statement
 
-> **For developers who use AI coding agents**, specwiki is a **CLI documentation synthesizer** that **discovers and unifies agent specs, rules, and skills into a browsable wiki**. Unlike SDD frameworks that *create* specs or IDEs that *run* agents, specwiki **makes existing agent instructions human-navigable** with one command.
+> **For developers who use AI coding agents**, specwiki is a **CLI documentation synthesizer** that **discovers and unifies agent specs, rules, and skills into a browsable wiki**. Unlike SDD frameworks that _create_ specs or IDEs that _run_ agents, specwiki **makes existing agent instructions human-navigable** with one command.
 
 ### 4.4 Differentiation Pillars
 
@@ -256,24 +256,24 @@ flowchart LR
 
 ### 5.2 Adoption Patterns
 
-| Pattern | Description | MVP support |
-| ------- | ----------- | ----------- |
-| **Solo local generate** | Dev runs CLI in project root, opens wiki in editor or browser | Full |
-| **Commit wiki to repo** | Add `wiki/` or `.specwiki/` to git for team visibility | Full (output dir configurable) |
-| **Pre-commit / CI hook** | Regenerate wiki on spec changes | POST-MVP (Phase 4.3 CI workflow is package-level, not consumer CI docs) |
-| **npm global install** | `npm link` / `npx specwiki` in any project | MVP target (Phase 4.2 publish) |
-| **Monorepo nested specs** | Multiple AGENTS.md, package-level rules | Partial (discovery finds files; slug collision is known gap) |
+| Pattern                   | Description                                                   | MVP support                                                             |
+| ------------------------- | ------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| **Solo local generate**   | Dev runs CLI in project root, opens wiki in editor or browser | Full                                                                    |
+| **Commit wiki to repo**   | Add `wiki/` or `.specwiki/` to git for team visibility        | Full (output dir configurable)                                          |
+| **Pre-commit / CI hook**  | Regenerate wiki on spec changes                               | POST-MVP (Phase 4.3 CI workflow is package-level, not consumer CI docs) |
+| **npm global install**    | `npm link` / `npx specwiki` in any project                    | MVP target (Phase 4.2 publish)                                          |
+| **Monorepo nested specs** | Multiple AGENTS.md, package-level rules                       | Partial (discovery finds files; slug collision is known gap)            |
 
 ### 5.3 MVP Success Metrics
 
-| Metric | Target | Measurement |
-| ------ | ------ | ----------- |
-| **Activation rate** | ≥70% of installs run `generate` within first session | npm download → GitHub issue/telemetry (POST-MVP) |
-| **Discovery yield** | Median project finds ≥5 spec files | `specwiki list` output count on fixture + dogfood repos |
-| **Time to first wiki** | <60 seconds from clone to browsable output | CLI benchmark on specwiki repo itself |
-| **Quality gate reliability** | 100% pass on `npm run test/lint/coverage/build` | CI (Phase 4.3) |
-| **Dogfood validation** | specwiki repo generates complete wiki of its own specs | Self-host test |
-| **Zero-config rate** | ≥80% of BMAD/OpenSpec/Cursor sample repos need no custom patterns | Fixture coverage in `tests/fixtures/` |
+| Metric                       | Target                                                            | Measurement                                             |
+| ---------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------- |
+| **Activation rate**          | ≥70% of installs run `generate` within first session              | npm download → GitHub issue/telemetry (POST-MVP)        |
+| **Discovery yield**          | Median project finds ≥5 spec files                                | `specwiki list` output count on fixture + dogfood repos |
+| **Time to first wiki**       | <60 seconds from clone to browsable output                        | CLI benchmark on specwiki repo itself                   |
+| **Quality gate reliability** | 100% pass on `npm run test/lint/coverage/build`                   | CI (Phase 4.3)                                          |
+| **Dogfood validation**       | specwiki repo generates complete wiki of its own specs            | Self-host test                                          |
+| **Zero-config rate**         | ≥80% of BMAD/OpenSpec/Cursor sample repos need no custom patterns | Fixture coverage in `tests/fixtures/`                   |
 
 ### 5.4 Anti-Metrics (What Not to Optimize in MVP)
 
@@ -323,20 +323,20 @@ Model Context Protocol (Anthropic-origin, industry-adopted) standardizes tool/da
 
 ## 7. POST-MVP Opportunities (Domain Lens)
 
-| Opportunity | Domain rationale | Dependency |
-| ----------- | ---------------- | ---------- |
-| **CI integration** | Teams want wiki regenerated on spec PRs; OSS maintainers want freshness guarantees | npm publish, stable CLI contract |
-| **`--config` / custom patterns** | Enterprise monorepos use non-standard paths | Phase 4.1 in HARNESS |
-| **Watch mode** | Solo devs iterate rules frequently; manual re-run is friction | File watcher, debounce |
-| **Spec validation / drift detection** | Compare AGENTS.md vs CLAUDE.md; flag stale wiki | Parsing + diff engine |
-| **Team sharing / publishing** | Persona B needs hosted wiki or GitHub Pages export | Static site export command |
-| **OpenSpec Stores integration** | Cross-repo spec repos need cross-repo discovery | OpenSpec Stores beta |
-| **Semantic search / AI Q&A** | "What rules apply to auth?" over unified index | Embeddings, optional LLM |
-| **Slug collision resolution** | Monorepos hit duplicate slugs (known MVP gap) | Phase 3.4 |
-| **MCP manifest indexing** | Document which external tools agents can reach | MCP schema parser |
-| **Plugins** | Custom category rules for org-specific layouts | Extension API |
-| **VS Code / Cursor extension** | Open wiki panel from IDE | Editor API |
-| **Diff-aware wiki** | Show what changed between generates | Git integration |
+| Opportunity                           | Domain rationale                                                                   | Dependency                       |
+| ------------------------------------- | ---------------------------------------------------------------------------------- | -------------------------------- |
+| **CI integration**                    | Teams want wiki regenerated on spec PRs; OSS maintainers want freshness guarantees | npm publish, stable CLI contract |
+| **`--config` / custom patterns**      | Enterprise monorepos use non-standard paths                                        | Phase 4.1 in HARNESS             |
+| **Watch mode**                        | Solo devs iterate rules frequently; manual re-run is friction                      | File watcher, debounce           |
+| **Spec validation / drift detection** | Compare AGENTS.md vs CLAUDE.md; flag stale wiki                                    | Parsing + diff engine            |
+| **Team sharing / publishing**         | Persona B needs hosted wiki or GitHub Pages export                                 | Static site export command       |
+| **OpenSpec Stores integration**       | Cross-repo spec repos need cross-repo discovery                                    | OpenSpec Stores beta             |
+| **Semantic search / AI Q&A**          | "What rules apply to auth?" over unified index                                     | Embeddings, optional LLM         |
+| **Slug collision resolution**         | Monorepos hit duplicate slugs (known MVP gap)                                      | Phase 3.4                        |
+| **MCP manifest indexing**             | Document which external tools agents can reach                                     | MCP schema parser                |
+| **Plugins**                           | Custom category rules for org-specific layouts                                     | Extension API                    |
+| **VS Code / Cursor extension**        | Open wiki panel from IDE                                                           | Editor API                       |
+| **Diff-aware wiki**                   | Show what changed between generates                                                | Git integration                  |
 
 Priority order by domain value × feasibility:
 
@@ -402,10 +402,10 @@ Generic
 
 ### Explicitly not MVP primary
 
-| Persona | Why deferred |
-| ------- | ------------ |
-| B (Small teams) | Needs CI regeneration, shared publishing, and onboarding docs workflow beyond local generate |
-| C (OSS maintainers) | Needs stable npm package, GitHub Pages export, and README integration—not yet in MVP |
+| Persona             | Why deferred                                                                                 |
+| ------------------- | -------------------------------------------------------------------------------------------- |
+| B (Small teams)     | Needs CI regeneration, shared publishing, and onboarding docs workflow beyond local generate |
+| C (OSS maintainers) | Needs stable npm package, GitHub Pages export, and README integration—not yet in MVP         |
 
 ---
 
@@ -447,30 +447,30 @@ Breadth of discovery patterns across SDD ecosystem + zero-config CLI. Moat deepe
 
 ## 11. References
 
-| Source | URL | Relevance |
-| ------ | --- | --------- |
-| BMAD Method (GitHub) | https://github.com/bmad-code-org/BMAD-METHOD | Framework artifacts, adoption |
-| OpenSpec | https://openspec.dev/ | SDD workflow, artifact layout |
-| OpenSpec GitHub | https://github.com/Fission-AI/OpenSpec | Delta specs, Stores concept |
-| Kiro | https://kiro.dev/ | `.kiro/specs/` structure |
-| AGENTS.md | https://agents.md/ | Cross-tool convention |
-| AGENTS.md GitHub | https://github.com/agentsmd/agents.md | Format adoption |
-| Cursor Rules docs | https://cursor.com/docs/rules | Rules/skills model |
-| Context Engineering for AI Agents (arxiv) | https://arxiv.org/html/2510.21413v4 | Instruction file proliferation research |
-| specwiki README | `/README.md` | Product scope, patterns |
-| specwiki HARNESS | `/HARNESS.md` | MVP phases, frozen contracts |
-| project-context | `discovery/project-context.md` | Implementation state |
+| Source                                    | URL                                          | Relevance                               |
+| ----------------------------------------- | -------------------------------------------- | --------------------------------------- |
+| BMAD Method (GitHub)                      | https://github.com/bmad-code-org/BMAD-METHOD | Framework artifacts, adoption           |
+| OpenSpec                                  | https://openspec.dev/                        | SDD workflow, artifact layout           |
+| OpenSpec GitHub                           | https://github.com/Fission-AI/OpenSpec       | Delta specs, Stores concept             |
+| Kiro                                      | https://kiro.dev/                            | `.kiro/specs/` structure                |
+| AGENTS.md                                 | https://agents.md/                           | Cross-tool convention                   |
+| AGENTS.md GitHub                          | https://github.com/agentsmd/agents.md        | Format adoption                         |
+| Cursor Rules docs                         | https://cursor.com/docs/rules                | Rules/skills model                      |
+| Context Engineering for AI Agents (arxiv) | https://arxiv.org/html/2510.21413v4          | Instruction file proliferation research |
+| specwiki README                           | `/README.md`                                 | Product scope, patterns                 |
+| specwiki HARNESS                          | `/HARNESS.md`                                | MVP phases, frozen contracts            |
+| project-context                           | `discovery/project-context.md`               | Implementation state                    |
 
 ---
 
 ## 12. Research Conclusions for Downstream Artifacts
 
-| Downstream step | Carry-forward |
-| --------------- | ------------- |
-| Product brief | Lead with Persona A pain; position as synthesis not authoring |
-| PRD | MVP features = list + generate + patterns; defer team/CI to POST-MVP roadmap |
-| Architecture | Discovery module is core IP; optimize pattern extensibility |
-| Epics | Phase 4 publish/CI enables Persona B/C expansion |
-| Readiness | Dogfood wiki on specwiki repo; validate against BMAD fixture tree |
+| Downstream step | Carry-forward                                                                |
+| --------------- | ---------------------------------------------------------------------------- |
+| Product brief   | Lead with Persona A pain; position as synthesis not authoring                |
+| PRD             | MVP features = list + generate + patterns; defer team/CI to POST-MVP roadmap |
+| Architecture    | Discovery module is core IP; optimize pattern extensibility                  |
+| Epics           | Phase 4 publish/CI enables Persona B/C expansion                             |
+| Readiness       | Dogfood wiki on specwiki repo; validate against BMAD fixture tree            |
 
 **Decision logged for discovery:** MVP primary persona = **A) Solo developers using Cursor/AI agents**.

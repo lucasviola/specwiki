@@ -9,6 +9,7 @@ Subagent-resolved questions and arbitrator outcomes. No owner input was solicite
 **Decision:** MVP ships static markdown + HTML output (`wiki/` layout). No bundled `specwiki serve` or local dev server.
 
 **Rationale:**
+
 - Brownfield v0.1 already generates browsable `wiki/html/*.html`; users can open files directly or use any static server
 - Aligns with HARNESS §12 frozen wiki layout and §0.9 "no network by default" trust boundary
 - Matches CLI peer pattern (ripgrep, Prettier, TypeDoc default to file output)
@@ -22,6 +23,7 @@ Subagent-resolved questions and arbitrator outcomes. No owner input was solicite
 **Decision:** MVP optimizes for Persona A — solo developers using Cursor, Claude Code, or similar AI coding agents on 1–3 active repos. Personas B (small teams), C (OSS maintainers), and D (enterprise) are POST-MVP expansion targets.
 
 **Rationale:**
+
 - v0.1 CLI (`list`, `generate`) matches local solo workflow with no auth, CI, or publishing
 - Highest pain frequency: solo users accumulate scattered rules/skills fastest
 - Shortest time-to-value validates core hypothesis (<60s to browsable wiki)
@@ -34,6 +36,7 @@ Subagent-resolved questions and arbitrator outcomes. No owner input was solicite
 **Decision:** MVP completes at HARNESS Phase 3 (structured logger, slug collisions, quality gate, `IMPLEMENTATION.md` through Phase 3). POST-MVP begins at Phase 4 (`--patterns`/config, npm publish, CI) and expansion features (`serve`, watch, `llms.txt`, semantic enrichment).
 
 **Rationale:**
+
 - Brownfield v0.1 already delivers core discover → parse → wiki loop; remaining gaps are hardening not greenfield
 - Phase 3 deliverables map directly to §13 deliverables checklist
 - Distribution and configurability (Phase 4) unlock Personas B/C but are not required to prove synthesis value for Persona A
@@ -46,6 +49,7 @@ Subagent-resolved questions and arbitrator outcomes. No owner input was solicite
 **Decision:** Remove standalone E5 "Verbose Pipeline Diagnostics" epic. `Logger.ts` moves to **E1 S1.3**. Discover/parse/output/command logging ACs are mandatory in **every feature story** (E2–E7, POST-MVP E8–E15) as §0.8 acceptance criteria alongside quality measures. No deferred "logging retrofit" pass.
 
 **Rationale:**
+
 - Owner: logging is essential part of every feature, not a separate deliverable
 - Aligns with HARNESS §0.8 ("as important as tests")
 - Vertical slices stay complete when merged — each story is shippable with observability
@@ -58,6 +62,7 @@ Subagent-resolved questions and arbitrator outcomes. No owner input was solicite
 **Decision:** All epics and stories use **vertical slicing** and **INVEST** per HARNESS §0.10. Stories deliver thin end-to-end user value (discover → parse → output → command as needed). Horizontal module epics (E2 Discovery, E3 Parsing, E4 Output) are replaced by user-journey epics (List, Generate MD, Generate HTML, Verbose, Trustworthy output).
 
 **Rationale:**
+
 - Horizontal layering delays demonstrable value until unrelated modules also ship
 - INVEST keeps stories owner-reviewable in one §0.3 checkpoint
 - Brownfield §9 module bullets remain for coverage traceability; vertical epics take precedence for sprint planning

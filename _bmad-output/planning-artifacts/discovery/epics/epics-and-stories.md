@@ -10,7 +10,8 @@ sources:
   - _bmad-output/planning-artifacts/discovery/architecture/ARCHITECTURE-SPINE.md
   - HARNESS.md §0.8, §0.10
 slicing: vertical + INVEST
-stepsCompleted: [step-vertical-slice-restructure, step-logging-merged-into-features]
+stepsCompleted:
+  [step-vertical-slice-restructure, step-logging-merged-into-features]
 ---
 
 # specwiki — Epics and Stories
@@ -23,13 +24,13 @@ Stories are **vertical slices** per **HARNESS §0.10**. **Structured logging (§
 
 ## Story slicing principles (HARNESS §0.10)
 
-| Principle | Application |
-| --------- | ----------- |
-| **Vertical** | User journey: list specs, generate markdown, generate HTML, trustworthy output, CLI contracts, sign-off |
-| **INVEST** | Each story: `INVEST: I✓ N✓ V✓ E✓ S✓ T✓` |
-| **Logging woven in** | No logging epic — §0.8 events ship with the feature story that touches those code paths |
-| **Demo path** | CLI command + fixture proving value after merge |
-| **Logger foundation** | `src/core/Logger.ts` introduced in **E1 S1.3**; all later stories use it |
+| Principle             | Application                                                                                             |
+| --------------------- | ------------------------------------------------------------------------------------------------------- |
+| **Vertical**          | User journey: list specs, generate markdown, generate HTML, trustworthy output, CLI contracts, sign-off |
+| **INVEST**            | Each story: `INVEST: I✓ N✓ V✓ E✓ S✓ T✓`                                                                 |
+| **Logging woven in**  | No logging epic — §0.8 events ship with the feature story that touches those code paths                 |
+| **Demo path**         | CLI command + fixture proving value after merge                                                         |
+| **Logger foundation** | `src/core/Logger.ts` introduced in **E1 S1.3**; all later stories use it                                |
 
 ### Mandatory AC blocks (every story)
 
@@ -51,11 +52,11 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 
 **Binds:** FR-030, FR-021, NFR-001, NFR-002, NFR-004, NFR-006, HARNESS §9 Phase 0, 3.1
 
-| Story | Summary | HARNESS |
-| ----- | ------- | ------- |
-| S1.1 | `IMPLEMENTATION.md` build log | 0.1 |
-| S1.2 | Verify quality-gate tooling | 0.2–0.4 |
-| S1.3 | Structured `Logger.ts` module | 3.1 |
+| Story | Summary                       | HARNESS |
+| ----- | ----------------------------- | ------- |
+| S1.1  | `IMPLEMENTATION.md` build log | 0.1     |
+| S1.2  | Verify quality-gate tooling   | 0.2–0.4 |
+| S1.3  | Structured `Logger.ts` module | 3.1     |
 
 #### S1.1 — Create IMPLEMENTATION.md build log
 
@@ -67,6 +68,7 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 **HARNESS:** Phase 0.1 | **FR:** FR-030
 
 **Functional:**
+
 - [ ] `IMPLEMENTATION.md` at repo root with status header
 - [ ] Checklist lists MVP epics E1–E7 with checkboxes
 - [ ] Build log table: date, story, summary, commit, quality-gate status
@@ -74,9 +76,11 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 - [ ] `npm run typecheck` and `npm run build` pass
 
 **Logging & diagnostics (§0.8):**
+
 - [ ] N/A — no runtime code; document §0.8 requirement in build log template row
 
 **Quality measures:**
+
 - [ ] `typecheck` and `build` pass
 
 #### S1.2 — Verify quality-gate tooling
@@ -89,15 +93,18 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 **HARNESS:** Phase 0.2–0.4 | **NFR:** NFR-001, NFR-002, NFR-004
 
 **Functional:**
+
 - [ ] Vitest + coverage v8 ≥ 90%; ESLint + Prettier configured
 - [ ] Scripts: `test`, `coverage`, `lint`, `format`, `typecheck`, `build`
 - [ ] `tests/` mirrors `src/`; fixture has ≥ 5 discoverable specs
 - [ ] Full gate passes; gaps documented in build log
 
 **Logging & diagnostics (§0.8):**
+
 - [ ] N/A — verification only unless gaps require fixes
 
 **Quality measures:**
+
 - [ ] Full §0.2 gate passes on current codebase
 
 #### S1.3 — Structured Logger module
@@ -110,15 +117,18 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 **HARNESS:** Phase 3.1 | **FR:** FR-021 | **AD:** AD-9
 
 **Functional:**
+
 - [ ] `src/core/Logger.ts` with `log.info` (verbose-gated) and `log.error` (always)
 - [ ] Dot-separated event names; JSON-serializable payload objects
 - [ ] No business logic in Logger module
 
 **Logging & diagnostics (§0.8):**
+
 - [ ] Logger unit tests cover verbose gate and error-always behaviour
 - [ ] Logger writes to stderr; no stdout pollution
 
 **Quality measures:**
+
 - [ ] Full §0.2 gate passes
 - [ ] `Logger.ts` has unit tests; coverage on `src/core/` ≥ 90%
 
@@ -130,12 +140,12 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 
 **Binds:** FR-001–004, FR-021, NFR-002, NFR-006, NFR-007, AD-2, AD-3, HARNESS §9 Phase 1
 
-| Story | Summary | HARNESS |
-| ----- | ------- | ------- |
-| S2.1 | Category grouping on list output | 1.1 |
-| S2.2 | Human-readable titles on list output | 1.2 |
-| S2.3 | Fixture discovery + discover logging | 1.3, 1.4 |
-| S2.4 | Zero-match helpful tip | — |
+| Story | Summary                              | HARNESS  |
+| ----- | ------------------------------------ | -------- |
+| S2.1  | Category grouping on list output     | 1.1      |
+| S2.2  | Human-readable titles on list output | 1.2      |
+| S2.3  | Fixture discovery + discover logging | 1.3, 1.4 |
+| S2.4  | Zero-match helpful tip               | —        |
 
 #### S2.1 — Category grouping on list output
 
@@ -147,15 +157,18 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 **HARNESS:** Phase 1.1 | **FR:** FR-002
 
 **Functional:**
+
 - [ ] `deriveCategory` covers all known path prefixes; prefix order tested
 - [ ] `specwiki list` groups by category on fixture
 - [ ] Category keys unchanged without owner approval (NFR-013)
 
 **Logging & diagnostics (§0.8):**
+
 - [ ] If `deriveCategory` paths change: errors use `log.error` with relative path context
 - [ ] No raw `console.log` added in `discover/specs.ts`
 
 **Quality measures:**
+
 - [ ] Full §0.2 gate passes
 - [ ] `discover/specs.ts` coverage ≥ 90% on touched functions
 
@@ -169,13 +182,16 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 **HARNESS:** Phase 1.2 | **FR:** FR-002
 
 **Functional:**
+
 - [ ] `deriveTitle` handles SKILL, AGENTS, SPEC, CLAUDE, GEMINI and generic basenames
 - [ ] No regressions on fixture expectations
 
 **Logging & diagnostics (§0.8):**
+
 - [ ] No new diagnostic noise in default (non-verbose) list mode
 
 **Quality measures:**
+
 - [ ] Full §0.2 gate passes
 - [ ] `deriveTitle` coverage ≥ 90%
 
@@ -190,11 +206,13 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 **HARNESS:** Phase 1.3, 1.4 | **FR:** FR-001, FR-003, FR-021 | **AD:** AD-2
 
 **Functional:**
+
 - [ ] `discoverSpecs` returns expected count on fixture (≥ 5; actual 10)
 - [ ] Sorted by category then `relativePath`; ignores node_modules/dist/wiki/.specwiki
 - [ ] Default patterns cover Cursor, OpenSpec/Kiro, Copilot, root agents
 
 **Logging & diagnostics (§0.8):**
+
 - [ ] `discover.start` logs project root and pattern count (verbose only)
 - [ ] `discover.match` logs each relative path (verbose only)
 - [ ] `discover.error` on glob/read failures (always via `log.error`)
@@ -202,6 +220,7 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 - [ ] Tests verify verbose vs non-verbose stderr behaviour
 
 **Quality measures:**
+
 - [ ] Full §0.2 gate passes
 - [ ] `discoverSpecs` coverage ≥ 90%
 
@@ -215,14 +234,17 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 **FR:** FR-004 | **AD:** AD-1
 
 **Functional:**
+
 - [ ] Zero matches: exit 0 with tip (consistent with generate)
 - [ ] Test asserts tip and exit code
 
 **Logging & diagnostics (§0.8):**
+
 - [ ] `discover.empty` event when zero matches (verbose only) with pattern hint
 - [ ] Tip remains on stdout (user-facing); diagnostics on stderr
 
 **Quality measures:**
+
 - [ ] Full §0.2 gate passes
 
 **E2 gate:** List on fixture works; discover logging verified with `--verbose`.
@@ -235,10 +257,10 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 
 **Binds:** FR-007–013, FR-021, NFR-002, AD-4, AD-5, AD-8, HARNESS §9 Phase 2.1–2.3, 2.5, 2.6
 
-| Story | Summary | HARNESS |
-| ----- | ------- | ------- |
-| S3.1 | Parse specs + parse logging | 2.1, 2.2, 2.6 |
-| S3.2 | Write markdown wiki + output logging | 2.3, 2.5, 2.6 |
+| Story | Summary                              | HARNESS       |
+| ----- | ------------------------------------ | ------------- |
+| S3.1  | Parse specs + parse logging          | 2.1, 2.2, 2.6 |
+| S3.2  | Write markdown wiki + output logging | 2.3, 2.5, 2.6 |
 
 #### S3.1 — Parse specs into structured page content
 
@@ -251,17 +273,20 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 **HARNESS:** Phase 2.1–2.2 | **FR:** FR-007, FR-008, FR-009
 
 **Functional:**
+
 - [ ] `extractSections` / `extractDescription` / `parseSpecFile` behaviour verified
 - [ ] Frontmatter `title` overrides derived title; raw body preserved
 - [ ] No eval, dynamic import, or network I/O (NFR-010, NFR-012)
 
 **Logging & diagnostics (§0.8):**
+
 - [ ] `parse.file` logs relative path per parsed spec (verbose only)
 - [ ] `parse.error` logs path + message on read/parse failure (always)
 - [ ] No full file contents in payloads (NFR-007)
 - [ ] Tests verify verbose vs quiet
 
 **Quality measures:**
+
 - [ ] Full §0.2 gate passes
 - [ ] `parse/markdown.ts` coverage ≥ 90%
 
@@ -276,15 +301,18 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 **HARNESS:** Phase 2.3, 2.5 | **FR:** FR-011, FR-012, FR-013
 
 **Functional:**
+
 - [ ] `pageSlug`, `buildPageContent`, `buildIndex`, `writeWiki` match frozen layout
 - [ ] Writes confined to resolved output directory
 
 **Logging & diagnostics (§0.8):**
+
 - [ ] `output.write` logs target relative path per markdown file (verbose only)
 - [ ] `output.error` on mkdir/write failures (always)
 - [ ] `generate.summary` log with page count (verbose only) — or equivalent in command layer
 
 **Quality measures:**
+
 - [ ] Full §0.2 gate passes
 - [ ] `output/wiki.ts` coverage ≥ 90% on touched functions
 
@@ -298,10 +326,10 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 
 **Binds:** FR-011, FR-015, FR-016, FR-021, NFR-003, NFR-008, NFR-009, NFR-011, AD-6, AD-7, HARNESS §9 Phase 2.4–2.5
 
-| Story | Summary | HARNESS |
-| ----- | ------- | ------- |
-| S4.1 | HTML title escaping and page structure | 2.4 |
-| S4.2 | Write HTML wiki tree + HTML output logging | 2.5 |
+| Story | Summary                                    | HARNESS |
+| ----- | ------------------------------------------ | ------- |
+| S4.1  | HTML title escaping and page structure     | 2.4     |
+| S4.2  | Write HTML wiki tree + HTML output logging | 2.5     |
 
 #### S4.1 — HTML title escaping and page structure
 
@@ -313,14 +341,17 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 **HARNESS:** Phase 2.4 | **FR:** FR-015 | **AD:** AD-6
 
 **Functional:**
+
 - [ ] `escapeHtml` / `wrapHtml` / `renderMarkdown` safety verified
 - [ ] Tests use malicious title strings; structure intent tested
 
 **Logging & diagnostics (§0.8):**
+
 - [ ] `render.error` on markdown parse failure if applicable (always)
 - [ ] No logging of unsanitized user title strings at info level
 
 **Quality measures:**
+
 - [ ] Full §0.2 gate passes
 - [ ] HTML-related functions coverage ≥ 90%
 
@@ -335,15 +366,18 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 **HARNESS:** Phase 2.5 | **FR:** FR-011, FR-015 | **NFR:** NFR-008, NFR-009
 
 **Functional:**
+
 - [ ] `writeHtmlWiki` creates `html/index.html` and `html/{slug}.html`
 - [ ] Path traversal guards; temp-dir integration tests
 
 **Logging & diagnostics (§0.8):**
+
 - [ ] `output.write` logs each HTML path (verbose only)
 - [ ] `output.error` on write failures (always)
 - [ ] Tests verify verbose emission for HTML writes
 
 **Quality measures:**
+
 - [ ] Full §0.2 gate passes
 - [ ] `writeHtmlWiki` coverage ≥ 90%
 
@@ -357,10 +391,10 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 
 **Binds:** FR-014, NFR-008, NFR-009, AD-5, HARNESS §9 Phase 3.4, §11 #1
 
-| Story | Summary | HARNESS |
-| ----- | ------- | ------- |
-| S5.1 | Slug collision disambiguation | 3.4 |
-| S5.2 | Path traversal guard tests | 2.5 |
+| Story | Summary                       | HARNESS |
+| ----- | ----------------------------- | ------- |
+| S5.1  | Slug collision disambiguation | 3.4     |
+| S5.2  | Path traversal guard tests    | 2.5     |
 
 #### S5.1 — Slug collision disambiguation
 
@@ -372,14 +406,17 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 **HARNESS:** Phase 3.4, §11 #1 | **FR:** FR-014
 
 **Functional:**
+
 - [ ] Duplicate slugs disambiguated; index links match
 - [ ] Non-colliding paths preserve existing algorithm (NFR-013)
 
 **Logging & diagnostics (§0.8):**
+
 - [ ] `output.slug-collision` logs original and disambiguated slug (verbose only)
 - [ ] Test verifies log emission when collision occurs
 
 **Quality measures:**
+
 - [ ] Full §0.2 gate passes
 - [ ] Collision path coverage in `output/wiki.ts`
 
@@ -393,14 +430,17 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 **NFR:** NFR-008, NFR-009
 
 **Functional:**
+
 - [ ] Tests cover `..` in slug-derived paths
 - [ ] No files outside resolved output directory
 
 **Logging & diagnostics (§0.8):**
+
 - [ ] `output.error` when path guard rejects a write (always)
 - [ ] Payload includes attempted path, not file content
 
 **Quality measures:**
+
 - [ ] Full §0.2 gate passes
 
 **E5 gate:** Collisions handled; path guards tested and logged.
@@ -413,10 +453,10 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 
 **Binds:** FR-003, FR-004, FR-016, FR-019–022, FR-021, AD-10, HARNESS §9 Phase 3.2–3.3
 
-| Story | Summary | HARNESS |
-| ----- | ------- | ------- |
-| S6.1 | Command integration + lifecycle logging | 3.2, 3.3 |
-| S6.2 | Exit code contracts | — |
+| Story | Summary                                 | HARNESS  |
+| ----- | --------------------------------------- | -------- |
+| S6.1  | Command integration + lifecycle logging | 3.2, 3.3 |
+| S6.2  | Exit code contracts                     | —        |
 
 #### S6.1 — Command integration and lifecycle logging
 
@@ -429,11 +469,13 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 **HARNESS:** Phase 3.2, 3.3 | **FR:** FR-003, FR-016, FR-019, FR-020, FR-021
 
 **Functional:**
+
 - [ ] `listSpecs` / `generateWiki` tests for flags, defaults, stdout summaries
 - [ ] Non-zero exit on simulated I/O/parse failure
 - [ ] Command module ≥ 90% coverage
 
 **Logging & diagnostics (§0.8):**
+
 - [ ] `cli.command` logs command name + resolved flags (verbose only)
 - [ ] `cli.error` on runtime failures with message, no stack secrets (always)
 - [ ] User summaries remain on stdout (chalk); diagnostics on stderr via Logger
@@ -441,6 +483,7 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 - [ ] Tests verify `cli.command` / `cli.error` emission
 
 **Quality measures:**
+
 - [ ] Full §0.2 gate passes
 - [ ] `commands/generate.ts` coverage ≥ 90%
 
@@ -454,14 +497,17 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 **FR:** FR-022 | **AD:** AD-10
 
 **Functional:**
+
 - [ ] Usage → 2; runtime → 1; success → 0
 - [ ] Documented in README or IMPLEMENTATION.md
 
 **Logging & diagnostics (§0.8):**
+
 - [ ] `cli.error` logs usage errors before exit 2
 - [ ] `cli.error` logs runtime errors before exit 1
 
 **Quality measures:**
+
 - [ ] Full §0.2 gate passes
 - [ ] Tests cover usage and runtime exit codes
 
@@ -473,10 +519,10 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 
 **Binds:** FR-030, FR-031, HARNESS §9 Phase 3.5, §13
 
-| Story | Summary | HARNESS |
-| ----- | ------- | ------- |
-| S7.1 | Dogfood wiki on fixture | — |
-| S7.2 | Full quality gate + §13 checklist | 3.5 |
+| Story | Summary                           | HARNESS |
+| ----- | --------------------------------- | ------- |
+| S7.1  | Dogfood wiki on fixture           | —       |
+| S7.2  | Full quality gate + §13 checklist | 3.5     |
 
 #### S7.1 — Dogfood wiki on fixture
 
@@ -488,15 +534,18 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 **FR:** FR-031
 
 **Functional:**
+
 - [ ] Generate < 60s; ≥ 5 pages; categorized index + HTML
 - [ ] Repo root zero-yield documented (POST-MVP FR-006)
 - [ ] Result in IMPLEMENTATION.md build log
 
 **Logging & diagnostics (§0.8):**
+
 - [ ] Dogfood run with `--verbose` shows discover → parse → output → cli event chain
 - [ ] No missing pipeline stage logs vs E2–E6 requirements
 
 **Quality measures:**
+
 - [ ] Full §0.2 gate passes before sign-off
 
 #### S7.2 — Full quality gate and §13 checklist
@@ -509,14 +558,17 @@ Doc-only or verify-only stories (E1) use minimal logging ACs where no runtime co
 **HARNESS:** Phase 3.5, §13 | **FR:** FR-030
 
 **Functional:**
+
 - [ ] All §13 functionality, meta, and quality items pass
 - [ ] `IMPLEMENTATION.md` complete through E7
 
 **Logging & diagnostics (§0.8):**
+
 - [ ] §13 item "structured logging follows §0.8" explicitly verified
 - [ ] No feature story merged without logging ACs satisfied
 
 **Quality measures:**
+
 - [ ] Full §0.2 gate; coverage ≥ 90% repo-wide
 
 **MVP gate:** E1–E7 complete; §13 green; logging woven — no deferred logging epic.
@@ -531,11 +583,11 @@ POST-MVP stories use the same three AC groups (Functional, Logging & diagnostics
 
 **Binds:** FR-005, FR-006
 
-| Story | Summary |
-| ----- | ------- |
-| S8.1 | `--patterns` CLI flag |
-| S8.2 | Project config file loader |
-| S8.3 | Extended default patterns |
+| Story | Summary                    |
+| ----- | -------------------------- |
+| S8.1  | `--patterns` CLI flag      |
+| S8.2  | Project config file loader |
+| S8.3  | Extended default patterns  |
 
 #### S8.1 — --patterns CLI flag
 
@@ -655,39 +707,39 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 
 ### MVP epics (E1–E7)
 
-| Epic | User journey | Stories | FR-021 logging |
-| ---- | ------------ | ------- | -------------- |
-| E1 Foundation | Gate + Logger | S1.1–S1.3 | S1.3 introduces Logger |
-| E2 List | `specwiki list` | S2.1–S2.4 | discover.* in S2.3+ |
-| E3 Markdown | `wiki/*.md` | S3.1–S3.2 | parse.* + output.write |
-| E4 HTML | `wiki/html/` | S4.1–S4.2 | output.write HTML |
+| Epic           | User journey       | Stories   | FR-021 logging                |
+| -------------- | ------------------ | --------- | ----------------------------- |
+| E1 Foundation  | Gate + Logger      | S1.1–S1.3 | S1.3 introduces Logger        |
+| E2 List        | `specwiki list`    | S2.1–S2.4 | discover.* in S2.3+           |
+| E3 Markdown    | `wiki/*.md`        | S3.1–S3.2 | parse.* + output.write        |
+| E4 HTML        | `wiki/html/`       | S4.1–S4.2 | output.write HTML             |
 | E5 Trustworthy | Unique safe output | S5.1–S5.2 | slug-collision + guard errors |
-| E6 CLI | Flags + exit codes | S6.1–S6.2 | cli.command + cli.error |
-| E7 Sign-off | Dogfood + §13 | S7.1–S7.2 | Full pipeline log audit |
+| E6 CLI         | Flags + exit codes | S6.1–S6.2 | cli.command + cli.error       |
+| E7 Sign-off    | Dogfood + §13      | S7.1–S7.2 | Full pipeline log audit       |
 
 ### POST-MVP epics (E8–E15)
 
-| Epic | Stories |
-| ---- | ------- |
-| E8 Custom discovery | S8.1–S8.3 |
-| E9 Agent I/O | S9.1–S9.2 |
-| E10 Team CI | S10.1 |
-| E11 Live loop | S11.1–S11.2 |
-| E12 Semantic | S12.1–S12.3 |
-| E13 Distribution | S13.1–S13.2 |
-| E14 Ecosystem | S14.1–S14.3 |
-| E15 IDE | S15.1 |
+| Epic                | Stories     |
+| ------------------- | ----------- |
+| E8 Custom discovery | S8.1–S8.3   |
+| E9 Agent I/O        | S9.1–S9.2   |
+| E10 Team CI         | S10.1       |
+| E11 Live loop       | S11.1–S11.2 |
+| E12 Semantic        | S12.1–S12.3 |
+| E13 Distribution    | S13.1–S13.2 |
+| E14 Ecosystem       | S14.1–S14.3 |
+| E15 IDE             | S15.1       |
 
 ---
 
 ## Migration notes
 
-| Change | Detail |
-| ------ | ------ |
-| E5 Verbose epic **removed** | Logging merged into E2–E4, E6; Logger in E1 S1.3 |
-| E6–E8 renumbered → **E5–E7** | Trustworthy, CLI, Sign-off |
-| POST-MVP E9–E16 → **E8–E15** | Shifted down one |
-| Every story | Functional + **Logging & diagnostics** + **Quality measures** AC groups |
+| Change                       | Detail                                                                  |
+| ---------------------------- | ----------------------------------------------------------------------- |
+| E5 Verbose epic **removed**  | Logging merged into E2–E4, E6; Logger in E1 S1.3                        |
+| E6–E8 renumbered → **E5–E7** | Trustworthy, CLI, Sign-off                                              |
+| POST-MVP E9–E16 → **E8–E15** | Shifted down one                                                        |
+| Every story                  | Functional + **Logging & diagnostics** + **Quality measures** AC groups |
 
 ---
 
@@ -702,8 +754,8 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 
 ## Discovery Artifacts
 
-| Artifact | Path |
-| -------- | ---- |
-| HARNESS §0.8 + §0.10 | `HARNESS.md` |
-| PRD | [prd/prd.md](prd/prd.md) |
-| Decisions | [decisions.md](../decisions.md) |
+| Artifact             | Path                            |
+| -------------------- | ------------------------------- |
+| HARNESS §0.8 + §0.10 | `HARNESS.md`                    |
+| PRD                  | [prd/prd.md](prd/prd.md)        |
+| Decisions            | [decisions.md](../decisions.md) |

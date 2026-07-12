@@ -39,16 +39,16 @@ patches_applied:
 
 ## Executive Summary
 
-| Dimension | Result |
-| --------- | ------ |
-| **Overall verdict** | **Ready with caveats** |
-| **PRD completeness** | Complete — 31 FRs (19 MVP + 12 POST-MVP), 17 NFRs |
-| **Architecture alignment** | Strong — 11 ADs, brownfield ratification matches code |
-| **Epic FR coverage** | 100% MVP FR traceability; POST-MVP mapped to E7–E12 |
-| **Epic quality** | Acceptable for brownfield CLI; 2 documented dependency caveats |
-| **UX alignment** | N/A — CLI product; user journeys in PRD sufficient |
-| **Critical patches** | 1 conflict resolved (FR-031 dogfood scope) |
-| **Implementation blockers** | None for planning handoff; 5 code gaps remain for MVP build |
+| Dimension                   | Result                                                         |
+| --------------------------- | -------------------------------------------------------------- |
+| **Overall verdict**         | **Ready with caveats**                                         |
+| **PRD completeness**        | Complete — 31 FRs (19 MVP + 12 POST-MVP), 17 NFRs              |
+| **Architecture alignment**  | Strong — 11 ADs, brownfield ratification matches code          |
+| **Epic FR coverage**        | 100% MVP FR traceability; POST-MVP mapped to E7–E12            |
+| **Epic quality**            | Acceptable for brownfield CLI; 2 documented dependency caveats |
+| **UX alignment**            | N/A — CLI product; user journeys in PRD sufficient             |
+| **Critical patches**        | 1 conflict resolved (FR-031 dogfood scope)                     |
+| **Implementation blockers** | None for planning handoff; 5 code gaps remain for MVP build    |
 
 Planning artifacts are aligned and sufficient to proceed to **step-08 MVP roadmap**. Caveats are documented implementation gaps (logger, slug collisions, `IMPLEMENTATION.md`, list zero-match tip parity, path traversal tests) — all already tracked in epics E1–E6.
 
@@ -58,15 +58,15 @@ Planning artifacts are aligned and sufficient to proceed to **step-08 MVP roadma
 
 ### Inventory
 
-| Document | Path | Status | Notes |
-| -------- | ---- | ------ | ----- |
-| PRD | `prd/prd.md` | Found | Single file, final |
-| Architecture | `architecture/ARCHITECTURE-SPINE.md` | Found | Single file, final |
-| Epics & Stories | `epics/epics-and-stories.md` | Found | Single file, final |
-| Project Context | `project-context.md` | Found | Brownfield authoritative |
-| Product Brief | `product-brief.md` | Found | Draft status; aligned with PRD |
-| HARNESS | `HARNESS.md` (repo root) | Found | §4 known-gaps partially stale |
-| UX Design | — | **Not found** | Not required for CLI MVP |
+| Document        | Path                                 | Status        | Notes                          |
+| --------------- | ------------------------------------ | ------------- | ------------------------------ |
+| PRD             | `prd/prd.md`                         | Found         | Single file, final             |
+| Architecture    | `architecture/ARCHITECTURE-SPINE.md` | Found         | Single file, final             |
+| Epics & Stories | `epics/epics-and-stories.md`         | Found         | Single file, final             |
+| Project Context | `project-context.md`                 | Found         | Brownfield authoritative       |
+| Product Brief   | `product-brief.md`                   | Found         | Draft status; aligned with PRD |
+| HARNESS         | `HARNESS.md` (repo root)             | Found         | §4 known-gaps partially stale  |
+| UX Design       | —                                    | **Not found** | Not required for CLI MVP       |
 
 ### Duplicates
 
@@ -74,10 +74,10 @@ No duplicate whole/sharded document pairs found.
 
 ### Missing Documents
 
-| Document | Impact |
-| -------- | ------ |
-| UX specifications | Low — CLI with static HTML output; PRD user journey covers Persona A |
-| `IMPLEMENTATION.md` | Expected gap — E1 S1.1 creates at implementation start |
+| Document            | Impact                                                               |
+| ------------------- | -------------------------------------------------------------------- |
+| UX specifications   | Low — CLI with static HTML output; PRD user journey covers Persona A |
+| `IMPLEMENTATION.md` | Expected gap — E1 S1.1 creates at implementation start               |
 
 ---
 
@@ -112,37 +112,37 @@ NFR-001–NFR-017 derived from HARNESS §0. Coverage spans TDD, quality gate, lo
 
 ### MVP FR Coverage Matrix
 
-| FR | PRD Summary | Epic / Story | Status |
-| -- | ----------- | ------------ | ------ |
-| FR-001 | Glob scan with ignores | E2 / S2.3 | ✓ Covered |
-| FR-002 | Category/title derivation | E2 / S2.1, S2.2 | ✓ Covered |
-| FR-003 | `list` grouped output | E2 / S2.3, E5 / S5.3 | ✓ Covered |
-| FR-004 | Zero-match helpful tip | E6 / S6.1, E5 / S5.3 | ✓ Covered |
-| FR-007 | UTF-8 + frontmatter parse | E3 / S3.2 | ✓ Covered |
-| FR-008 | Description + TOC | E3 / S3.1 | ✓ Covered |
-| FR-009 | Raw body preservation | E3 / S3.2 | ✓ Covered |
-| FR-011 | `wiki/index.md` | E4 / S4.1, S4.3 | ✓ Covered |
-| FR-012 | Per-spec pages | E4 / S4.1, S4.3 | ✓ Covered |
-| FR-013 | Slug derivation | E4 / S4.1 | ✓ Covered |
-| FR-014 | Slug collision disambiguation | E5 / S5.4 | ✓ Covered |
-| FR-015 | HTML wiki + escapeHtml | E4 / S4.2, S4.3 | ✓ Covered |
-| FR-016 | Generate summary stdout | E5 / S5.3 | ✓ Covered |
-| FR-019 | `--project` flag | E5 / S5.3 | ✓ Covered |
-| FR-020 | `--output` flag | E5 / S5.3 | ✓ Covered |
-| FR-021 | `--verbose` structured logs | E5 / S5.1–S5.2, E2 / S2.4, E4 / S4.4 | ✓ Covered |
-| FR-022 | Exit codes 0/1/2 | E6 / S6.2, E5 / S5.3 | ✓ Covered |
-| FR-030 | `IMPLEMENTATION.md` build log | E1 / S1.1 | ✓ Covered |
-| FR-031 | Dogfood validation | E6 / S6.3 | ✓ Covered (patched) |
+| FR     | PRD Summary                   | Epic / Story                         | Status              |
+| ------ | ----------------------------- | ------------------------------------ | ------------------- |
+| FR-001 | Glob scan with ignores        | E2 / S2.3                            | ✓ Covered           |
+| FR-002 | Category/title derivation     | E2 / S2.1, S2.2                      | ✓ Covered           |
+| FR-003 | `list` grouped output         | E2 / S2.3, E5 / S5.3                 | ✓ Covered           |
+| FR-004 | Zero-match helpful tip        | E6 / S6.1, E5 / S5.3                 | ✓ Covered           |
+| FR-007 | UTF-8 + frontmatter parse     | E3 / S3.2                            | ✓ Covered           |
+| FR-008 | Description + TOC             | E3 / S3.1                            | ✓ Covered           |
+| FR-009 | Raw body preservation         | E3 / S3.2                            | ✓ Covered           |
+| FR-011 | `wiki/index.md`               | E4 / S4.1, S4.3                      | ✓ Covered           |
+| FR-012 | Per-spec pages                | E4 / S4.1, S4.3                      | ✓ Covered           |
+| FR-013 | Slug derivation               | E4 / S4.1                            | ✓ Covered           |
+| FR-014 | Slug collision disambiguation | E5 / S5.4                            | ✓ Covered           |
+| FR-015 | HTML wiki + escapeHtml        | E4 / S4.2, S4.3                      | ✓ Covered           |
+| FR-016 | Generate summary stdout       | E5 / S5.3                            | ✓ Covered           |
+| FR-019 | `--project` flag              | E5 / S5.3                            | ✓ Covered           |
+| FR-020 | `--output` flag               | E5 / S5.3                            | ✓ Covered           |
+| FR-021 | `--verbose` structured logs   | E5 / S5.1–S5.2, E2 / S2.4, E4 / S4.4 | ✓ Covered           |
+| FR-022 | Exit codes 0/1/2              | E6 / S6.2, E5 / S5.3                 | ✓ Covered           |
+| FR-030 | `IMPLEMENTATION.md` build log | E1 / S1.1                            | ✓ Covered           |
+| FR-031 | Dogfood validation            | E6 / S6.3                            | ✓ Covered (patched) |
 
 ### POST-MVP FR Coverage
 
-| FR range | Epic |
-| -------- | ---- |
-| FR-005–FR-006, FR-017, FR-023 | E7 |
-| FR-024–FR-026 | E8 |
-| FR-010 | E9 |
-| FR-018, FR-027–FR-028 | E10 |
-| FR-029 | E11 |
+| FR range                      | Epic |
+| ----------------------------- | ---- |
+| FR-005–FR-006, FR-017, FR-023 | E7   |
+| FR-024–FR-026                 | E8   |
+| FR-010                        | E9   |
+| FR-018, FR-027–FR-028         | E10  |
+| FR-029                        | E11  |
 
 ### Missing Requirements
 
@@ -182,15 +182,15 @@ None. Missing UX doc is appropriate for this product class.
 
 ### Compliance Summary
 
-| Epic | User value | Independence | Story sizing | Forward deps | AC quality |
-| ---- | ---------- | ------------ | ------------ | ------------ | ---------- |
-| E1 Scaffold | ⚠️ Technical | ✓ | ✓ | ✓ | ✓ Testable |
-| E2 Discovery | ⚠️ Hardening | ✓ | ✓ | 🟡 S2.4 → S5.1 | ✓ |
-| E3 Parsing | ⚠️ Hardening | ✓ | ✓ | ✓ | ✓ |
-| E4 Wiki Output | ⚠️ Hardening | ✓ | ✓ | 🟡 S4.4 → S5.1 | ✓ |
-| E5 CLI Hardening | ✓ User-facing | ✓ | ✓ | ✓ | ✓ |
-| E6 Validation | ✓ Sign-off | Needs E1–E5 | ✓ | ✓ | ✓ (patched) |
-| E7–E12 POST-MVP | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Epic             | User value    | Independence | Story sizing | Forward deps   | AC quality  |
+| ---------------- | ------------- | ------------ | ------------ | -------------- | ----------- |
+| E1 Scaffold      | ⚠️ Technical  | ✓            | ✓            | ✓              | ✓ Testable  |
+| E2 Discovery     | ⚠️ Hardening  | ✓            | ✓            | 🟡 S2.4 → S5.1 | ✓           |
+| E3 Parsing       | ⚠️ Hardening  | ✓            | ✓            | ✓              | ✓           |
+| E4 Wiki Output   | ⚠️ Hardening  | ✓            | ✓            | 🟡 S4.4 → S5.1 | ✓           |
+| E5 CLI Hardening | ✓ User-facing | ✓            | ✓            | ✓              | ✓           |
+| E6 Validation    | ✓ Sign-off    | Needs E1–E5  | ✓            | ✓              | ✓ (patched) |
+| E7–E12 POST-MVP  | ✓             | ✓            | ✓            | ✓              | ✓           |
 
 ### Findings by Severity
 
@@ -220,17 +220,17 @@ All 40 stories have checkbox ACs with measurable outcomes (coverage ≥ 90%, qua
 
 Executed against v0.1 codebase to validate brownfield claims in architecture and project-context.
 
-| Check | Command / action | Result |
-| ----- | ---------------- | ------ |
-| Test suite | `npm run test` | 15/15 pass |
-| Coverage | `npm run coverage` | 99.43% lines; branches 90.32% (threshold met) |
-| Fixture discovery | `list` on `tests/fixtures/sample-project/` | 10 specs across 8 categories |
-| Self-repo discovery | `list` on specwiki repo root | **0 specs** — `.agents/skills/`, HARNESS, `_bmad-output/` outside default patterns |
-| Logger module | `src/core/Logger.ts` | **Missing** |
-| Slug collision code | grep `collision`/`disambiguate` | **Missing** |
-| `IMPLEMENTATION.md` | file search | **Missing** |
-| List zero-match tip | `listSpecs` empty project | Message only — no helpful tip (generate has tip) |
-| HTML title escape | `tests/output/wiki.test.ts` | Test exists and passes |
+| Check               | Command / action                           | Result                                                                             |
+| ------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------- |
+| Test suite          | `npm run test`                             | 15/15 pass                                                                         |
+| Coverage            | `npm run coverage`                         | 99.43% lines; branches 90.32% (threshold met)                                      |
+| Fixture discovery   | `list` on `tests/fixtures/sample-project/` | 10 specs across 8 categories                                                       |
+| Self-repo discovery | `list` on specwiki repo root               | **0 specs** — `.agents/skills/`, HARNESS, `_bmad-output/` outside default patterns |
+| Logger module       | `src/core/Logger.ts`                       | **Missing**                                                                        |
+| Slug collision code | grep `collision`/`disambiguate`            | **Missing**                                                                        |
+| `IMPLEMENTATION.md` | file search                                | **Missing**                                                                        |
+| List zero-match tip | `listSpecs` empty project                  | Message only — no helpful tip (generate has tip)                                   |
+| HTML title escape   | `tests/output/wiki.test.ts`                | Test exists and passes                                                             |
 
 ---
 
@@ -240,52 +240,52 @@ Current pass/fail against §13 — implementation not complete; expected for rea
 
 ### Functionality
 
-| Item | Status | Notes |
-| ---- | ------ | ----- |
-| `specwiki list` discovers and groups per README | **PASS** | Fixture: 10 files, 8 categories |
-| `specwiki generate` writes md + HTML per layout | **PASS** | Fixture integration test green |
-| `--project`, `--output`, `--verbose` flags | **PASS** | Wired in `cli.ts` |
+| Item                                                 | Status      | Notes                                     |
+| ---------------------------------------------------- | ----------- | ----------------------------------------- |
+| `specwiki list` discovers and groups per README      | **PASS**    | Fixture: 10 files, 8 categories           |
+| `specwiki generate` writes md + HTML per layout      | **PASS**    | Fixture integration test green            |
+| `--project`, `--output`, `--verbose` flags           | **PASS**    | Wired in `cli.ts`                         |
 | Zero-spec projects exit cleanly with helpful message | **PARTIAL** | Generate has tip; list missing tip (S6.1) |
 
 ### Meta / Persistence
 
-| Item | Status | Notes |
-| ---- | ------ | ----- |
-| `IMPLEMENTATION.md` build log through Phase 3 | **FAIL** | E1 S1.1 not started |
-| HARNESS §0.2 lists all quality-gate scripts | **PASS** | Scripts exist in `package.json` |
+| Item                                          | Status   | Notes                           |
+| --------------------------------------------- | -------- | ------------------------------- |
+| `IMPLEMENTATION.md` build log through Phase 3 | **FAIL** | E1 S1.1 not started             |
+| HARNESS §0.2 lists all quality-gate scripts   | **PASS** | Scripts exist in `package.json` |
 
 ### Code Quality
 
-| Item | Status | Notes |
-| ---- | ------ | ----- |
-| All §0.2 commands pass | **PASS** | Verified test + coverage |
-| Coverage ≥ 90% | **PASS** | 99.43% lines |
-| Comments follow §0.6 | **PASS** | Minimal, appropriate |
-| Code cleanliness §0.7 | **PASS** | Focused modules |
-| Structured logging §0.8 | **FAIL** | Raw `console.log`; Logger missing |
-| Path/HTML safety §0.9 | **PARTIAL** | Title escape tested; path traversal tests thin |
+| Item                    | Status      | Notes                                          |
+| ----------------------- | ----------- | ---------------------------------------------- |
+| All §0.2 commands pass  | **PASS**    | Verified test + coverage                       |
+| Coverage ≥ 90%          | **PASS**    | 99.43% lines                                   |
+| Comments follow §0.6    | **PASS**    | Minimal, appropriate                           |
+| Code cleanliness §0.7   | **PASS**    | Focused modules                                |
+| Structured logging §0.8 | **FAIL**    | Raw `console.log`; Logger missing              |
+| Path/HTML safety §0.9   | **PARTIAL** | Title escape tested; path traversal tests thin |
 
 ---
 
 ## Cross-Artifact Alignment
 
-| Topic | PRD | Architecture | Epics | Code | Aligned? |
-| ----- | --- | ------------ | ----- | ---- | -------- |
-| MVP = Phases 0–3 | ✓ | ✓ | ✓ E1–E6 | — | ✓ |
-| POST-MVP = Phase 4+ | ✓ | ✓ extension points | ✓ E7–E12 | — | ✓ |
-| Frozen patterns extend-only | ✓ NFR-013 | ✓ AD-2 | ✓ S2.1 | ✓ 15 patterns | ✓ |
-| Slug collision MVP blocker | ✓ FR-014 | ✓ AD-5 gap | ✓ S5.4 | ✗ not built | ✓ (tracked) |
-| Logger MVP blocker | ✓ FR-021 | ✓ AD-9 gap | ✓ S5.1 | ✗ not built | ✓ (tracked) |
-| Dogfood validation | ✓ FR-031 patched | ✓ patched | ✓ S6.3 patched | Fixture 10 specs | ✓ (after patch) |
-| No UX / no serve MVP | ✓ decisions | ✓ NFR-012 | — | — | ✓ |
-| Persona A primary | ✓ | — | — | — | ✓ |
+| Topic                       | PRD              | Architecture       | Epics          | Code             | Aligned?        |
+| --------------------------- | ---------------- | ------------------ | -------------- | ---------------- | --------------- |
+| MVP = Phases 0–3            | ✓                | ✓                  | ✓ E1–E6        | —                | ✓               |
+| POST-MVP = Phase 4+         | ✓                | ✓ extension points | ✓ E7–E12       | —                | ✓               |
+| Frozen patterns extend-only | ✓ NFR-013        | ✓ AD-2             | ✓ S2.1         | ✓ 15 patterns    | ✓               |
+| Slug collision MVP blocker  | ✓ FR-014         | ✓ AD-5 gap         | ✓ S5.4         | ✗ not built      | ✓ (tracked)     |
+| Logger MVP blocker          | ✓ FR-021         | ✓ AD-9 gap         | ✓ S5.1         | ✗ not built      | ✓ (tracked)     |
+| Dogfood validation          | ✓ FR-031 patched | ✓ patched          | ✓ S6.3 patched | Fixture 10 specs | ✓ (after patch) |
+| No UX / no serve MVP        | ✓ decisions      | ✓ NFR-012          | —              | —                | ✓               |
+| Persona A primary           | ✓                | —                  | —              | —                | ✓               |
 
 ### Stale Content Flagged
 
-| Location | Issue | Action |
-| -------- | ----- | ------ |
-| HARNESS §4 "Known gaps" | Lists "no tests", "no lint" — false per project-context | Informational only; `project-context.md` is authoritative |
-| product-brief.md `status: draft` | PRD/epics are final | Low risk; content aligned |
+| Location                         | Issue                                                   | Action                                                    |
+| -------------------------------- | ------------------------------------------------------- | --------------------------------------------------------- |
+| HARNESS §4 "Known gaps"          | Lists "no tests", "no lint" — false per project-context | Informational only; `project-context.md` is authoritative |
+| product-brief.md `status: draft` | PRD/epics are final                                     | Low risk; content aligned                                 |
 
 ---
 
@@ -317,14 +317,14 @@ Caveats are **known implementation gaps** in v0.1 code — not planning defects.
 
 ### Implementation Gaps (expected — not planning blockers)
 
-| Gap | Story | Priority |
-| --- | ----- | -------- |
-| `IMPLEMENTATION.md` missing | S1.1 | MVP blocker |
-| `src/core/Logger.ts` missing | S5.1 | MVP blocker |
-| Slug collision disambiguation | S5.4 | MVP blocker |
-| List zero-match tip parity | S6.1 | MVP polish |
-| Path traversal guard tests | S4.3 | MVP verify |
-| Exit code 2 for usage errors | S6.2 | MVP polish [ASSUMPTION] |
+| Gap                           | Story | Priority                |
+| ----------------------------- | ----- | ----------------------- |
+| `IMPLEMENTATION.md` missing   | S1.1  | MVP blocker             |
+| `src/core/Logger.ts` missing  | S5.1  | MVP blocker             |
+| Slug collision disambiguation | S5.4  | MVP blocker             |
+| List zero-match tip parity    | S6.1  | MVP polish              |
+| Path traversal guard tests    | S4.3  | MVP verify              |
+| Exit code 2 for usage errors  | S6.2  | MVP polish [ASSUMPTION] |
 
 ### Recommended Next Steps
 
@@ -335,14 +335,14 @@ Caveats are **known implementation gaps** in v0.1 code — not planning defects.
 
 ### QA Lead Sign-off
 
-| Criterion | Met? |
-| --------- | ---- |
-| PRD ↔ Architecture alignment | ✓ |
-| PRD ↔ Epics FR traceability | ✓ |
-| Stories have testable ACs | ✓ |
-| Brownfield gaps documented | ✓ |
-| No unresolved planning conflicts | ✓ |
-| Human owner sign-off | Waived (headless) |
+| Criterion                        | Met?              |
+| -------------------------------- | ----------------- |
+| PRD ↔ Architecture alignment     | ✓                 |
+| PRD ↔ Epics FR traceability      | ✓                 |
+| Stories have testable ACs        | ✓                 |
+| Brownfield gaps documented       | ✓                 |
+| No unresolved planning conflicts | ✓                 |
+| Human owner sign-off             | Waived (headless) |
 
 **Verdict:** Proceed to MVP roadmap. Implementation may begin at E1 S1.1 when owner authorizes Phase 0.
 

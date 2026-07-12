@@ -1,7 +1,7 @@
 ---
 project_name: specwiki
 user_name: Lucas
-date: '2026-07-12'
+date: "2026-07-12"
 sections_completed:
   - technology_stack
   - critical_implementation_rules
@@ -18,20 +18,20 @@ _This file contains critical rules and patterns that AI agents must follow when 
 
 ## Technology Stack & Versions
 
-| Layer | Technology | Version / constraint |
-| ----- | ---------- | -------------------- |
-| Runtime | Node.js | ≥ 20 (`engines.node`) |
-| Language | TypeScript | 5.8.x, strict mode |
-| Module system | ESM | `"type": "module"`; imports use `.js` extension |
-| CLI framework | Commander | ^13.1.0 |
-| Glob discovery | fast-glob | ^3.3.3 |
-| Frontmatter | gray-matter | ^4.0.3 |
-| Markdown → HTML | marked | ^15.0.7 |
-| Terminal output | chalk | ^5.4.1 |
-| Test runner | Vitest | ^3.0.9 with @vitest/coverage-v8 |
-| Lint / format | ESLint 9 + Prettier 3 | Flat config (`eslint.config.js`) |
-| Dev runner | tsx | ^4.19.3 (`npm run dev`) |
-| Build | tsc | Output to `dist/`; bin entry `dist/cli.js` |
+| Layer           | Technology            | Version / constraint                            |
+| --------------- | --------------------- | ----------------------------------------------- |
+| Runtime         | Node.js               | ≥ 20 (`engines.node`)                           |
+| Language        | TypeScript            | 5.8.x, strict mode                              |
+| Module system   | ESM                   | `"type": "module"`; imports use `.js` extension |
+| CLI framework   | Commander             | ^13.1.0                                         |
+| Glob discovery  | fast-glob             | ^3.3.3                                          |
+| Frontmatter     | gray-matter           | ^4.0.3                                          |
+| Markdown → HTML | marked                | ^15.0.7                                         |
+| Terminal output | chalk                 | ^5.4.1                                          |
+| Test runner     | Vitest                | ^3.0.9 with @vitest/coverage-v8                 |
+| Lint / format   | ESLint 9 + Prettier 3 | Flat config (`eslint.config.js`)                |
+| Dev runner      | tsx                   | ^4.19.3 (`npm run dev`)                         |
+| Build           | tsc                   | Output to `dist/`; bin entry `dist/cli.js`      |
 
 **Scripts (quality gate):** `test`, `coverage`, `lint`, `format`, `typecheck`, `build`
 
@@ -51,13 +51,13 @@ _This file contains critical rules and patterns that AI agents must follow when 
 
 **Still open (HARNESS §4, §11 — verify before planning):**
 
-| Gap | Status |
-| --- | ------ |
-| `IMPLEMENTATION.md` build log | **Missing** — create in Phase 0 |
-| Structured logger (`src/core/Logger.ts`) | **Missing** — verbose uses raw `console.log` |
-| Slug collision handling | **Missing** — duplicate paths → identical slugs |
-| Custom patterns / `--config` | **Missing** — patterns hard-coded in `DEFAULT_SPEC_PATTERNS` |
-| Path traversal safety on `--output` | **Verify** — must not write outside resolved output dir (§0.9) |
+| Gap                                      | Status                                                         |
+| ---------------------------------------- | -------------------------------------------------------------- |
+| `IMPLEMENTATION.md` build log            | **Missing** — create in Phase 0                                |
+| Structured logger (`src/core/Logger.ts`) | **Missing** — verbose uses raw `console.log`                   |
+| Slug collision handling                  | **Missing** — duplicate paths → identical slugs                |
+| Custom patterns / `--config`             | **Missing** — patterns hard-coded in `DEFAULT_SPEC_PATTERNS`   |
+| Path traversal safety on `--output`      | **Verify** — must not write outside resolved output dir (§0.9) |
 
 **HARNESS §4 "Known gaps" is partially stale:** tests, Vitest, lint, and format tooling now exist. Cross-check HARNESS before treating "no tests" as true.
 

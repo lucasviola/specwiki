@@ -45,12 +45,14 @@ This is a **documentation-only** story — no runtime code changes. Brownfield b
 Per HARNESS §0.4 and FR-030:
 
 **Status header (top of file):**
+
 - `**Last updated:**` — today's date
 - `**Current position:**` — HARNESS Phase 0.1 complete; next: E1 S1.2 verify quality gate
 - `**Test count:**` — `15 passing` (current brownfield baseline)
 - Deliverables table with columns: Deliverable | Status | Reference
 
 **Progression checklist:**
+
 - One checkbox per MVP epic E1–E7 (not per-story granularity)
 - Epic titles from `epics-and-stories.md`:
   - E1 — Project Foundation
@@ -62,12 +64,14 @@ Per HARNESS §0.4 and FR-030:
   - E7 — MVP Validation & Sign-off
 
 **Build log table:**
+
 ```markdown
 | Date | Story | Summary | Commit | Quality gate |
-|------|-------|---------|--------|--------------|
+| ---- | ----- | ------- | ------ | ------------ |
 ```
 
 **Workflow references section:**
+
 - Link to `HARNESS.md` §0 (TDD, quality gate, checkpoint workflow)
 - §0.8 — structured logging woven into feature stories (not separate logging epic)
 - §0.10 — vertical slices + INVEST; one story = thin end-to-end user value
@@ -75,6 +79,7 @@ Per HARNESS §0.4 and FR-030:
 ### Seed Row Content
 
 MVP-ROADMAP suggests seeding a row documenting discovery-loop artifact creation. For S1.1:
+
 - Story: `E1 S1.1`
 - Summary: `docs: create IMPLEMENTATION.md build log and MVP epic checklist`
 - Commit: `uncommitted` until owner commits
