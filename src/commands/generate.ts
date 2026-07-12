@@ -1,11 +1,13 @@
 import chalk from "chalk";
 import path from "node:path";
+import { log } from "../core/Logger.js";
 import { discoverSpecs } from "../discover/specs.js";
 import { parseSpecFile } from "../parse/markdown.js";
 import { buildWiki, writeHtmlWiki, writeWiki } from "../output/wiki.js";
 import type { GenerateOptions } from "../types.js";
 
 export async function generateWiki(options: GenerateOptions): Promise<void> {
+  log.setVerbose(Boolean(options.verbose));
   const { projectRoot, outputDir, verbose } = options;
 
   if (verbose) {
@@ -52,6 +54,8 @@ export async function generateWiki(options: GenerateOptions): Promise<void> {
 }
 
 export async function listSpecs(options: GenerateOptions): Promise<void> {
+  log.setVerbose(Boolean(options.verbose));
+
   const specFiles = await discoverSpecs({
     projectRoot: options.projectRoot,
     patterns: options.patterns,

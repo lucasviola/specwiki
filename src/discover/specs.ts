@@ -1,6 +1,7 @@
 import fg from "fast-glob";
 import path from "node:path";
 import { DEFAULT_SPEC_PATTERNS } from "../config/patterns.js";
+import { log } from "../core/Logger.js";
 import type { DiscoverOptions, SpecFile } from "../types.js";
 
 /** Path-prefix category for discovery and list grouping. Exported for tests. */
@@ -49,20 +50,34 @@ export async function discoverSpecs(
 ): Promise<SpecFile[]> {
   const patterns = options.patterns ?? DEFAULT_SPEC_PATTERNS;
 
-  const entries = await fg(patterns, {
-    cwd: options.projectRoot,
-    absolute: true,
-    onlyFiles: true,
-    dot: true,
-    ignore: [
-      "**/node_modules/**",
-      "**/dist/**",
-      "**/wiki/**",
-      "**/.specwiki/**",
-    ],
+  log.info("discover.start", {
+    projectRoot: options.projectRoot,
+    patternCount: patterns.length,
   });
 
-  return entries
+  let entries: string[];
+  try {
+    entries = await fg(patterns, {
+      cwd: options.projectRoot,
+      absolute: true,
+      onlyFiles: true,
+      dot: true,
+      ignore: [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/wiki/**",
+        "**/.specwiki/**",
+      ],
+    });
+  } catch (err) {
+    log.error("discover.error", {
+      projectRoot: options.projectRoot,
+      message: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
+
+  const specs = entries
     .map((filePath) => {
       const relativePath = path.relative(options.projectRoot, filePath);
       return {
@@ -77,4 +92,15 @@ export async function discoverSpecs(
       if (catCompare !== 0) return catCompare;
       return a.relativePath.localeCompare(b.relativePath);
     });
+
+  for (const spec of specs) {
+    log.info("discover.match", { relativePath: spec.relativePath });
+  }
+
+  log.info("discover.complete", {
+    projectRoot: options.projectRoot,
+    matchCount: specs.length,
+  });
+
+  return specs;
 }

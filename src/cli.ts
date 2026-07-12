@@ -33,10 +33,12 @@ program
   .command("list")
   .description("List discovered spec files without generating")
   .option("-p, --project <path>", "Project root to scan", process.cwd())
+  .option("-v, --verbose", "Show detailed discover diagnostics on stderr")
   .action(async (opts) => {
     await listSpecs({
       projectRoot: path.resolve(opts.project),
       outputDir: "wiki",
+      verbose: opts.verbose,
     });
   });
 

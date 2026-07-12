@@ -3,6 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { log } from "../../src/core/Logger.js";
 import { generateWiki, listSpecs } from "../../src/commands/generate.js";
 
 const fixtureRoot = path.resolve(
@@ -12,19 +13,31 @@ const fixtureRoot = path.resolve(
 
 const tempDirs: string[] = [];
 let logSpy: ReturnType<typeof vi.spyOn>;
+let stderrSpy: ReturnType<typeof vi.spyOn>;
 
 beforeEach(() => {
+  log.setVerbose(false);
   logSpy = vi.spyOn(console, "log").mockImplementation(() => undefined);
+  stderrSpy = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
 });
 
 afterEach(async () => {
+  log.setVerbose(false);
   logSpy.mockRestore();
+  stderrSpy.mockRestore();
   await Promise.all(
     tempDirs
       .splice(0)
       .map((dir) => fs.rm(dir, { force: true, recursive: true })),
   );
 });
+
+function parseStderrLines(): Record<string, unknown>[] {
+  return stderrSpy.mock.calls
+    .map(([chunk]) => String(chunk).trim())
+    .filter(Boolean)
+    .map((line) => JSON.parse(line) as Record<string, unknown>);
+}
 
 describe("generateWiki", () => {
   it("writes wiki output for discovered specs", async () => {
@@ -119,5 +132,27 @@ describe("listSpecs", () => {
     });
 
     expect(logSpy.mock.calls.flat().join(" ")).toContain("No spec files found");
+  });
+
+  it("emits discover diagnostics on stderr when verbose is enabled", async () => {
+    await listSpecs({
+      projectRoot: fixtureRoot,
+      outputDir: "wiki",
+      verbose: true,
+    });
+
+    const lines = parseStderrLines();
+    const events = lines.map((line) => line.event);
+    const matchCount = lines.filter(
+      (line) => line.event === "discover.match",
+    ).length;
+    const completeLine = lines.find(
+      (line) => line.event === "discover.complete",
+    );
+
+    expect(events[0]).toBe("discover.start");
+    expect(events.at(-1)).toBe("discover.complete");
+    expect(matchCount).toBeGreaterThan(0);
+    expect(completeLine?.matchCount).toBe(matchCount);
   });
 });

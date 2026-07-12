@@ -2,7 +2,8 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { log } from "../../src/core/Logger.js";
 import {
   deriveCategory,
   deriveTitle,
@@ -15,14 +16,29 @@ const fixtureRoot = path.resolve(
 );
 
 const tempDirs: string[] = [];
+let stderrSpy: ReturnType<typeof vi.spyOn>;
+
+beforeEach(() => {
+  log.setVerbose(false);
+  stderrSpy = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+});
 
 afterEach(async () => {
+  vi.restoreAllMocks();
+  log.setVerbose(false);
   await Promise.all(
     tempDirs
       .splice(0)
       .map((dir) => fs.rm(dir, { force: true, recursive: true })),
   );
 });
+
+function parseStderrLines(): Record<string, unknown>[] {
+  return stderrSpy.mock.calls
+    .map(([chunk]) => String(chunk).trim())
+    .filter(Boolean)
+    .map((line) => JSON.parse(line) as Record<string, unknown>);
+}
 
 describe("deriveCategory", () => {
   it.each([
@@ -77,6 +93,13 @@ describe("deriveTitle", () => {
 });
 
 describe("discoverSpecs", () => {
+  it("discovers at least five specs on the sample fixture", async () => {
+    const specs = await discoverSpecs({ projectRoot: fixtureRoot });
+
+    expect(specs.length).toBeGreaterThanOrEqual(5);
+    expect(specs.length).toBe(10);
+  });
+
   it("discovers and categorizes spec files in a project tree", async () => {
     const specs = await discoverSpecs({ projectRoot: fixtureRoot });
 
@@ -156,5 +179,141 @@ describe("discoverSpecs", () => {
     });
 
     expect(specs).toEqual([]);
+  });
+
+  it("does not emit discover info logs on stderr in default mode", async () => {
+    log.setVerbose(false);
+
+    await discoverSpecs({ projectRoot: fixtureRoot });
+
+    expect(parseStderrLines()).toEqual([]);
+  });
+
+  it("emits discover.start and discover.match on stderr when verbose", async () => {
+    log.setVerbose(true);
+
+    const specs = await discoverSpecs({ projectRoot: fixtureRoot });
+    const lines = parseStderrLines();
+    const events = lines.map((line) => line.event);
+
+    expect(events[0]).toBe("discover.start");
+    expect(events.filter((event) => event === "discover.match")).toHaveLength(
+      specs.length,
+    );
+    expect(events.at(-1)).toBe("discover.complete");
+
+    const startLine = lines[0];
+    const completeLine = lines.at(-1);
+    expect(startLine).toMatchObject({
+      event: "discover.start",
+      level: "info",
+      projectRoot: fixtureRoot,
+    });
+    expect(startLine?.patternCount).toBeGreaterThan(0);
+    expect(completeLine).toMatchObject({
+      event: "discover.complete",
+      level: "info",
+      projectRoot: fixtureRoot,
+      matchCount: specs.length,
+    });
+
+    for (const spec of specs) {
+      expect(events).toContain("discover.match");
+      expect(
+        lines.some(
+          (line) =>
+            line.event === "discover.match" &&
+            line.relativePath === spec.relativePath,
+        ),
+      ).toBe(true);
+    }
+  });
+
+  it("emits discover.error and rethrows when glob fails", async () => {
+    vi.resetModules();
+    vi.doMock("fast-glob", () => ({
+      default: vi.fn().mockRejectedValue(new Error("glob failed")),
+    }));
+
+    const { discoverSpecs: discoverSpecsWithMockedGlob } =
+      await import("../../src/discover/specs.js");
+
+    await expect(
+      discoverSpecsWithMockedGlob({ projectRoot: fixtureRoot }),
+    ).rejects.toThrow("glob failed");
+
+    const lines = parseStderrLines();
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toMatchObject({
+      event: "discover.error",
+      level: "error",
+      projectRoot: fixtureRoot,
+      message: "glob failed",
+    });
+
+    vi.doUnmock("fast-glob");
+    vi.resetModules();
+  });
+
+  it("emits discover.error with string message when glob throws non-Error", async () => {
+    vi.resetModules();
+    vi.doMock("fast-glob", () => ({
+      default: vi.fn().mockRejectedValue("glob string failure"),
+    }));
+
+    const { discoverSpecs: discoverSpecsWithMockedGlob } =
+      await import("../../src/discover/specs.js");
+
+    await expect(
+      discoverSpecsWithMockedGlob({ projectRoot: fixtureRoot }),
+    ).rejects.toBe("glob string failure");
+
+    const lines = parseStderrLines();
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toMatchObject({
+      event: "discover.error",
+      level: "error",
+      projectRoot: fixtureRoot,
+      message: "glob string failure",
+    });
+
+    vi.doUnmock("fast-glob");
+    vi.resetModules();
+  });
+
+  it("ignores node_modules, dist, wiki, and .specwiki directories", async () => {
+    const projectRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-discover-ignore-"),
+    );
+    tempDirs.push(projectRoot);
+
+    await fs.mkdir(path.join(projectRoot, "node_modules", "pkg"), {
+      recursive: true,
+    });
+    await fs.mkdir(path.join(projectRoot, "dist"), { recursive: true });
+    await fs.mkdir(path.join(projectRoot, "wiki"), { recursive: true });
+    await fs.mkdir(path.join(projectRoot, ".specwiki"), { recursive: true });
+    await fs.writeFile(path.join(projectRoot, "AGENTS.md"), "# Agents");
+    await fs.writeFile(
+      path.join(projectRoot, "node_modules", "pkg", "AGENTS.md"),
+      "# Ignored",
+    );
+    await fs.writeFile(
+      path.join(projectRoot, "dist", "AGENTS.md"),
+      "# Ignored",
+    );
+    await fs.writeFile(
+      path.join(projectRoot, "wiki", "AGENTS.md"),
+      "# Ignored",
+    );
+    await fs.writeFile(
+      path.join(projectRoot, ".specwiki", "AGENTS.md"),
+      "# Ignored",
+    );
+
+    const specs = await discoverSpecs({ projectRoot });
+
+    expect(specs).toHaveLength(1);
+    expect(specs[0]?.relativePath).toBe("AGENTS.md");
   });
 });
