@@ -1,4 +1,34 @@
-<nav class="specwiki-nav"><a href="index.html">← Back to index</a></nav>
-<article class="specwiki-article specwiki-index">
-{{{content}}}
-</article>
+<div class="specwiki-layout">
+  <nav class="category-nav" aria-label="Categories">
+    {{#categories}}
+    <div class="category-nav-group">
+      <a href="index.html#{{anchor}}" class="category-nav-heading">{{label}}</a>
+      <ul class="category-nav-pages">
+        {{#pages}}
+        <li><a href="{{href}}">{{title}}</a></li>
+        {{/pages}}
+      </ul>
+    </div>
+    {{/categories}}
+  </nav>
+  <div class="specwiki-center">
+    <article class="specwiki-portal" id="content">
+      <h1>Main Page</h1>
+      <p class="specwiki-portal-intro">
+        Structured documentation generated from AI specs, agent instructions,
+        and spec-driven development files in this project.
+      </p>
+      <p><strong>{{pageCount}}</strong> {{pageCountLabel}} indexed.</p>
+      {{#categories}}
+      <section id="{{anchor}}" class="specwiki-category-section">
+        <h2>{{label}}</h2>
+        <ul class="specwiki-portal-pages">
+          {{#pages}}
+          <li><a href="{{href}}">{{title}}</a> — <code>{{sourcePath}}</code></li>
+          {{/pages}}
+        </ul>
+      </section>
+      {{/categories}}
+    </article>
+  </div>
+</div>

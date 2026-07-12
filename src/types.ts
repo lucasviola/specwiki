@@ -27,6 +27,8 @@ export interface WikiPage {
   category: string;
   content: string;
   sourcePath: string;
+  description: string;
+  sections: SpecSection[];
 }
 
 export interface WikiOutput {

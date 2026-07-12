@@ -1,16 +1,39 @@
 import fs from "node:fs/promises";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { log } from "../../../src/core/Logger.js";
 import {
   HtmlRenderer,
   getHtmlRenderer,
   resetHtmlRendererCache,
 } from "../../../src/output/html/renderer.js";
+import type { WikiPage } from "../../../src/types.js";
+
+function samplePage(overrides: Partial<WikiPage> = {}): WikiPage {
+  return {
+    slug: "spec",
+    title: "Custom Spec Title",
+    category: "root",
+    content: "# Custom Spec Title",
+    sourcePath: "SPEC.md",
+    description: "Short description.",
+    sections: [
+      {
+        level: 2,
+        title: "Requirements",
+        content: "Must preserve markdown.",
+        anchor: "requirements",
+      },
+    ],
+    ...overrides,
+  };
+}
 
 describe("HtmlRenderer", () => {
   let renderer: HtmlRenderer;
 
   beforeEach(async () => {
     resetHtmlRendererCache();
+    log.setVerbose(false);
     renderer = await HtmlRenderer.create();
   });
 
@@ -18,42 +41,46 @@ describe("HtmlRenderer", () => {
     resetHtmlRendererCache();
   });
 
-  it("renders index page with escaped title and external stylesheet", () => {
-    const html = renderer.renderIndex(
-      "Evil <img src=x onerror=alert(1)>",
-      "<h1>Index</h1>",
-    );
+  it("renders index page with Main Page portal and category nav", () => {
+    const html = renderer.renderIndex([samplePage()]);
 
     expect(html).toMatch(/^<!DOCTYPE html>/);
     expect(html).toContain('<html lang="en">');
     expect(html).toContain(
       '<link rel="stylesheet" href="assets/specwiki.css">',
     );
-    expect(html).toContain(
-      "<title>Evil &lt;img src=x onerror=alert(1)&gt; — Spec Wiki</title>",
-    );
+    expect(html).toContain("<title>Spec Wiki — Spec Wiki</title>");
     expect(html).toContain('<header class="specwiki-header">');
-    expect(html).toContain('<article class="specwiki-article specwiki-index">');
-    expect(html).toContain("<h1>Index</h1>");
+    expect(html).toContain('<nav class="category-nav"');
+    expect(html).toContain('id="content"');
+    expect(html).toContain("<h1>Main Page</h1>");
+    expect(html).toContain('href="spec.html"');
+    expect(html).not.toMatch(/href="[^"]*\.md"/);
     expect(html).not.toContain("<style>");
-    expect(html).not.toMatch(/<title>[^<]*<img/);
   });
 
-  it("renders article page with back navigation", () => {
-    const html = renderer.renderArticle("Architecture", "<p>Body</p>");
+  it("renders article page with infobox, breadcrumb, TOC, and category nav", () => {
+    const page = samplePage();
+    const html = renderer.renderArticle(page, [page], "<p>Body</p>");
 
-    expect(html).toContain("<title>Architecture — Spec Wiki</title>");
-    expect(html).toContain(
-      '<nav class="specwiki-nav"><a href="index.html">← Back to index</a></nav>',
-    );
-    expect(html).toContain('<article class="specwiki-article">');
+    expect(html).toContain("<title>Custom Spec Title — Spec Wiki</title>");
+    expect(html).toContain('class="category-nav"');
+    expect(html).toContain('class="infobox"');
+    expect(html).toContain('class="toc"');
+    expect(html).toContain('id="content"');
+    expect(html).toContain('class="breadcrumb"');
+    expect(html).toContain("Main Page");
+    expect(html).toContain("Project Root");
+    expect(html).toContain("<code>SPEC.md</code>");
+    expect(html).toContain('href="#requirements"');
     expect(html).toContain("<p>Body</p>");
-    expect(html).not.toContain("specwiki-index");
   });
 
   it("escapes ampersands in title without double-escaping body HTML", () => {
+    const page = samplePage({ title: "Tom & Jerry" });
     const html = renderer.renderArticle(
-      "Tom & Jerry",
+      page,
+      [page],
       "<p>Content &amp; more</p>",
     );
 
@@ -61,13 +88,45 @@ describe("HtmlRenderer", () => {
     expect(html).toContain("<p>Content &amp; more</p>");
   });
 
-  it("escapes script injection payloads in titles", () => {
+  it("escapes script injection payloads in titles and metadata", () => {
     const malicious = '<script>alert("x")</script>';
-    const html = renderer.renderArticle(malicious, "<p>Safe</p>");
-    const escaped = "&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;";
+    const page = samplePage({
+      title: malicious,
+      sourcePath: malicious,
+      description: malicious,
+    });
+    const html = renderer.renderArticle(page, [page], "<p>Safe</p>");
+    const escaped = "&lt;script&gt;alert(&quot;x&quot;)&lt;&#x2F;script&gt;";
 
     expect(html).toContain(`<title>${escaped} — Spec Wiki</title>`);
     expect(html).not.toContain("<script>");
+    expect(html).toContain(`<code>${escaped}</code>`);
+  });
+
+  it("omits TOC rail when page has no sections", () => {
+    const page = samplePage({ sections: [] });
+    const html = renderer.renderArticle(page, [page], "<p>Body</p>");
+
+    expect(html).not.toContain('class="toc"');
+    expect(html).toContain('id="content"');
+  });
+
+  it("uses relative inter-page links safe for file:// navigation", () => {
+    const page = samplePage();
+    const html = renderer.renderArticle(page, [page], "<p>Body</p>");
+
+    expect(html).toContain('href="index.html"');
+    expect(html).toContain('href="spec.html"');
+    expect(html).not.toMatch(/href="\/[^"]*"/);
+    expect(html).not.toMatch(/href="https?:\/\//);
+  });
+
+  it("throws when required article fields are missing", () => {
+    const page = samplePage({ title: "", sourcePath: "" });
+
+    expect(() => renderer.renderArticle(page, [page], "<p>Body</p>")).toThrow(
+      /Missing required template fields/,
+    );
   });
 
   it("bundles wikimedia-ui-base tokens with specwiki layout CSS", async () => {
@@ -77,7 +136,9 @@ describe("HtmlRenderer", () => {
     expect(css).toContain("--color-primary");
     expect(css).toContain("--font-family-base");
     expect(css).toContain(".specwiki-header");
-    expect(css).toContain(".specwiki-logo");
+    expect(css).toContain(".category-nav");
+    expect(css).toContain(".infobox");
+    expect(css).toContain(".toc");
   });
 
   it("reuses cached renderer from getHtmlRenderer", async () => {
@@ -109,7 +170,7 @@ describe("HtmlRenderer", () => {
 describe("HtmlRenderer asset paths", () => {
   it("resolves templates relative to the renderer module", async () => {
     const renderer = await HtmlRenderer.create();
-    const html = renderer.renderIndex("Spec Wiki", "<p>Hello</p>");
+    const html = renderer.renderIndex([samplePage()]);
 
     expect(html).toContain('href="assets/specwiki.css"');
     expect(html).not.toMatch(/href="\/assets\//);

@@ -1,4 +1,57 @@
-<nav class="specwiki-nav"><a href="index.html">← Back to index</a></nav>
-<article class="specwiki-article">
-{{{content}}}
-</article>
+<div class="specwiki-layout specwiki-layout-article">
+  <nav class="category-nav" aria-label="Categories">
+    {{#categories}}
+    <div class="category-nav-group{{#active}} category-nav-active{{/active}}">
+      <a href="index.html#{{anchor}}" class="category-nav-heading">{{label}}</a>
+      <ul class="category-nav-pages">
+        {{#pages}}
+        <li><a href="{{href}}">{{title}}</a></li>
+        {{/pages}}
+      </ul>
+    </div>
+    {{/categories}}
+  </nav>
+  <div class="specwiki-center">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      {{#breadcrumbs}}
+      {{^first}} › {{/first}}
+      {{#href}}<a href="{{href}}">{{label}}</a>{{/href}}
+      {{^href}}<span aria-current="page">{{label}}</span>{{/href}}
+      {{/breadcrumbs}}
+    </nav>
+    <aside class="infobox">
+      <h2 class="infobox-title">{{title}}</h2>
+      <table class="infobox-table">
+        <tbody>
+          <tr>
+            <th scope="row">Category</th>
+            <td>{{categoryLabel}}</td>
+          </tr>
+          <tr>
+            <th scope="row">Source</th>
+            <td><code>{{sourcePath}}</code></td>
+          </tr>
+          {{#hasDescription}}
+          <tr>
+            <th scope="row">Summary</th>
+            <td>{{description}}</td>
+          </tr>
+          {{/hasDescription}}
+        </tbody>
+      </table>
+    </aside>
+    <main id="content" class="specwiki-article-body">
+      {{{content}}}
+    </main>
+  </div>
+  {{#hasToc}}
+  <nav class="toc" aria-label="Table of contents">
+    <h2 class="toc-heading">Contents</h2>
+    <ul class="toc-list">
+      {{#tocEntries}}
+      <li class="toc-level-{{level}}"><a href="{{href}}">{{title}}</a></li>
+      {{/tocEntries}}
+    </ul>
+  </nav>
+  {{/hasToc}}
+</div>

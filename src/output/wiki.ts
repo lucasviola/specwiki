@@ -171,6 +171,8 @@ export function buildWiki(specs: ParsedSpec[]): WikiOutput {
     category: spec.file.category,
     content: buildPageContent(spec),
     sourcePath: spec.file.relativePath,
+    description: spec.description,
+    sections: spec.sections,
   }));
 
   return {
@@ -296,10 +298,8 @@ export async function writeHtmlWiki(
 
   let indexHtml: string;
   try {
-    indexHtml = renderer.renderIndex(
-      "Spec Wiki",
-      renderMarkdown(wiki.indexContent),
-    );
+    log.info("output.render", { kind: "index", slug: "index" });
+    indexHtml = renderer.renderIndex(wiki.pages);
   } catch (err) {
     log.error("output.error", {
       relativePath: "html/index.html",
@@ -325,7 +325,12 @@ export async function writeHtmlWiki(
   for (const page of wiki.pages) {
     let html: string;
     try {
-      html = renderer.renderArticle(page.title, renderMarkdown(page.content));
+      log.info("output.render", { kind: "article", slug: page.slug });
+      html = renderer.renderArticle(
+        page,
+        wiki.pages,
+        renderMarkdown(page.content),
+      );
     } catch (err) {
       log.error("output.error", {
         relativePath: `html/${page.slug}.html`,

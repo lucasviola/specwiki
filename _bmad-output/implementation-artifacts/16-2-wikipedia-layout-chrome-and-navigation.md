@@ -4,7 +4,7 @@ baseline_commit: e2debdf222d40cdc45230294d95f7ec7dc95c056
 
 # Story 16.2: Wikipedia layout chrome and navigation
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -39,28 +39,28 @@ INVEST: I✓ N✓ V✓ E✓ S✓ T✓
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Extend `WikiPage` with navigation metadata (AC: #2, #5)
-  - [ ] Add `description: string` and `sections: SpecSection[]` to `WikiPage` in `src/types.ts`
-  - [ ] Populate in `buildWiki()` from `ParsedSpec` — do not change markdown `buildPageContent` format
-  - [ ] Add/update unit tests for `buildWiki` metadata fields
-- [ ] Task 2: Build navigation context in `HtmlRenderer` (AC: #1, #2, #3, #4)
-  - [ ] Index context: categories with label (`CATEGORY_LABELS`), pages per category, relative `slug.html` links
-  - [ ] Article context: infobox fields, breadcrumb segments, TOC entries from `page.sections` with `#anchor` hrefs
-  - [ ] Left nav: all categories with links to index category anchors or filtered article lists
-  - [ ] Header bar: site title "Spec Wiki" linking to `index.html`
-- [ ] Task 3: Update Mustache templates and CSS (AC: #1, #2, #9)
-  - [ ] `layout.mustache` — three-column wiki chrome (nav | content | TOC)
-  - [ ] `index.mustache` — Main Page portal with per-category sections
-  - [ ] `article.mustache` — infobox aside, breadcrumb, `#content` main region
-  - [ ] `specwiki.css` — layout grid, infobox box, TOC rail, category nav styles (Wikimedia tokens)
-- [ ] Task 4: Logging and validation (AC: #6, #7)
-  - [ ] Emit `output.render` with `{ kind, slug }` before each page write (verbose only)
-  - [ ] Validate required template fields; `output.error` + throw on missing title/category/sourcePath
-- [ ] Task 5: Tests and quality gate (AC: #8, #9, #10)
-  - [ ] Integration test: generated article HTML contains `#content`, `.infobox`, `.toc`, `.category-nav`
-  - [ ] Test breadcrumb text and relative inter-page links
-  - [ ] Test `file://`-safe relative paths (no leading `/`, no `http://`)
-  - [ ] Run full §0.2 gate; update `IMPLEMENTATION.md`
+- [x] Task 1: Extend `WikiPage` with navigation metadata (AC: #2, #5)
+  - [x] Add `description: string` and `sections: SpecSection[]` to `WikiPage` in `src/types.ts`
+  - [x] Populate in `buildWiki()` from `ParsedSpec` — do not change markdown `buildPageContent` format
+  - [x] Add/update unit tests for `buildWiki` metadata fields
+- [x] Task 2: Build navigation context in `HtmlRenderer` (AC: #1, #2, #3, #4)
+  - [x] Index context: categories with label (`CATEGORY_LABELS`), pages per category, relative `slug.html` links
+  - [x] Article context: infobox fields, breadcrumb segments, TOC entries from `page.sections` with `#anchor` hrefs
+  - [x] Left nav: all categories with links to index category anchors or filtered article lists
+  - [x] Header bar: site title "Spec Wiki" linking to `index.html`
+- [x] Task 3: Update Mustache templates and CSS (AC: #1, #2, #9)
+  - [x] `layout.mustache` — three-column wiki chrome (nav | content | TOC)
+  - [x] `index.mustache` — Main Page portal with per-category sections
+  - [x] `article.mustache` — infobox aside, breadcrumb, `#content` main region
+  - [x] `specwiki.css` — layout grid, infobox box, TOC rail, category nav styles (Wikimedia tokens)
+- [x] Task 4: Logging and validation (AC: #6, #7)
+  - [x] Emit `output.render` with `{ kind, slug }` before each page write (verbose only)
+  - [x] Validate required template fields; `output.error` + throw on missing title/category/sourcePath
+- [x] Task 5: Tests and quality gate (AC: #8, #9, #10)
+  - [x] Integration test: generated article HTML contains `#content`, `.infobox`, `.toc`, `.category-nav`
+  - [x] Test breadcrumb text and relative inter-page links
+  - [x] Test `file://`-safe relative paths (no leading `/`, no `http://`)
+  - [x] Run full §0.2 gate; update `IMPLEMENTATION.md`
 
 ## Dev Notes
 
@@ -145,21 +145,59 @@ Format: `Main Page › {Category Label} › {Title}` — all segments escaped; f
 
 ### Agent Model Used
 
+Composer
+
 ### Debug Log References
+
+- Mustache default escaping uses `&#x2F;` for `/` in `</script>` — tests updated to match (equivalent XSS safety)
+- Index HTML no longer renders markdown index (which linked to `.md`); dedicated Main Page portal built from `WikiPage[]`
 
 ### Completion Notes List
 
+- Extended `WikiPage` with `description` and `sections`; populated in `buildWiki` without changing markdown output
+- Rebuilt `HtmlRenderer.renderIndex` / `renderArticle` with category nav, infobox, breadcrumb, TOC rail
+- Updated Mustache templates and `specwiki.css` for three-column Wikipedia-style layout
+- Added `output.render` verbose logging in `writeHtmlWiki`; validation errors emit `output.error`
+- 162 tests pass; `renderer.ts` at 98.8% coverage
+
 ### File List
+
+- src/types.ts
+- src/output/wiki.ts
+- src/output/html/renderer.ts
+- src/output/html/templates/layout.mustache
+- src/output/html/templates/index.mustache
+- src/output/html/templates/article.mustache
+- src/output/html/assets/specwiki.css
+- tests/output/wiki.test.ts
+- tests/output/html/renderer.test.ts
+- IMPLEMENTATION.md
+- _bmad-output/implementation-artifacts/sprint-status.yaml
+
+### Change Log
+
+- 2026-07-12: S16.2 — Wikipedia layout chrome and navigation implemented
 
 ## Senior Developer Review (AI)
 
-**Review date:**  
-**Review outcome:**  
-**Reviewer model:**
+**Review date:** 2026-07-12  
+**Review outcome:** Approved (patches applied)  
+**Reviewer model:** Manual triage (Blind Hunter / Edge Case Hunter / Acceptance Auditor subagents hit API limits; review performed via bmad-code-review workflow)
 
 ### Action Items
 
+- [x] Remove duplicate `output.error` on validation failure (`validateArticlePage` + `writeHtmlWiki` catch)
+- [x] Add explicit AC #5 regression test asserting markdown output unchanged
+
 ### Review Findings
+
+- [x] [Review][Patch] Duplicate `output.error` on missing template fields [`src/output/html/renderer.ts:201`, `src/output/wiki.ts:335`]
+- [x] [Review][Patch] No explicit markdown contract regression test for AC #5 [`tests/output/wiki.test.ts`]
+- [x] [Review][Defer] TOC `#anchor` links non-functional until S16.3 adds heading IDs [`src/output/html/renderer.ts:163`] — deferred, cross-story dependency documented in S16.3
+
+**Dismissed (4):** Mustache `{{}}` escaping vs explicit `escapeHtml` (equivalent safety); duplicate title in infobox + markdown H1 (pre-existing `buildPageContent` pattern); index page uses 2-column layout without TOC rail (intentional — TOC is article-only); within-category page order follows discovery order (matches markdown `buildIndex` behavior).
+
+**Layers:** Blind Hunter + Edge Case Hunter + Acceptance Auditor attempted via subagents; all fell back to Composer due to API usage limits.
 
 ## QA Manual Validation
 

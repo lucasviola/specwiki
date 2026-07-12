@@ -76,6 +76,8 @@ function maliciousWiki(slug: string): WikiOutput {
         category: spec.file.category,
         content: "# Malicious\n\nTraversal probe.",
         sourcePath: spec.file.relativePath,
+        description: spec.description,
+        sections: spec.sections,
       },
     ],
   };
@@ -119,6 +121,47 @@ describe("buildWiki", () => {
     expect(wiki.pages[0].content).toContain("## Table of Contents");
     expect(wiki.indexContent).toContain("# Spec Wiki");
     expect(wiki.indexContent).toContain("[Custom Spec Title](spec.md)");
+  });
+
+  it("includes description and sections metadata on WikiPage", () => {
+    const wiki = buildWiki([sampleSpec()]);
+
+    expect(wiki.pages[0].description).toBe("Short description.");
+    expect(wiki.pages[0].sections).toEqual([
+      {
+        level: 2,
+        title: "Requirements",
+        content: "Must preserve markdown.",
+        anchor: "requirements",
+      },
+    ]);
+  });
+
+  it("sets empty description and sections when spec lacks them", () => {
+    const wiki = buildWiki([
+      sampleSpec({
+        description: "",
+        sections: [],
+      }),
+    ]);
+
+    expect(wiki.pages[0].description).toBe("");
+    expect(wiki.pages[0].sections).toEqual([]);
+  });
+
+  it("preserves markdown wiki output format when metadata fields are added", () => {
+    const wiki = buildWiki([sampleSpec()]);
+
+    expect(wiki.indexContent).toMatch(/\[Custom Spec Title\]\(spec\.md\)/);
+    expect(wiki.indexContent).not.toMatch(/\.html\)/);
+    expect(wiki.pages[0].content).toMatch(
+      /^# Custom Spec Title\n\n> Source: `SPEC\.md`/,
+    );
+    expect(wiki.pages[0].content).toContain("## Table of Contents");
+    expect(wiki.pages[0].content).toContain("- [Requirements](#requirements)");
+    expect(wiki.pages[0].content).toContain(
+      "## Requirements\n\nMust preserve markdown.",
+    );
   });
 
   it("derives slug from nested paths", () => {
@@ -235,7 +278,7 @@ describe("buildWiki", () => {
       "utf-8",
     );
     expect(html).toContain(
-      "<title>Title &lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt; — Spec Wiki</title>",
+      "<title>Title &lt;script&gt;alert(&quot;x&quot;)&lt;&#x2F;script&gt; — Spec Wiki</title>",
     );
     expect(html).not.toMatch(/<title>[^<]*<script>/);
   });
@@ -526,7 +569,7 @@ describe("slug collision", () => {
 });
 
 describe("writeHtmlWiki", () => {
-  it("writes index.html with structure and categorized content", async () => {
+  it("writes index.html with wiki chrome and categorized content", async () => {
     const outputDir = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-html-"),
     );
@@ -541,9 +584,11 @@ describe("writeHtmlWiki", () => {
     );
     expect(indexHtml).toMatch(/^<!DOCTYPE html>/);
     expect(indexHtml).toContain("<title>Spec Wiki — Spec Wiki</title>");
-    expect(indexHtml).toContain(
-      '<nav class="specwiki-nav"><a href="index.html">← Back to index</a></nav>',
-    );
+    expect(indexHtml).toContain('class="category-nav"');
+    expect(indexHtml).toContain('id="content"');
+    expect(indexHtml).toContain("<h1>Main Page</h1>");
+    expect(indexHtml).toContain('href="spec.html"');
+    expect(indexHtml).not.toMatch(/href="[^"]*\.md"/);
     expect(indexHtml).toContain(
       '<link rel="stylesheet" href="assets/specwiki.css">',
     );
@@ -569,22 +614,92 @@ describe("writeHtmlWiki", () => {
     expect(css).toContain(".specwiki-header");
   });
 
-  it("writes html/index.html and html/{slug}.html for each page", async () => {
+  it("writes article HTML with infobox, breadcrumb, TOC, and category nav", async () => {
     const outputDir = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-html-"),
     );
     tempDirs.push(outputDir);
 
     const wiki = buildWiki([sampleSpec()]);
-    const written = await writeHtmlWiki(outputDir, wiki);
+    await writeHtmlWiki(outputDir, wiki);
 
-    expect(written).toHaveLength(3);
-    expect(
-      await fs.readFile(path.join(outputDir, "html", "index.html"), "utf-8"),
-    ).toContain("<html");
-    expect(
-      await fs.readFile(path.join(outputDir, "html", "spec.html"), "utf-8"),
-    ).toContain("Custom Spec Title");
+    const articleHtml = await fs.readFile(
+      path.join(outputDir, "html", "spec.html"),
+      "utf-8",
+    );
+    expect(articleHtml).toContain('id="content"');
+    expect(articleHtml).toContain('class="infobox"');
+    expect(articleHtml).toContain('class="toc"');
+    expect(articleHtml).toContain('class="category-nav"');
+    expect(articleHtml).toContain('class="breadcrumb"');
+    expect(articleHtml).toContain("Main Page");
+    expect(articleHtml).toContain("Project Root");
+    expect(articleHtml).toContain("Custom Spec Title");
+    expect(articleHtml).toContain("<code>SPEC.md</code>");
+    expect(articleHtml).toContain('href="#requirements"');
+    expect(articleHtml).toContain('href="index.html"');
+    expect(articleHtml).toContain('href="index.html#category-root"');
+    expect(articleHtml).not.toMatch(/href="\/[^"]*"/);
+    expect(articleHtml).not.toMatch(/href="https?:\/\//);
+  });
+
+  it("emits output.render per page when verbose", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-"),
+    );
+    tempDirs.push(outputDir);
+    log.setVerbose(true);
+
+    const wiki = buildWiki([sampleSpec()]);
+    await writeHtmlWiki(outputDir, wiki);
+
+    const events = parseStderrLines().filter(
+      (line) => line.event === "output.render",
+    );
+
+    expect(events).toHaveLength(2);
+    expect(events).toContainEqual(
+      expect.objectContaining({ kind: "index", slug: "index" }),
+    );
+    expect(events).toContainEqual(
+      expect.objectContaining({ kind: "article", slug: "spec" }),
+    );
+  });
+
+  it("does not emit output.render when verbose is disabled", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([sampleSpec()]);
+    await writeHtmlWiki(outputDir, wiki);
+
+    const events = parseStderrLines().filter(
+      (line) => line.event === "output.render",
+    );
+    expect(events).toHaveLength(0);
+  });
+
+  it("emits output.error once when article template fields are missing", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([sampleSpec()]);
+    wiki.pages[0].title = "";
+
+    await expect(writeHtmlWiki(outputDir, wiki)).rejects.toThrow(
+      /Missing required template fields/,
+    );
+
+    const errorEvents = parseStderrLines().filter(
+      (line) => line.event === "output.error",
+    );
+    expect(errorEvents).toHaveLength(1);
+    expect(errorEvents[0]?.message).toMatch(/Missing required template fields/);
+    expect(errorEvents[0]?.relativePath).toBe("html/spec.html");
   });
 
   it("confines writes to the resolved output directory", async () => {
