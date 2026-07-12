@@ -118,7 +118,7 @@ describe("buildWiki", () => {
     expect(wiki.pages).toHaveLength(1);
     expect(wiki.pages[0].slug).toBe("spec");
     expect(wiki.pages[0].content).toContain("# Custom Spec Title");
-    expect(wiki.pages[0].content).toContain("## Table of Contents");
+    expect(wiki.pages[0].content).toContain('id="specwiki-toc"');
     expect(wiki.indexContent).toContain("# Spec Wiki");
     expect(wiki.indexContent).toContain("[Custom Spec Title](spec.md)");
   });
@@ -157,7 +157,7 @@ describe("buildWiki", () => {
     expect(wiki.pages[0].content).toMatch(
       /^# Custom Spec Title\n\n> Source: `SPEC\.md`/,
     );
-    expect(wiki.pages[0].content).toContain("## Table of Contents");
+    expect(wiki.pages[0].content).toContain('id="specwiki-toc"');
     expect(wiki.pages[0].content).toContain("- [Requirements](#requirements)");
     expect(wiki.pages[0].content).toContain(
       "## Requirements\n\nMust preserve markdown.",
@@ -592,6 +592,7 @@ describe("writeHtmlWiki", () => {
     expect(indexHtml).toContain(
       '<link rel="stylesheet" href="assets/specwiki.css">',
     );
+    expect(indexHtml).not.toContain('href="assets/highlight.css"');
     expect(indexHtml).not.toContain("<style>");
     expect(indexHtml).toContain('<header class="specwiki-header">');
     expect(indexHtml).toContain("Custom Spec Title");
@@ -612,6 +613,22 @@ describe("writeHtmlWiki", () => {
     );
     expect(css).toContain("--background-color-base");
     expect(css).toContain(".specwiki-header");
+  });
+
+  it("writes html/assets/highlight.css with syntax highlighting theme", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([sampleSpec()]);
+    await writeHtmlWiki(outputDir, wiki);
+
+    const css = await fs.readFile(
+      path.join(outputDir, "html", "assets", "highlight.css"),
+      "utf-8",
+    );
+    expect(css).toContain(".hljs");
   });
 
   it("writes article HTML with infobox, breadcrumb, TOC, and category nav", async () => {
@@ -637,6 +654,11 @@ describe("writeHtmlWiki", () => {
     expect(articleHtml).toContain("Custom Spec Title");
     expect(articleHtml).toContain("<code>SPEC.md</code>");
     expect(articleHtml).toContain('href="#requirements"');
+    expect(articleHtml).toContain('class="mw-parser-output"');
+    expect(articleHtml).toContain('<h2 id="requirements">');
+    expect(articleHtml).toContain(
+      '<link rel="stylesheet" href="assets/highlight.css">',
+    );
     expect(articleHtml).toContain('href="index.html"');
     expect(articleHtml).toContain('href="index.html#category-root"');
     expect(articleHtml).not.toMatch(/href="\/[^"]*"/);
@@ -730,8 +752,9 @@ describe("writeHtmlWiki", () => {
       (line) => line.event === "output.write",
     );
 
-    expect(events).toHaveLength(3);
+    expect(events).toHaveLength(4);
     expect(events.map((event) => event.relativePath).sort()).toEqual([
+      "html/assets/highlight.css",
       "html/assets/specwiki.css",
       "html/index.html",
       "html/spec.html",
@@ -766,6 +789,7 @@ describe("writeHtmlWiki", () => {
     const writeSpy = vi
       .spyOn(fs, "writeFile")
       .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce(undefined)
       .mockRejectedValueOnce(new Error("disk full"));
 
     await expect(writeHtmlWiki(outputDir, wiki)).rejects.toThrow("disk full");
@@ -787,6 +811,7 @@ describe("writeHtmlWiki", () => {
     const wiki = buildWiki([sampleSpec()]);
     const writeSpy = vi
       .spyOn(fs, "writeFile")
+      .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(undefined)
       .mockRejectedValueOnce("page write failed");

@@ -12,6 +12,7 @@ const require = createRequire(import.meta.url);
 const TEMPLATES_DIR = path.join(moduleDir, "templates");
 const ASSETS_DIR = path.join(moduleDir, "assets");
 const BUNDLED_CSS_FILENAME = "specwiki.css";
+const HIGHLIGHT_CSS_FILENAME = "highlight.css";
 
 interface NavPage {
   title: string;
@@ -71,6 +72,7 @@ export class HtmlRenderer {
     return Mustache.render(this.layoutTemplate, {
       pageTitle: "Spec Wiki",
       body,
+      includeHighlightCss: false,
     });
   }
 
@@ -102,6 +104,7 @@ export class HtmlRenderer {
     return Mustache.render(this.layoutTemplate, {
       pageTitle: page.title,
       body,
+      includeHighlightCss: true,
     });
   }
 
@@ -118,6 +121,15 @@ export class HtmlRenderer {
 
   static bundledCssFilename(): string {
     return BUNDLED_CSS_FILENAME;
+  }
+
+  static highlightCssFilename(): string {
+    return HIGHLIGHT_CSS_FILENAME;
+  }
+
+  static async readHighlightCss(): Promise<string> {
+    const highlightPath = require.resolve("highlight.js/styles/github.min.css");
+    return fs.readFile(highlightPath, "utf-8");
   }
 }
 

@@ -106,7 +106,7 @@ function buildPageContent(spec: ParsedSpec): string {
   }
 
   if (spec.sections.length > 0) {
-    lines.push("## Table of Contents", "");
+    lines.push('<h2 id="specwiki-toc">Table of Contents</h2>', "");
     for (const section of spec.sections) {
       const indent = "  ".repeat(Math.max(0, section.level - 2));
       lines.push(`${indent}- [${section.title}](#${section.anchor})`);
@@ -295,6 +295,35 @@ export async function writeHtmlWiki(
   }
   written.push(cssPath);
   log.info("output.write", { relativePath: cssRelativePath });
+
+  let highlightCss: string;
+  try {
+    highlightCss = await HtmlRenderer.readHighlightCss();
+  } catch (err) {
+    log.error("output.error", {
+      relativePath: "html/assets/highlight.css",
+      message: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
+
+  const highlightCssPath = path.join(
+    assetsDir,
+    HtmlRenderer.highlightCssFilename(),
+  );
+  const highlightCssRelativePath = "html/assets/highlight.css";
+  assertPathConfined(outputDir, highlightCssPath, highlightCssRelativePath);
+  try {
+    await fs.writeFile(highlightCssPath, highlightCss, "utf-8");
+  } catch (err) {
+    log.error("output.error", {
+      relativePath: highlightCssRelativePath,
+      message: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
+  written.push(highlightCssPath);
+  log.info("output.write", { relativePath: highlightCssRelativePath });
 
   let indexHtml: string;
   try {

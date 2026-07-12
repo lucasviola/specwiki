@@ -49,6 +49,7 @@ describe("HtmlRenderer", () => {
     expect(html).toContain(
       '<link rel="stylesheet" href="assets/specwiki.css">',
     );
+    expect(html).not.toContain('href="assets/highlight.css"');
     expect(html).toContain("<title>Spec Wiki — Spec Wiki</title>");
     expect(html).toContain('<header class="specwiki-header">');
     expect(html).toContain('<nav class="category-nav"');
@@ -73,6 +74,10 @@ describe("HtmlRenderer", () => {
     expect(html).toContain("Project Root");
     expect(html).toContain("<code>SPEC.md</code>");
     expect(html).toContain('href="#requirements"');
+    expect(html).toContain('class="mw-parser-output"');
+    expect(html).toContain(
+      '<link rel="stylesheet" href="assets/highlight.css">',
+    );
     expect(html).toContain("<p>Body</p>");
   });
 
@@ -139,6 +144,12 @@ describe("HtmlRenderer", () => {
     expect(css).toContain(".category-nav");
     expect(css).toContain(".infobox");
     expect(css).toContain(".toc");
+  });
+
+  it("reads highlight theme CSS from bundled assets or node_modules", async () => {
+    const css = await HtmlRenderer.readHighlightCss();
+
+    expect(css).toContain(".hljs");
   });
 
   it("reuses cached renderer from getHtmlRenderer", async () => {

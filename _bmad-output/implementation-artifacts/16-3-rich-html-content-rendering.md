@@ -1,10 +1,10 @@
 ---
-baseline_commit: e2debdf222d40cdc45230294d95f7ec7dc95c056
+baseline_commit: f98015b845154af815b89272a4f97f8d60ab98fa
 ---
 
 # Story 16.3: Rich HTML content rendering
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
@@ -39,28 +39,28 @@ INVEST: I✓ N✓ V✓ E✓ S✓ T✓
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Add `highlight.js` dependency (AC: #3)
-  - [ ] Add `highlight.js@^11.11.1` to `package.json` (owner-approved per E16 decision)
-  - [ ] Bundle highlight theme CSS to `src/output/html/assets/highlight.css` (e.g. `github` or `stackoverflow-light` theme)
-- [ ] Task 2: Enhance `renderMarkdown` for GFM + highlighting (AC: #1, #2, #3, #6, #7)
-  - [ ] Configure `marked` with `gfm: true` and custom renderer or extension hooks
-  - [ ] Register `highlight.js` on fenced code blocks; unknown language → plain `<pre><code>` (no error)
-  - [ ] Generate `id` attributes on `h2`–`h6` using same `slugify` logic as `extractSections` in `parse/markdown.ts`
-  - [ ] Optional: permalink `¶` link after headings (Wikipedia-style)
-- [ ] Task 3: Scope content typography (AC: #4)
-  - [ ] Wrap rendered body in `<div class="mw-parser-output">` in article template
-  - [ ] CSS rules for tables, strikethrough, task lists, code blocks scoped under `.mw-parser-output`
-  - [ ] Link `assets/highlight.css` in `layout.mustache`
-- [ ] Task 4: Security verification (AC: #5, #10)
-  - [ ] Confirm template boundary still escapes user fields; body HTML from marked is trusted local content
-  - [ ] Test malicious title in template fields does not break skin
-  - [ ] No `<script>` tags injected by highlighter or marked extensions
-- [ ] Task 5: Tests and quality gate (AC: #8, #9, #10)
-  - [ ] Unit test: fenced ` ```typescript ` block produces `<span class="hljs-...">` classes
-  - [ ] Unit test: `## My Section` → `<h2 id="my-section">`
-  - [ ] Unit test: heading IDs match `SpecSection.anchor` from parser
-  - [ ] Extend `render.error` test for highlighter failure path
-  - [ ] Run full §0.2 gate; update `IMPLEMENTATION.md`
+- [x] Task 1: Add `highlight.js` dependency (AC: #3)
+  - [x] Add `highlight.js@^11.11.1` to `package.json` (owner-approved per E16 decision)
+  - [x] Bundle highlight theme CSS to `src/output/html/assets/highlight.css` (e.g. `github` or `stackoverflow-light` theme)
+- [x] Task 2: Enhance `renderMarkdown` for GFM + highlighting (AC: #1, #2, #3, #6, #7)
+  - [x] Configure `marked` with `gfm: true` and custom renderer or extension hooks
+  - [x] Register `highlight.js` on fenced code blocks; unknown language → plain `<pre><code>` (no error)
+  - [x] Generate `id` attributes on `h2`–`h6` using same `slugify` logic as `extractSections` in `parse/markdown.ts`
+  - [x] Optional: permalink `¶` link after headings (Wikipedia-style)
+- [x] Task 3: Scope content typography (AC: #4)
+  - [x] Wrap rendered body in `<div class="mw-parser-output">` in article template
+  - [x] CSS rules for tables, strikethrough, task lists, code blocks scoped under `.mw-parser-output`
+  - [x] Link `assets/highlight.css` in `layout.mustache`
+- [x] Task 4: Security verification (AC: #5, #10)
+  - [x] Confirm template boundary still escapes user fields; body HTML from marked is trusted local content
+  - [x] Test malicious title in template fields does not break skin
+  - [x] No `<script>` tags injected by highlighter or marked extensions
+- [x] Task 5: Tests and quality gate (AC: #8, #9, #10)
+  - [x] Unit test: fenced ` ```typescript ` block produces `<span class="hljs-...">` classes
+  - [x] Unit test: `## My Section` → `<h2 id="my-section">`
+  - [x] Unit test: heading IDs match `SpecSection.anchor` from parser
+  - [x] Extend `render.error` test for highlighter failure path
+  - [x] Run full §0.2 gate; update `IMPLEMENTATION.md`
 
 ## Dev Notes
 
@@ -168,11 +168,43 @@ Wikipedia uses this class to scope content styles away from chrome. Apply to art
 
 ### Agent Model Used
 
+Composer
+
 ### Debug Log References
+
+- Heading IDs derived from raw markdown title (not marked `text` field) to match parser `extractSections` anchors
+- highlight.js failure on registered language logs `render.error` and falls back to plain `<pre><code>`
 
 ### Completion Notes List
 
+- Added `highlight.js@^11.11.1`; github.min.css bundled to `src/output/html/assets/highlight.css` via build script
+- Enhanced `renderMarkdown` with GFM, heading IDs (h2–h6), permalink links, and highlight.js for fenced code
+- Exported `slugify` for anchor consistency with TOC rail from S16.2
+- Wrapped article body in `.mw-parser-output`; scoped typography CSS; linked highlight.css in layout
+- 174 tests pass; `markdown.ts` at 100% line coverage
+
 ### File List
+
+- package.json
+- package-lock.json
+- scripts/copy-html-assets.mjs
+- src/parse/markdown.ts
+- src/output/html/renderer.ts
+- src/output/html/templates/layout.mustache
+- src/output/html/templates/article.mustache
+- src/output/html/assets/specwiki.css
+- src/output/html/assets/highlight.css
+- src/output/wiki.ts
+- tests/parse/markdown.test.ts
+- tests/output/html/renderer.test.ts
+- tests/output/wiki.test.ts
+- IMPLEMENTATION.md
+- _bmad-output/implementation-artifacts/sprint-status.yaml
+- _bmad-output/implementation-artifacts/deferred-work.md
+
+### Change Log
+
+- 2026-07-12: S16.3 — Rich HTML content rendering implemented
 
 ## Senior Developer Review (AI)
 

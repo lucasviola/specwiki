@@ -112,7 +112,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
 - [ ] **E16 — Wikipedia-Style HTML Wiki** — Vector-inspired skin, navigation chrome, search _(in progress)_
   - [x] S16.1 — Mustache HTML renderer and Wikimedia assets _(review)_
   - [x] S16.2 — Wikipedia layout chrome and navigation
-  - [ ] S16.3 — Rich HTML content rendering
+  - [x] S16.3 — Rich HTML content rendering
   - [ ] S16.4 — Client-side wiki search
 
 ## HARNESS §13 Deliverables Checklist
@@ -194,4 +194,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-12 | MVP close | **MVP formally closed** — owner sign-off; all E1–E7 stories promoted to `done`; `mvp_status: closed` in sprint-status; quality gate re-verified (147 tests)                                                                                                            | uncommitted           | test ✓ · lint ✓ · typecheck ✓ · build ✓                         |
 | 2026-07-12 | E16 S16.1 | `feat(output): Mustache HTML renderer with Wikimedia design tokens` — HtmlRenderer + mustache templates; bundled specwiki.css; wrapHtml removed; mustache + wikimedia-ui-base deps (AD-11); 9 renderer tests; renderer.ts 100% coverage                                | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E16 S16.2 | `feat(output): Wikipedia layout chrome and navigation` — WikiPage description/sections metadata; three-column Mustache chrome (category nav, infobox, TOC rail); Main Page index portal; output.render verbose event; 15 new/updated tests; renderer.ts 98.8% coverage | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-12 | E16 S16.3 | `feat(parse): rich HTML content rendering with GFM and highlight.js` — exported slugify; heading ids h2–h6 matching TOC anchors; highlight.js fenced code blocks; highlight.css asset; `.mw-parser-output` wrapper; 10 new tests; markdown.ts 100% coverage            | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | _template_ | _E?_ S?_  | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                | _hash or uncommitted_ | _full §0.2 gate result_                                         |

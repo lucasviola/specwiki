@@ -219,10 +219,34 @@ body.specwiki {
 }
 
 .specwiki-portal h1,
-.specwiki-article-body h1,
-.specwiki-article-body h2,
-.specwiki-article-body h3 {
+.mw-parser-output h1,
+.mw-parser-output h2,
+.mw-parser-output h3 {
   line-height: var(--line-height-heading);
+}
+
+.mw-parser-output h2,
+.mw-parser-output h3,
+.mw-parser-output h4,
+.mw-parser-output h5,
+.mw-parser-output h6 {
+  position: relative;
+}
+
+.mw-parser-output .heading-permalink {
+  opacity: 0;
+  margin-left: 0.35em;
+  color: var(--color-base--subtle);
+  text-decoration: none;
+  font-weight: var(--font-weight-normal);
+}
+
+.mw-parser-output h2:hover .heading-permalink,
+.mw-parser-output h3:hover .heading-permalink,
+.mw-parser-output h4:hover .heading-permalink,
+.mw-parser-output h5:hover .heading-permalink,
+.mw-parser-output h6:hover .heading-permalink {
+  opacity: 1;
 }
 
 .specwiki-portal-intro {
@@ -241,18 +265,52 @@ body.specwiki {
 }
 
 .specwiki-portal-pages a,
-.specwiki-article-body a {
+.mw-parser-output a {
   color: var(--color-primary);
 }
 
-.specwiki-article-body blockquote {
+.mw-parser-output table {
+  border-collapse: collapse;
+  margin: var(--padding-vertical-base) 0;
+  width: 100%;
+}
+
+.mw-parser-output th,
+.mw-parser-output td {
+  border: 1px solid var(--border-color-base);
+  padding: 0.35rem 0.5rem;
+  text-align: left;
+}
+
+.mw-parser-output th {
+  background-color: var(--background-color-interactive-subtle);
+}
+
+.mw-parser-output del {
+  color: var(--color-base--subtle);
+}
+
+.mw-parser-output ul.contains-task-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.mw-parser-output li.task-list-item {
+  list-style: none;
+}
+
+.mw-parser-output li.task-list-item input[type="checkbox"] {
+  margin-right: 0.35em;
+}
+
+.mw-parser-output blockquote {
   border-left: 3px solid var(--border-color-base);
   margin: 0;
   padding: var(--padding-vertical-base) var(--padding-horizontal-base);
   color: var(--color-base--subtle);
 }
 
-.specwiki-article-body code {
+.mw-parser-output code {
   background-color: var(--background-color-code);
   padding: 0.15em 0.4em;
   border-radius: var(--border-radius-base);
@@ -260,19 +318,24 @@ body.specwiki {
   font-family: var(--font-family-monospace);
 }
 
-.specwiki-article-body pre {
+.mw-parser-output pre {
   background-color: var(--background-color-code);
   padding: var(--padding-horizontal-base);
   border-radius: var(--border-radius-base);
   overflow-x: auto;
 }
 
-.specwiki-article-body pre code {
+.mw-parser-output pre code {
   background: none;
   padding: 0;
 }
 
-.specwiki-article-body hr {
+.mw-parser-output pre code.hljs {
+  background: transparent;
+  padding: 0;
+}
+
+.mw-parser-output hr {
   border: none;
   border-top: 1px solid var(--border-color-divider);
   margin: calc(var(--padding-horizontal-base) * 2) 0;

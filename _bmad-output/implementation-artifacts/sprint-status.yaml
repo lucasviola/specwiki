@@ -119,7 +119,7 @@ development_status:
   epic-16: in-progress
   16-1-mustache-html-renderer-and-wikimedia-assets: review
   16-2-wikipedia-layout-chrome-and-navigation: done
-  16-3-rich-html-content-rendering: ready-for-dev
+  16-3-rich-html-content-rendering: done
   16-4-client-side-wiki-search: ready-for-dev
   epic-16-retrospective: optional
 

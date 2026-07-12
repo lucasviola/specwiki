@@ -4,7 +4,12 @@ import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { marked } from "marked";
 import { log } from "../../src/core/Logger.js";
-import { parseSpecFile, renderMarkdown } from "../../src/parse/markdown.js";
+import {
+  createAnchorAllocator,
+  parseSpecFile,
+  renderMarkdown,
+  slugify,
+} from "../../src/parse/markdown.js";
 import type { SpecFile } from "../../src/types.js";
 
 const tempDirs: string[] = [];
@@ -159,6 +164,33 @@ First real paragraph.`,
 
     expect(parsed.sections).toEqual([]);
     expect(parsed.description).toBe("Plain text only.");
+  });
+
+  it("disambiguates duplicate section anchors", async () => {
+    const file = await writeTempSpec(
+      "SPEC.md",
+      `## Same Title
+
+First.
+
+## Same Title
+
+Second.
+`,
+    );
+    const parsed = await parseSpecFile(file);
+
+    expect(parsed.sections.map((section) => section.anchor)).toEqual([
+      "same-title",
+      "same-title-2",
+    ]);
+  });
+
+  it("uses fallback anchors for punctuation-only headings", async () => {
+    const file = await writeTempSpec("SPEC.md", "## !!!\n\nBody.");
+    const parsed = await parseSpecFile(file);
+
+    expect(parsed.sections[0].anchor).toBe("section-1");
   });
 
   it("extracts multiple heading levels with slugified anchors", async () => {
@@ -336,5 +368,158 @@ describe("renderMarkdown", () => {
       (line) => line.level === "info",
     );
     expect(infoEvents).toHaveLength(0);
+  });
+
+  it("renders GFM tables", () => {
+    const html = renderMarkdown(
+      "| Column | Value |\n| ------ | ----- |\n| foo    | bar   |",
+    );
+
+    expect(html).toContain("<table>");
+    expect(html).toContain("<th>Column</th>");
+    expect(html).toContain("<td>foo</td>");
+  });
+
+  it("renders GFM strikethrough and task lists", () => {
+    const html = renderMarkdown("~~removed~~\n\n- [x] done\n- [ ] todo");
+
+    expect(html).toContain("<del>removed</del>");
+    expect(html).toContain('type="checkbox"');
+    expect(html).toContain("checked");
+  });
+
+  it("adds heading ids for h2-h6 matching slugify", () => {
+    const html = renderMarkdown("## My Section\n\n### Nested Section");
+
+    expect(html).toContain('<h2 id="my-section">');
+    expect(html).toContain('<h3 id="nested-section">');
+    expect(html).not.toMatch(/<h1 id=/);
+  });
+
+  it("disambiguates duplicate heading ids", () => {
+    const html = renderMarkdown("## Same\n\n### Same");
+
+    expect(html).toContain('<h2 id="same">');
+    expect(html).toContain('<h3 id="same-2">');
+    expect(html.match(/id="same"/g)).toHaveLength(1);
+  });
+
+  it("uses fallback ids for punctuation-only headings", () => {
+    const html = renderMarkdown("## !!!\n\n## ???");
+
+    expect(html).toContain('<h2 id="section-1">');
+    expect(html).toContain('<h2 id="section-2">');
+  });
+
+  it("escapes script tags in unhighlighted code blocks", () => {
+    const html = renderMarkdown("```unknown\n<script>alert(1)</script>\n```");
+
+    expect(html).toContain("&lt;script&gt;alert(1)&lt;/script&gt;");
+    expect(html).not.toContain("<script>");
+  });
+
+  it("matches heading ids to parsed section anchors", async () => {
+    const file = await writeTempSpec(
+      "SPEC.md",
+      `## Level 2: Details!
+
+Body.
+
+### Level 3 — Notes
+
+More body.
+`,
+    );
+    const parsed = await parseSpecFile(file);
+    const html = renderMarkdown(parsed.rawContent);
+
+    for (const section of parsed.sections.filter(
+      (entry) => entry.level >= 2 && entry.level <= 6,
+    )) {
+      expect(html).toContain(`id="${section.anchor}"`);
+    }
+  });
+
+  it("matches heading ids when rendering full page content with specwiki toc", async () => {
+    const file = await writeTempSpec(
+      "SPEC.md",
+      `## Requirements
+
+Body.
+
+## Table of Contents
+
+User section.
+`,
+    );
+    const parsed = await parseSpecFile(file);
+    const { buildWiki } = await import("../../src/output/wiki.js");
+    const wiki = buildWiki([parsed]);
+    const html = renderMarkdown(wiki.pages[0].content);
+
+    expect(html).toContain('id="specwiki-toc"');
+    expect(html).toContain('id="requirements"');
+    expect(html).toContain('id="table-of-contents"');
+    for (const section of parsed.sections.filter(
+      (entry) => entry.level >= 2 && entry.level <= 6,
+    )) {
+      expect(html).toContain(`id="${section.anchor}"`);
+    }
+  });
+
+  it("highlights fenced code blocks with highlight.js classes", () => {
+    const html = renderMarkdown("```typescript\nconst x: number = 1;\n```");
+
+    expect(html).toContain('class="hljs language-typescript"');
+    expect(html).toMatch(/hljs-/);
+  });
+
+  it("falls back silently for unknown highlight languages", () => {
+    const html = renderMarkdown("```not-a-real-language\nplain text\n```");
+
+    expect(html).toContain("<pre><code>plain text</code></pre>");
+    expect(html).not.toContain("hljs");
+    expect(parseStderrLines()).toEqual([]);
+  });
+
+  it("emits render.error when highlight.js throws for a registered language", async () => {
+    const hljs = await import("highlight.js/lib/core");
+    const highlightSpy = vi
+      .spyOn(hljs.default, "highlight")
+      .mockImplementationOnce(() => {
+        throw new Error("highlight boom");
+      });
+
+    const html = renderMarkdown("```typescript\nconst x = 1;\n```");
+
+    expect(html).toContain("<pre><code>");
+    expect(html).not.toContain("hljs");
+    expect(parseStderrLines()).toContainEqual(
+      expect.objectContaining({
+        event: "render.error",
+        level: "error",
+        message: "highlight boom",
+      }),
+    );
+
+    highlightSpy.mockRestore();
+  });
+});
+
+describe("slugify", () => {
+  it("matches parser anchor conventions", () => {
+    expect(slugify("Level 2: Details!")).toBe("level-2-details");
+    expect(slugify("Level 3 — Notes")).toBe("level-3-notes");
+  });
+});
+
+describe("createAnchorAllocator", () => {
+  it("disambiguates repeated titles and handles empty slugs", () => {
+    const allocate = createAnchorAllocator();
+
+    expect(allocate("Same")).toBe("same");
+    expect(allocate("Same")).toBe("same-2");
+    expect(allocate("!!!")).toBe("section-1");
+    expect(allocate("!!!")).toBe("section-2");
   });
 });
