@@ -82,6 +82,35 @@ describe("generateWiki", () => {
     }
   });
 
+  it("emits output.write and generate.summary on stderr when verbose is enabled", async () => {
+    const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-out-"));
+    tempDirs.push(outputDir);
+
+    await generateWiki({
+      projectRoot: fixtureRoot,
+      outputDir,
+      verbose: true,
+    });
+
+    const lines = parseStderrLines();
+    const writeEvents = lines.filter((line) => line.event === "output.write");
+    const summaryEvent = lines.find(
+      (line) => line.event === "generate.summary",
+    );
+
+    expect(writeEvents.length).toBeGreaterThan(0);
+    expect(writeEvents.some((event) => event.relativePath === "index.md")).toBe(
+      true,
+    );
+    for (const event of writeEvents) {
+      expect(event.relativePath).toBeTruthy();
+      expect(JSON.stringify(event)).not.toMatch(/rawContent|frontmatter/);
+    }
+
+    expect(summaryEvent?.pageCount).toBe(writeEvents.length - 1);
+    expect(summaryEvent?.markdownFiles).toBe(writeEvents.length);
+  });
+
   it("prints a helpful message when no specs are found", async () => {
     const emptyRoot = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-empty-"),

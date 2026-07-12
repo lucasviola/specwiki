@@ -161,20 +161,20 @@ unless the owner approves.
 
 Launch **exactly one** review subagent, synchronously (`run_in_background: false`):
 
-| Priority | Subagent | Notes |
-| -------- | -------- | ----- |
+| Priority      | Subagent                                               | Notes                                         |
+| ------------- | ------------------------------------------------------ | --------------------------------------------- |
 | 1 (preferred) | `bugbot` (`subagent_type: "bugbot"`, `readonly: true`) | Follow the `review-bugbot` skill prompt shape |
-| 2 (alternate) | `bmad-code-review` workflow | Blind Hunter + Edge Case Hunter in parallel |
+| 2 (alternate) | `bmad-code-review` workflow                            | Blind Hunter + Edge Case Hunter in parallel   |
 
 **Diff scope:** `uncommitted changes` (default) — all staged and unstaged changes for the
 current task. Use `branch changes` only when reviewing an entire feature branch.
 
 **Model rule — different LLM required:**
 
-| Implementer model family | Reviewer model (pick one) |
-| ------------------------ | ------------------------- |
+| Implementer model family | Reviewer model (pick one)                                          |
+| ------------------------ | ------------------------------------------------------------------ |
 | Composer / GPT / Codex   | `claude-opus-4-8-thinking-high` or `claude-sonnet-5-thinking-high` |
-| Claude                   | `gpt-5.3-codex` or `gpt-5.5-medium` |
+| Claude                   | `gpt-5.3-codex` or `gpt-5.5-medium`                                |
 
 Pass the reviewer `model` parameter explicitly on the `Task` tool call. Record the reviewer
 model in the story file (`Senior Developer Review (AI) → Reviewer model`) and in the §0.3
@@ -184,11 +184,11 @@ checkpoint.
 
 Classify every finding before presenting to the owner:
 
-| Category | Meaning | Default action |
-| -------- | ------- | -------------- |
-| **Patch** | Real issue; fixable without scope change | Offer to implement before commit |
-| **Defer** | Real issue; out of scope or larger than this task | Log in story file; do not fix now |
-| **Reject** | Noise, false positive, or already covered by tests | Drop silently |
+| Category   | Meaning                                            | Default action                    |
+| ---------- | -------------------------------------------------- | --------------------------------- |
+| **Patch**  | Real issue; fixable without scope change           | Offer to implement before commit  |
+| **Defer**  | Real issue; out of scope or larger than this task  | Log in story file; do not fix now |
+| **Reject** | Noise, false positive, or already covered by tests | Drop silently                     |
 
 Present findings as a compact table: **Severity | Location | Finding | Triage**.
 
@@ -399,27 +399,27 @@ vs "IMPLEMENTATION Phase N".
 
 The following are **hard failures** against this harness:
 
-| Anti-pattern                                                      | Why it is forbidden                                     |
-| ----------------------------------------------------------------- | ------------------------------------------------------- |
-| Implementing a full HARNESS phase in one agent turn               | Skips TDD checkpoints, review, and commits per bullet   |
-| Marking "Phase N complete" without per-task commits               | Owner cannot review or bisect history                   |
-| Changing code without updating the project log                    | Breaks traceability and owner visibility                |
-| Proceeding after checkpoint without owner approval                | Owner loses control of merge order                      |
+| Anti-pattern                                                      | Why it is forbidden                                      |
+| ----------------------------------------------------------------- | -------------------------------------------------------- |
+| Implementing a full HARNESS phase in one agent turn               | Skips TDD checkpoints, review, and commits per bullet    |
+| Marking "Phase N complete" without per-task commits               | Owner cannot review or bisect history                    |
+| Changing code without updating the project log                    | Breaks traceability and owner visibility                 |
+| Proceeding after checkpoint without owner approval                | Owner loses control of merge order                       |
 | Skipping §0.2.5 code review or §0.2.6 QA analysis                 | Misses adversarial review and manual validation guidance |
-| Auto-applying code-review Patch items without owner approval      | Owner cannot control scope before commit                  |
-| Committing without being asked                                    | §0.3 — owner commits or explicitly delegates            |
-| Batch-updating status only at the end of a phase                  | Build log must grow one row per task                    |
-| Running e2e tests or recording demo videos without owner request  | Wastes time; violates §0.2.1 owner opt-in policy        |
-| Committing gitignored artifacts (videos, build output, secrets)   | Pollutes repo; may leak sensitive data                  |
-| Drive-by refactors or unrelated file churn in a task              | Violates §0.7 scope; obscures review and bisect         |
-| Horizontal layer-only story with no user-visible outcome          | Violates §0.10 — reframe as vertical slice              |
-| Epic organized by module (`discover/`, `parse/`) not user journey | Violates §0.10 vertical slicing                         |
-| Epic or story dedicated to logging / verbose diagnostics only     | Violates §0.8 + §0.10 — weave logs into feature stories |
-| Leaving dead imports, unused helpers, or stale comments           | Codebase rots between tasks                             |
-| Shipping a feature without structured logs (§0.8)                 | Owner cannot debug failures in QA or production         |
-| Logging passwords, tokens, JWTs, emails, or secrets               | Security violation — use IDs and sanitized fields only  |
-| Writing wiki output outside the resolved `--output` directory     | Path traversal / data loss risk                         |
-| Committing `.env`, API keys, or real credentials                  | Secrets leak — use `.env.example` placeholders only     |
+| Auto-applying code-review Patch items without owner approval      | Owner cannot control scope before commit                 |
+| Committing without being asked                                    | §0.3 — owner commits or explicitly delegates             |
+| Batch-updating status only at the end of a phase                  | Build log must grow one row per task                     |
+| Running e2e tests or recording demo videos without owner request  | Wastes time; violates §0.2.1 owner opt-in policy         |
+| Committing gitignored artifacts (videos, build output, secrets)   | Pollutes repo; may leak sensitive data                   |
+| Drive-by refactors or unrelated file churn in a task              | Violates §0.7 scope; obscures review and bisect          |
+| Horizontal layer-only story with no user-visible outcome          | Violates §0.10 — reframe as vertical slice               |
+| Epic organized by module (`discover/`, `parse/`) not user journey | Violates §0.10 vertical slicing                          |
+| Epic or story dedicated to logging / verbose diagnostics only     | Violates §0.8 + §0.10 — weave logs into feature stories  |
+| Leaving dead imports, unused helpers, or stale comments           | Codebase rots between tasks                              |
+| Shipping a feature without structured logs (§0.8)                 | Owner cannot debug failures in QA or production          |
+| Logging passwords, tokens, JWTs, emails, or secrets               | Security violation — use IDs and sanitized fields only   |
+| Writing wiki output outside the resolved `--output` directory     | Path traversal / data loss risk                          |
+| Committing `.env`, API keys, or real credentials                  | Secrets leak — use `.env.example` placeholders only      |
 
 If you already violated this (e.g. built an entire phase at once), **do not pretend it was
 compliant**. Log it in the build log as a single retrospective block, then **resume strict

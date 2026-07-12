@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { log } from "../core/Logger.js";
 import { CATEGORY_LABELS } from "../config/patterns.js";
 import { renderMarkdown } from "../parse/markdown.js";
 import type { ParsedSpec, WikiOutput, WikiPage } from "../types.js";
@@ -102,18 +103,45 @@ export async function writeWiki(
   outputDir: string,
   wiki: WikiOutput,
 ): Promise<string[]> {
-  await fs.mkdir(outputDir, { recursive: true });
+  try {
+    await fs.mkdir(outputDir, { recursive: true });
+  } catch (err) {
+    log.error("output.error", {
+      relativePath: ".",
+      message: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
 
   const written: string[] = [];
 
   const indexPath = path.join(outputDir, "index.md");
-  await fs.writeFile(indexPath, wiki.indexContent, "utf-8");
+  try {
+    await fs.writeFile(indexPath, wiki.indexContent, "utf-8");
+  } catch (err) {
+    log.error("output.error", {
+      relativePath: "index.md",
+      message: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
   written.push(indexPath);
+  log.info("output.write", { relativePath: "index.md" });
 
   for (const page of wiki.pages) {
     const filePath = path.join(outputDir, `${page.slug}.md`);
-    await fs.writeFile(filePath, page.content, "utf-8");
+    const relativePath = `${page.slug}.md`;
+    try {
+      await fs.writeFile(filePath, page.content, "utf-8");
+    } catch (err) {
+      log.error("output.error", {
+        relativePath,
+        message: err instanceof Error ? err.message : String(err),
+      });
+      throw err;
+    }
     written.push(filePath);
+    log.info("output.write", { relativePath: `${page.slug}.md` });
   }
 
   return written;

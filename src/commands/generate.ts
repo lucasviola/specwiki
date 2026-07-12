@@ -46,6 +46,12 @@ export async function generateWiki(options: GenerateOptions): Promise<void> {
   const written = await writeWiki(resolvedOutput, wiki);
   const htmlWritten = await writeHtmlWiki(resolvedOutput, wiki);
 
+  log.info("generate.summary", {
+    pageCount: wiki.pages.length,
+    markdownFiles: written.length,
+    htmlFiles: htmlWritten.length,
+  });
+
   console.log(
     chalk.green(`✓ Generated wiki with ${wiki.pages.length} page(s)`),
   );

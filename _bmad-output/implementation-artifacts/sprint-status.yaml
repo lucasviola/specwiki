@@ -45,7 +45,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-07-12
-last_updated: 2026-07-12T17:05:00
+last_updated: 2026-07-12T17:12:00
 project: specwiki
 project_key: NOKEY
 tracking_system: file-system
@@ -65,7 +65,7 @@ development_status:
   epic-2-retrospective: optional
   epic-3: in-progress
   3-1-parse-specs-into-structured-page-content: done
-  3-2-write-categorized-markdown-wiki-tree: backlog
+  3-2-write-categorized-markdown-wiki-tree: review
   epic-3-retrospective: optional
   epic-4: backlog
   4-1-html-title-escaping-and-page-structure: backlog
