@@ -1,3 +1,5 @@
+import fs from "node:fs/promises";
+import os from "node:os";
 import { execFile } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -44,5 +46,80 @@ describe("cli list --verbose", () => {
     expect(lines.filter((line) => line.event === "discover.match").length).toBe(
       lines.find((line) => line.event === "discover.complete")?.matchCount,
     );
+  });
+});
+
+describe("cli list zero-match", () => {
+  it("exits 0 with helpful tip on empty project", async () => {
+    const emptyRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-empty-"),
+    );
+
+    try {
+      const { stdout, stderr } = await execFileAsync(
+        process.execPath,
+        ["--import", "tsx/esm", cliPath, "list", "--project", emptyRoot],
+        { cwd: projectRoot },
+      );
+
+      expect(stdout).toContain("No spec files found");
+      expect(stdout).toContain(
+        "Tip: specwiki looks for AGENTS.md, SPEC.md, .cursor/rules/",
+      );
+      expect(stderr).toBe("");
+    } finally {
+      await fs.rm(emptyRoot, { force: true, recursive: true });
+    }
+  });
+
+  it("emits discover.empty on stderr when verbose on empty project", async () => {
+    const emptyRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-empty-verbose-"),
+    );
+
+    try {
+      const { stdout, stderr } = await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "list",
+          "--verbose",
+          "--project",
+          emptyRoot,
+        ],
+        { cwd: projectRoot },
+      );
+
+      expect(stdout).toContain("No spec files found");
+      expect(stdout).toContain(
+        "Tip: specwiki looks for AGENTS.md, SPEC.md, .cursor/rules/",
+      );
+
+      const lines = stderr
+        .trim()
+        .split("\n")
+        .filter(Boolean)
+        .map((line) => JSON.parse(line) as Record<string, unknown>);
+      const events = lines.map((line) => line.event);
+
+      expect(events).toEqual([
+        "discover.start",
+        "discover.empty",
+        "discover.complete",
+      ]);
+      expect(lines[1]).toMatchObject({
+        event: "discover.empty",
+        level: "info",
+        patternCount: expect.any(Number),
+      });
+      expect(lines.at(-1)).toMatchObject({
+        event: "discover.complete",
+        matchCount: 0,
+      });
+    } finally {
+      await fs.rm(emptyRoot, { force: true, recursive: true });
+    }
   });
 });

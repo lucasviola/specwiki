@@ -69,7 +69,11 @@ describe("generateWiki", () => {
       outputDir: "wiki",
     });
 
-    expect(logSpy.mock.calls.flat().join(" ")).toContain("No spec files found");
+    const output = logSpy.mock.calls.flat().join(" ");
+    expect(output).toContain("No spec files found");
+    expect(output).toContain(
+      "Tip: specwiki looks for AGENTS.md, SPEC.md, .cursor/rules/",
+    );
   });
 });
 
@@ -120,7 +124,7 @@ describe("listSpecs", () => {
     expect(output).toContain("My Skill — .cursor/skills/my-skill/SKILL.md");
   });
 
-  it("prints a message when no specs are found", async () => {
+  it("prints a helpful message when no specs are found", async () => {
     const emptyRoot = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-empty-list-"),
     );
@@ -131,7 +135,11 @@ describe("listSpecs", () => {
       outputDir: "wiki",
     });
 
-    expect(logSpy.mock.calls.flat().join(" ")).toContain("No spec files found");
+    const output = logSpy.mock.calls.flat().join(" ");
+    expect(output).toContain("No spec files found");
+    expect(output).toContain(
+      "Tip: specwiki looks for AGENTS.md, SPEC.md, .cursor/rules/",
+    );
   });
 
   it("emits discover diagnostics on stderr when verbose is enabled", async () => {

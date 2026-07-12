@@ -97,6 +97,13 @@ export async function discoverSpecs(
     log.info("discover.match", { relativePath: spec.relativePath });
   }
 
+  if (specs.length === 0) {
+    log.info("discover.empty", {
+      projectRoot: options.projectRoot,
+      patternCount: patterns.length,
+    });
+  }
+
   log.info("discover.complete", {
     projectRoot: options.projectRoot,
     matchCount: specs.length,

@@ -6,6 +6,14 @@ import { parseSpecFile } from "../parse/markdown.js";
 import { buildWiki, writeHtmlWiki, writeWiki } from "../output/wiki.js";
 import type { GenerateOptions } from "../types.js";
 
+const ZERO_SPECS_TIP =
+  "Tip: specwiki looks for AGENTS.md, SPEC.md, .cursor/rules/, specs/, openspec/, and similar paths.";
+
+function printZeroSpecsMessage(): void {
+  console.log(chalk.yellow("No spec files found."));
+  console.log(chalk.dim(ZERO_SPECS_TIP));
+}
+
 export async function generateWiki(options: GenerateOptions): Promise<void> {
   log.setVerbose(Boolean(options.verbose));
   const { projectRoot, outputDir, verbose } = options;
@@ -20,12 +28,7 @@ export async function generateWiki(options: GenerateOptions): Promise<void> {
   });
 
   if (specFiles.length === 0) {
-    console.log(chalk.yellow("No spec files found."));
-    console.log(
-      chalk.dim(
-        "Tip: specwiki looks for AGENTS.md, SPEC.md, .cursor/rules/, specs/, openspec/, and similar paths.",
-      ),
-    );
+    printZeroSpecsMessage();
     return;
   }
 
@@ -62,7 +65,7 @@ export async function listSpecs(options: GenerateOptions): Promise<void> {
   });
 
   if (specFiles.length === 0) {
-    console.log(chalk.yellow("No spec files found."));
+    printZeroSpecsMessage();
     return;
   }
 

@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-12  
-**Current position:** E2 S2.3 complete — next: E2 S2.4 zero-match helpful tip  
-**Test count:** 60 passing
+**Current position:** E2 S2.4 complete — next: E3 S3.1 parse specs into structured page content  
+**Test count:** 64 passing
 
 ## Deliverables
 
@@ -39,8 +39,8 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
 - [ ] **E2 — List Discovered Specs** (`specwiki list`) — discover → categorize → display
   - [x] S2.1 — Category grouping on list output _(done)_
   - [x] S2.2 — Human-readable titles on list output _(done)_
-  - [x] S2.3 — Fixture discovery integration and discover logging _(review)_
-  - [ ] S2.4 — Zero-match helpful tip
+  - [x] S2.3 — Fixture discovery integration and discover logging _(done)_
+  - [x] S2.4 — Zero-match helpful tip _(done)_
 - [ ] **E3 — Generate Markdown Wiki** (`wiki/*.md`) — discover → parse → write markdown
   - [ ] S3.1 — Parse specs into structured page content
   - [ ] S3.2 — Write categorized markdown wiki tree
@@ -68,5 +68,6 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-12 | E1 S1.3  | `feat(core): add structured Logger module with verbose-gated log.info` — JSON events to stderr; 7 unit tests; `src/core/` 100% coverage                                                                                      | 921c2f8               | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E2 S2.1  | `test(discover): exhaustive deriveCategory tests and list grouping assertions` — exported deriveCategory; 16 new tests; discover branch coverage 95.34%                                                                      | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E2 S2.2  | `feat(list): show human-readable titles in list output` — exported deriveTitle; 12 unit tests; list lines formatted as `{title} — {path}`                                                                                    | d5563be               | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
-| 2026-07-12 | E2 S2.3  | `feat(discover): structured discover logging and list --verbose` — discover.start/match/complete/error events; CLI and command verbose wiring; 8 new tests; discover branch coverage 100%                                  | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-12 | E2 S2.3  | `feat(discover): structured discover logging and list --verbose` — discover.start/match/complete/error events; CLI and command verbose wiring; 8 new tests; discover branch coverage 100%                                    | 9e5c1e1               | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-12 | E2 S2.4  | `feat(list): zero-match helpful tip and discover.empty logging` — list tip parity with generate; discover.empty verbose event; 3 new tests; CLI e2e for empty list exit 0                                                    | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | _template_ | _E?_ S?_ | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                         |

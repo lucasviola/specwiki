@@ -181,6 +181,55 @@ describe("discoverSpecs", () => {
     expect(specs).toEqual([]);
   });
 
+  it("emits discover.empty on stderr when verbose and no specs match", async () => {
+    const emptyRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-discover-empty-verbose-"),
+    );
+    tempDirs.push(emptyRoot);
+    log.setVerbose(true);
+
+    const specs = await discoverSpecs({
+      projectRoot: emptyRoot,
+      patterns: ["AGENTS.md"],
+    });
+
+    expect(specs).toEqual([]);
+
+    const lines = parseStderrLines();
+    const events = lines.map((line) => line.event);
+
+    expect(events).toEqual([
+      "discover.start",
+      "discover.empty",
+      "discover.complete",
+    ]);
+    expect(lines[1]).toMatchObject({
+      event: "discover.empty",
+      level: "info",
+      projectRoot: emptyRoot,
+      patternCount: 1,
+    });
+    expect(lines.at(-1)).toMatchObject({
+      event: "discover.complete",
+      matchCount: 0,
+    });
+  });
+
+  it("does not emit discover.empty on stderr in default mode", async () => {
+    const emptyRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-discover-empty-quiet-"),
+    );
+    tempDirs.push(emptyRoot);
+    log.setVerbose(false);
+
+    await discoverSpecs({
+      projectRoot: emptyRoot,
+      patterns: ["AGENTS.md"],
+    });
+
+    expect(parseStderrLines()).toEqual([]);
+  });
+
   it("does not emit discover info logs on stderr in default mode", async () => {
     log.setVerbose(false);
 
