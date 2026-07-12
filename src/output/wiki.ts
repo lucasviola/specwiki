@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { log } from "../core/Logger.js";
 import { CATEGORY_LABELS } from "../config/patterns.js";
 import { renderMarkdown } from "../parse/markdown.js";
+import { getHtmlRenderer, HtmlRenderer } from "./html/renderer.js";
 import type { ParsedSpec, WikiOutput, WikiPage } from "../types.js";
 
 const PATH_ESCAPE_MESSAGE = "Path escapes output directory";
@@ -243,9 +244,70 @@ export async function writeHtmlWiki(
     throw err;
   }
 
+  let renderer: HtmlRenderer;
+  try {
+    renderer = await getHtmlRenderer();
+  } catch (err) {
+    log.error("output.error", {
+      relativePath: "html/templates",
+      message: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
+
   const written: string[] = [];
 
-  const indexHtml = wrapHtml("Spec Wiki", renderMarkdown(wiki.indexContent));
+  const assetsDir = path.join(htmlDir, "assets");
+  try {
+    await fs.mkdir(assetsDir, { recursive: true });
+  } catch (err) {
+    log.error("output.error", {
+      relativePath: "html/assets",
+      message: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
+
+  let bundledCss: string;
+  try {
+    bundledCss = await HtmlRenderer.bundleCss();
+  } catch (err) {
+    log.error("output.error", {
+      relativePath: "html/assets/specwiki.css",
+      message: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
+
+  const cssPath = path.join(assetsDir, HtmlRenderer.bundledCssFilename());
+  const cssRelativePath = "html/assets/specwiki.css";
+  assertPathConfined(outputDir, cssPath, cssRelativePath);
+  try {
+    await fs.writeFile(cssPath, bundledCss, "utf-8");
+  } catch (err) {
+    log.error("output.error", {
+      relativePath: cssRelativePath,
+      message: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
+  written.push(cssPath);
+  log.info("output.write", { relativePath: cssRelativePath });
+
+  let indexHtml: string;
+  try {
+    indexHtml = renderer.renderIndex(
+      "Spec Wiki",
+      renderMarkdown(wiki.indexContent),
+    );
+  } catch (err) {
+    log.error("output.error", {
+      relativePath: "html/index.html",
+      message: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
+
   const indexPath = path.join(htmlDir, "index.html");
   assertPathConfined(outputDir, indexPath, "html/index.html");
   try {
@@ -261,7 +323,17 @@ export async function writeHtmlWiki(
   log.info("output.write", { relativePath: "html/index.html" });
 
   for (const page of wiki.pages) {
-    const html = wrapHtml(page.title, renderMarkdown(page.content));
+    let html: string;
+    try {
+      html = renderer.renderArticle(page.title, renderMarkdown(page.content));
+    } catch (err) {
+      log.error("output.error", {
+        relativePath: `html/${page.slug}.html`,
+        message: err instanceof Error ? err.message : String(err),
+      });
+      throw err;
+    }
+
     const filePath = path.join(htmlDir, `${page.slug}.html`);
     const relativePath = `html/${page.slug}.html`;
     assertPathConfined(outputDir, filePath, relativePath);
@@ -279,33 +351,6 @@ export async function writeHtmlWiki(
   }
 
   return written;
-}
-
-export function wrapHtml(title: string, body: string): string {
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${escapeHtml(title)} — Spec Wiki</title>
-  <style>
-    :root { --bg: #fafafa; --text: #1a1a1a; --muted: #666; --border: #e0e0e0; --link: #2563eb; }
-    * { box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, sans-serif; max-width: 48rem; margin: 0 auto; padding: 2rem 1.5rem; background: var(--bg); color: var(--text); line-height: 1.6; }
-    h1, h2, h3 { line-height: 1.3; }
-    a { color: var(--link); }
-    blockquote { border-left: 3px solid var(--border); margin: 0; padding: 0.5rem 1rem; color: var(--muted); }
-    code { background: #f0f0f0; padding: 0.15em 0.4em; border-radius: 3px; font-size: 0.9em; }
-    pre { background: #f0f0f0; padding: 1rem; border-radius: 6px; overflow-x: auto; }
-    hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
-    nav { margin-bottom: 2rem; font-size: 0.9rem; }
-  </style>
-</head>
-<body>
-  <nav><a href="index.html">← Back to index</a></nav>
-  ${body}
-</body>
-</html>`;
 }
 
 export function escapeHtml(text: string): string {

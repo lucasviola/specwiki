@@ -1,0 +1,97 @@
+/* Spec Wiki layout — Vector-inspired chrome (S16.1 baseline) */
+
+* {
+  box-sizing: var(--box-sizing-base, border-box);
+}
+
+body.specwiki {
+  margin: 0;
+  font-family: var(--font-family-base);
+  font-size: 0.875rem;
+  line-height: var(--line-height-base);
+  color: var(--color-base);
+  background-color: var(--background-color-base);
+}
+
+.specwiki-header {
+  background-color: var(--background-color-base);
+  border-bottom: 1px solid var(--border-color-divider);
+  padding: 0 var(--padding-horizontal-base);
+}
+
+.specwiki-header-inner {
+  max-width: var(--max-width-base);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  min-height: var(--size-tool);
+}
+
+.specwiki-logo {
+  color: var(--color-base);
+  text-decoration: none;
+  font-weight: var(--font-weight-bold);
+  font-size: 1rem;
+}
+
+.specwiki-logo:hover {
+  color: var(--color-base--hover);
+}
+
+.specwiki-main {
+  max-width: var(--max-width-base);
+  margin: 0 auto;
+  padding: var(--padding-horizontal-base);
+}
+
+.specwiki-nav {
+  margin-bottom: var(--padding-horizontal-base);
+  font-size: 0.8125rem;
+}
+
+.specwiki-nav a {
+  color: var(--color-primary);
+}
+
+.specwiki-article h1,
+.specwiki-article h2,
+.specwiki-article h3 {
+  line-height: var(--line-height-heading);
+}
+
+.specwiki-article a {
+  color: var(--color-primary);
+}
+
+.specwiki-article blockquote {
+  border-left: 3px solid var(--border-color-base);
+  margin: 0;
+  padding: var(--padding-vertical-base) var(--padding-horizontal-base);
+  color: var(--color-base--subtle);
+}
+
+.specwiki-article code {
+  background-color: var(--background-color-code);
+  padding: 0.15em 0.4em;
+  border-radius: var(--border-radius-base);
+  font-size: 0.9em;
+  font-family: var(--font-family-monospace);
+}
+
+.specwiki-article pre {
+  background-color: var(--background-color-code);
+  padding: var(--padding-horizontal-base);
+  border-radius: var(--border-radius-base);
+  overflow-x: auto;
+}
+
+.specwiki-article pre code {
+  background: none;
+  padding: 0;
+}
+
+.specwiki-article hr {
+  border: none;
+  border-top: 1px solid var(--border-color-divider);
+  margin: calc(var(--padding-horizontal-base) * 2) 0;
+}

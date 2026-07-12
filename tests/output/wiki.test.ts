@@ -8,10 +8,10 @@ import {
   buildWiki,
   escapeHtml,
   pageSlug,
-  wrapHtml,
   writeHtmlWiki,
   writeWiki,
 } from "../../src/output/wiki.js";
+import { resetHtmlRendererCache } from "../../src/output/html/renderer.js";
 import type { ParsedSpec, WikiOutput } from "../../src/types.js";
 
 const tempDirs: string[] = [];
@@ -19,11 +19,13 @@ let stderrSpy: ReturnType<typeof vi.spyOn>;
 
 beforeEach(() => {
   log.setVerbose(false);
+  resetHtmlRendererCache();
   stderrSpy = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
 });
 
 afterEach(async () => {
   log.setVerbose(false);
+  resetHtmlRendererCache();
   stderrSpy.mockRestore();
   await Promise.all(
     tempDirs
@@ -104,31 +106,6 @@ describe("escapeHtml", () => {
 
   it("leaves safe text unchanged", () => {
     expect(escapeHtml("Architecture Overview")).toBe("Architecture Overview");
-  });
-});
-
-describe("wrapHtml", () => {
-  it("produces valid page structure with escaped title", () => {
-    const html = wrapHtml("Evil <img src=x onerror=alert(1)>", "<p>Body</p>");
-
-    expect(html).toMatch(/^<!DOCTYPE html>/);
-    expect(html).toContain('<html lang="en">');
-    expect(html).toContain('<meta charset="UTF-8">');
-    expect(html).toContain('name="viewport"');
-    expect(html).toContain(
-      "<title>Evil &lt;img src=x onerror=alert(1)&gt; — Spec Wiki</title>",
-    );
-    expect(html).toContain(
-      '<nav><a href="index.html">← Back to index</a></nav>',
-    );
-    expect(html).toContain("<p>Body</p>");
-    expect(html).not.toMatch(/<title>[^<]*<img/);
-  });
-
-  it("escapes ampersands in title without double-escaping body", () => {
-    const html = wrapHtml("Tom & Jerry", "<p>Content &amp; more</p>");
-    expect(html).toContain("<title>Tom &amp; Jerry — Spec Wiki</title>");
-    expect(html).toContain("<p>Content &amp; more</p>");
   });
 });
 
@@ -565,9 +542,31 @@ describe("writeHtmlWiki", () => {
     expect(indexHtml).toMatch(/^<!DOCTYPE html>/);
     expect(indexHtml).toContain("<title>Spec Wiki — Spec Wiki</title>");
     expect(indexHtml).toContain(
-      '<nav><a href="index.html">← Back to index</a></nav>',
+      '<nav class="specwiki-nav"><a href="index.html">← Back to index</a></nav>',
     );
+    expect(indexHtml).toContain(
+      '<link rel="stylesheet" href="assets/specwiki.css">',
+    );
+    expect(indexHtml).not.toContain("<style>");
+    expect(indexHtml).toContain('<header class="specwiki-header">');
     expect(indexHtml).toContain("Custom Spec Title");
+  });
+
+  it("writes html/assets/specwiki.css with bundled stylesheet", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([sampleSpec()]);
+    await writeHtmlWiki(outputDir, wiki);
+
+    const css = await fs.readFile(
+      path.join(outputDir, "html", "assets", "specwiki.css"),
+      "utf-8",
+    );
+    expect(css).toContain("--background-color-base");
+    expect(css).toContain(".specwiki-header");
   });
 
   it("writes html/index.html and html/{slug}.html for each page", async () => {
@@ -579,7 +578,7 @@ describe("writeHtmlWiki", () => {
     const wiki = buildWiki([sampleSpec()]);
     const written = await writeHtmlWiki(outputDir, wiki);
 
-    expect(written).toHaveLength(2);
+    expect(written).toHaveLength(3);
     expect(
       await fs.readFile(path.join(outputDir, "html", "index.html"), "utf-8"),
     ).toContain("<html");
@@ -616,8 +615,9 @@ describe("writeHtmlWiki", () => {
       (line) => line.event === "output.write",
     );
 
-    expect(events).toHaveLength(2);
+    expect(events).toHaveLength(3);
     expect(events.map((event) => event.relativePath).sort()).toEqual([
+      "html/assets/specwiki.css",
       "html/index.html",
       "html/spec.html",
     ]);
@@ -650,6 +650,7 @@ describe("writeHtmlWiki", () => {
     const wiki = buildWiki([sampleSpec()]);
     const writeSpy = vi
       .spyOn(fs, "writeFile")
+      .mockResolvedValueOnce(undefined)
       .mockRejectedValueOnce(new Error("disk full"));
 
     await expect(writeHtmlWiki(outputDir, wiki)).rejects.toThrow("disk full");
@@ -671,6 +672,7 @@ describe("writeHtmlWiki", () => {
     const wiki = buildWiki([sampleSpec()]);
     const writeSpy = vi
       .spyOn(fs, "writeFile")
+      .mockResolvedValueOnce(undefined)
       .mockResolvedValueOnce(undefined)
       .mockRejectedValueOnce("page write failed");
 
