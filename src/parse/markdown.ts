@@ -56,8 +56,7 @@ export async function parseSpecFile(file: SpecFile): Promise<ParsedSpec> {
   const { data: frontmatter, content } = matter(raw);
 
   const title =
-    (typeof frontmatter.title === "string" && frontmatter.title) ||
-    file.title;
+    (typeof frontmatter.title === "string" && frontmatter.title) || file.title;
 
   return {
     file,

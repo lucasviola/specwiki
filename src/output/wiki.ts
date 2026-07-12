@@ -56,7 +56,7 @@ function buildIndex(pages: WikiPage[]): string {
     "Structured documentation generated from AI specs, agent instructions,",
     "and spec-driven development files in this project.",
     "",
-    `**${pages.length}** spec file${pages.length === 1 ? "" : "s"} indexed.",
+    `**${pages.length}** spec file${pages.length === 1 ? "" : "s"} indexed.`,
     "",
     "---",
     "",

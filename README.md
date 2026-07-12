@@ -8,13 +8,13 @@ Transform AI specs in any project into structured, wiki-like documentation.
 
 Out of the box, specwiki discovers specs from:
 
-| Source | Patterns |
-|--------|----------|
-| Root agent files | `AGENTS.md`, `SPEC.md`, `CLAUDE.md`, `GEMINI.md` |
-| Cursor | `.cursor/rules/**`, `.cursor/skills/**/SKILL.md` |
-| Spec frameworks | `specs/**`, `openspec/**`, `.kiro/specs/**` |
-| Docs & plans | `docs/specs/**`, `docs/plans/**`, `requirements/**` |
-| GitHub Copilot | `.github/copilot-instructions.md` |
+| Source           | Patterns                                            |
+| ---------------- | --------------------------------------------------- |
+| Root agent files | `AGENTS.md`, `SPEC.md`, `CLAUDE.md`, `GEMINI.md`    |
+| Cursor           | `.cursor/rules/**`, `.cursor/skills/**/SKILL.md`    |
+| Spec frameworks  | `specs/**`, `openspec/**`, `.kiro/specs/**`         |
+| Docs & plans     | `docs/specs/**`, `docs/plans/**`, `requirements/**` |
+| GitHub Copilot   | `.github/copilot-instructions.md`                   |
 
 ## Install
 
@@ -58,6 +58,7 @@ wiki/
 ```
 
 Each wiki page includes:
+
 - Title and source file path
 - Auto-generated table of contents from headings
 - Full spec content, preserved as markdown

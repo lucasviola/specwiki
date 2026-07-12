@@ -46,7 +46,9 @@ export async function generateWiki(options: GenerateOptions): Promise<void> {
   );
   console.log(chalk.dim(`  Markdown: ${resolvedOutput}/`));
   console.log(chalk.dim(`  HTML:     ${resolvedOutput}/html/`));
-  console.log(chalk.dim(`  ${written.length + htmlWritten.length} files written`));
+  console.log(
+    chalk.dim(`  ${written.length + htmlWritten.length} files written`),
+  );
 }
 
 export async function listSpecs(options: GenerateOptions): Promise<void> {

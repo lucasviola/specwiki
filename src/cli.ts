@@ -2,23 +2,24 @@
 
 import { Command } from "commander";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { generateWiki, listSpecs } from "./commands/generate.js";
 
 const program = new Command();
 
 program
   .name("specwiki")
-  .description(
-    "Transform AI specs into structured wiki-like documentation",
-  )
+  .description("Transform AI specs into structured wiki-like documentation")
   .version("0.1.0");
 
 program
   .command("generate")
   .description("Discover specs and generate wiki documentation")
   .option("-p, --project <path>", "Project root to scan", process.cwd())
-  .option("-o, --output <dir>", "Output directory (relative to project)", "wiki")
+  .option(
+    "-o, --output <dir>",
+    "Output directory (relative to project)",
+    "wiki",
+  )
   .option("-v, --verbose", "Show detailed output")
   .action(async (opts) => {
     await generateWiki({

@@ -52,7 +52,12 @@ export async function discoverSpecs(
     absolute: true,
     onlyFiles: true,
     dot: true,
-    ignore: ["**/node_modules/**", "**/dist/**", "**/wiki/**", "**/.specwiki/**"],
+    ignore: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/wiki/**",
+      "**/.specwiki/**",
+    ],
   });
 
   return entries

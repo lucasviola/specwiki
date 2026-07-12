@@ -2,6 +2,7 @@ node_modules/
 dist/
 wiki/
 .specwiki/
+coverage/
 *.log
 .DS_Store
 
