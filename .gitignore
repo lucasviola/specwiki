@@ -1,0 +1,12 @@
+node_modules/
+dist/
+wiki/
+.specwiki/
+*.log
+.DS_Store
+
+# BMAD internal tooling (skills, agents, workflows, config)
+_bmad/
+.agents/skills/bmad-*/
+
+# Keep tracked: _bmad-output/ (planning & implementation specs), docs/ (project knowledge)
