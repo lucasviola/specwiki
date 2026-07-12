@@ -87,5 +87,12 @@ export async function parseSpecFile(file: SpecFile): Promise<ParsedSpec> {
 }
 
 export function renderMarkdown(markdown: string): string {
-  return marked.parse(markdown, { async: false }) as string;
+  try {
+    return marked.parse(markdown, { async: false }) as string;
+  } catch (err) {
+    log.error("render.error", {
+      message: err instanceof Error ? err.message : String(err),
+    });
+    throw err;
+  }
 }

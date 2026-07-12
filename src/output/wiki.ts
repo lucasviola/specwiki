@@ -171,7 +171,7 @@ export async function writeHtmlWiki(
   return written;
 }
 
-function wrapHtml(title: string, body: string): string {
+export function wrapHtml(title: string, body: string): string {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -198,10 +198,11 @@ function wrapHtml(title: string, body: string): string {
 </html>`;
 }
 
-function escapeHtml(text: string): string {
+export function escapeHtml(text: string): string {
   return text
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }

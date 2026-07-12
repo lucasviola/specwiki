@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { marked } from "marked";
 import { log } from "../../src/core/Logger.js";
 import { parseSpecFile, renderMarkdown } from "../../src/parse/markdown.js";
 import type { SpecFile } from "../../src/types.js";
@@ -290,5 +291,50 @@ describe("renderMarkdown", () => {
     expect(html).toContain("<h1");
     expect(html).toContain("Hello");
     expect(html).toContain("<strong>bold</strong>");
+  });
+
+  it("emits render.error and rethrows on parse failure regardless of verbose", () => {
+    log.setVerbose(false);
+    const parseSpy = vi.spyOn(marked, "parse").mockImplementationOnce(() => {
+      throw new Error("parse boom");
+    });
+
+    expect(() => renderMarkdown("# bad")).toThrow("parse boom");
+
+    const lines = parseStderrLines();
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toMatchObject({
+      event: "render.error",
+      level: "error",
+      message: "parse boom",
+    });
+    expect(JSON.stringify(lines[0])).not.toContain("<script>");
+    parseSpy.mockRestore();
+  });
+
+  it("stringifies non-Error parse failures in render.error", () => {
+    log.setVerbose(false);
+    const parseSpy = vi.spyOn(marked, "parse").mockImplementationOnce(() => {
+      throw "render failed";
+    });
+
+    expect(() => renderMarkdown("content")).toThrow();
+
+    const lines = parseStderrLines();
+    expect(lines[0]).toMatchObject({
+      event: "render.error",
+      level: "error",
+      message: "render failed",
+    });
+    parseSpy.mockRestore();
+  });
+
+  it("does not emit info-level logs during successful render", () => {
+    log.setVerbose(true);
+    renderMarkdown("# Title");
+    const infoEvents = parseStderrLines().filter(
+      (line) => line.level === "info",
+    );
+    expect(infoEvents).toHaveLength(0);
   });
 });
