@@ -15,6 +15,10 @@ Out of the box, specwiki discovers specs from:
 | Spec frameworks  | `specs/**`, `openspec/**`, `.kiro/specs/**`         |
 | Docs & plans     | `docs/specs/**`, `docs/plans/**`, `requirements/**` |
 | GitHub Copilot   | `.github/copilot-instructions.md`                   |
+| Monorepo agents  | `**/AGENTS.md` (nested packages)                    |
+| BMAD output      | `_bmad-output/**/*.md`                              |
+| Agent skills     | `.agents/skills/**/SKILL.md`                        |
+| README files     | `**/README.md` (standalone wiki pages)              |
 
 ## Install
 

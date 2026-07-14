@@ -62,13 +62,13 @@ Usage errors emit `cli.error` on stderr (JSON) before exit 2. Runtime failures e
 
 | Metric           | Result (2026-07-12)              |
 | ---------------- | -------------------------------- |
-| Spec files found | 10                               |
-| Wiki pages       | 10                               |
-| Categories       | 8                                |
+| Spec files found | 15 (extended defaults, S8.3)     |
+| Wiki pages       | 15                               |
+| Categories       | 10                               |
 | Generate time    | ~0.4s (< 60s AC)                 |
 | Markdown + HTML  | ✓ `index.md` + `html/index.html` |
 
-**Repo root limited yield (POST-MVP FR-006):** Running `specwiki list --project .` on the specwiki repository finds only paths matching `DEFAULT_SPEC_PATTERNS` (currently 1 file: `.cursor/rules/specwiki-checkpoint.mdc`). High-value self-repo paths **outside** default patterns — `README.md`, `HARNESS.md`, `_bmad-output/`, `.agents/skills/` — are deferred to E8 (extended patterns / `--config`). Folder README index behaviour (FR-035) is also E8.
+**Extended default patterns (FR-006 / S8.3):** `DEFAULT_SPEC_PATTERNS` now includes `**/AGENTS.md`, `_bmad-output/**/*.md`, `.agents/skills/**/SKILL.md`, and `**/README.md` appended after legacy entries. Running `specwiki list --project .` on the specwiki repository discovers root `README.md`, `_bmad-output/`, `.agents/skills/`, and nested agent files alongside existing defaults. `HARNESS.md` remains outside default patterns. Folder README index binding (FR-035) is S8.4.
 
 ## MVP Epic Progression Checklist
 
@@ -106,7 +106,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
 - [ ] **E8 — Custom Discovery Configuration** — `--patterns`, config loader, extended defaults, `README.md` discovery and folder index pages _(in progress)_
   - [x] S8.1 — `--patterns` CLI flag _(review)_
   - [x] S8.2 — Project config file loader _(review)_
-  - [ ] S8.3 — Extended default patterns
+  - [x] S8.3 — Extended default patterns _(review)_
   - [ ] S8.4 — README discovery and folder index
 - [ ] **E9 — Agent Interoperability** — `--json`, `llms.txt`
 - [ ] **E10 — Team CI Freshness** — `generate --check`

@@ -27,6 +27,12 @@ export const DEFAULT_SPEC_PATTERNS = [
 
   // GitHub Copilot
   ".github/copilot-instructions.md",
+
+  // Extended POST-MVP discovery (S8.3)
+  "**/AGENTS.md",
+  "_bmad-output/**/*.md",
+  ".agents/skills/**/SKILL.md",
+  "**/README.md",
 ];
 
 const EMPTY_PATTERNS_MESSAGE =
@@ -181,5 +187,7 @@ export const CATEGORY_LABELS: Record<string, string> = {
   requirements: "Requirements",
   plans: "Plans",
   github: "GitHub",
+  "bmad-output": "BMAD Output",
+  "agent-skills": "Agent Skills",
   other: "Other",
 };

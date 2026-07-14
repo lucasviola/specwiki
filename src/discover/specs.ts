@@ -19,6 +19,8 @@ export function deriveCategory(relativePath: string): string {
   if (normalized.startsWith("docs/plans/")) return "plans";
   if (normalized.startsWith("requirements/")) return "requirements";
   if (normalized.startsWith(".github/")) return "github";
+  if (normalized.startsWith("_bmad-output/")) return "bmad-output";
+  if (normalized.startsWith(".agents/skills/")) return "agent-skills";
 
   return "other";
 }
@@ -39,6 +41,7 @@ export function deriveTitle(relativePath: string): string {
   if (basename === "SPEC") return "Project Specification";
   if (basename === "CLAUDE") return "Claude Instructions";
   if (basename === "GEMINI") return "Gemini Instructions";
+  if (basename === "README") return "Readme";
 
   return basename
     .replace(/[-_]/g, " ")

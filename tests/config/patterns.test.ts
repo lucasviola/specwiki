@@ -6,14 +6,46 @@ import {
 } from "../../src/config/patterns.js";
 
 describe("patterns config", () => {
+  const LEGACY_PATTERN_COUNT = 15;
+
   it("includes common root spec filenames", () => {
     expect(DEFAULT_SPEC_PATTERNS).toContain("AGENTS.md");
     expect(DEFAULT_SPEC_PATTERNS).toContain("SPEC.md");
   });
 
+  it("includes extended default patterns appended after legacy entries", () => {
+    expect(DEFAULT_SPEC_PATTERNS).toContain("**/AGENTS.md");
+    expect(DEFAULT_SPEC_PATTERNS).toContain("_bmad-output/**/*.md");
+    expect(DEFAULT_SPEC_PATTERNS).toContain(".agents/skills/**/SKILL.md");
+    expect(DEFAULT_SPEC_PATTERNS).toContain("**/README.md");
+    expect(DEFAULT_SPEC_PATTERNS).toContain(".cursor/rules/**/*.{md,mdc}");
+    expect(DEFAULT_SPEC_PATTERNS.length).toBe(LEGACY_PATTERN_COUNT + 4);
+
+    const legacyTail = DEFAULT_SPEC_PATTERNS.slice(0, LEGACY_PATTERN_COUNT);
+    expect(legacyTail).toEqual([
+      "AGENTS.md",
+      "SPEC.md",
+      "CLAUDE.md",
+      "GEMINI.md",
+      "llms.txt",
+      ".cursor/rules/**/*.{md,mdc}",
+      ".cursor/skills/**/SKILL.md",
+      "specs/**/*.{md,mdc}",
+      "spec/**/*.{md,mdc}",
+      "openspec/**/*.{md,mdc}",
+      ".kiro/specs/**/*.{md,mdc}",
+      "docs/specs/**/*.{md,mdc}",
+      "requirements/**/*.{md,mdc}",
+      "docs/plans/**/*.{md,mdc}",
+      ".github/copilot-instructions.md",
+    ]);
+  });
+
   it("maps categories to display labels", () => {
     expect(CATEGORY_LABELS.root).toBe("Project Root");
     expect(CATEGORY_LABELS["cursor-rules"]).toBe("Cursor Rules");
+    expect(CATEGORY_LABELS["bmad-output"]).toBe("BMAD Output");
+    expect(CATEGORY_LABELS["agent-skills"]).toBe("Agent Skills");
   });
 
   it.each([

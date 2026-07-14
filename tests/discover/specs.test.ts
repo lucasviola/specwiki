@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { log } from "../../src/core/Logger.js";
+import { DEFAULT_SPEC_PATTERNS } from "../../src/config/patterns.js";
 import {
   deriveCategory,
   deriveTitle,
@@ -55,6 +56,11 @@ describe("deriveCategory", () => {
     ["docs/plans/roadmap.md", "plans"],
     ["requirements/req-001.md", "requirements"],
     [".github/copilot-instructions.md", "github"],
+    ["_bmad-output/planning/artifact.md", "bmad-output"],
+    [".agents/skills/bmad-skill/SKILL.md", "agent-skills"],
+    ["packages/nested/AGENTS.md", "other"],
+    ["README.md", "root"],
+    ["docs/README.md", "other"],
     ["src/lib/internal.md", "other"],
     [".cursor/other/file.md", "other"],
   ])("maps %s to category %s", (relativePath, expected) => {
@@ -97,7 +103,7 @@ describe("discoverSpecs", () => {
     const specs = await discoverSpecs({ projectRoot: fixtureRoot });
 
     expect(specs.length).toBeGreaterThanOrEqual(5);
-    expect(specs.length).toBe(10);
+    expect(specs.length).toBe(15);
   });
 
   it("discovers and categorizes spec files in a project tree", async () => {
@@ -148,6 +154,26 @@ describe("discoverSpecs", () => {
     expect(byPath["openspec/change.md"]).toMatchObject({
       category: "openspec",
       title: "Change",
+    });
+    expect(byPath["packages/nested/AGENTS.md"]).toMatchObject({
+      category: "other",
+      title: "Agent Instructions",
+    });
+    expect(byPath["_bmad-output/planning/artifact.md"]).toMatchObject({
+      category: "bmad-output",
+      title: "Artifact",
+    });
+    expect(byPath[".agents/skills/bmad-skill/SKILL.md"]).toMatchObject({
+      category: "agent-skills",
+      title: "Bmad Skill",
+    });
+    expect(byPath["README.md"]).toMatchObject({
+      category: "root",
+      title: "Readme",
+    });
+    expect(byPath["docs/README.md"]).toMatchObject({
+      category: "other",
+      title: "Readme",
     });
   });
 
@@ -258,7 +284,7 @@ describe("discoverSpecs", () => {
       level: "info",
       projectRoot: fixtureRoot,
     });
-    expect(startLine?.patternCount).toBeGreaterThan(0);
+    expect(startLine?.patternCount).toBe(DEFAULT_SPEC_PATTERNS.length);
     expect(completeLine).toMatchObject({
       event: "discover.complete",
       level: "info",
