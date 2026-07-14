@@ -7,6 +7,8 @@ import {
 
 describe("patterns config", () => {
   const LEGACY_PATTERN_COUNT = 15;
+  const EXTENDED_PATTERN_COUNT = 4;
+  const CATCH_ALL_PATTERN_COUNT = 1;
 
   it("includes common root spec filenames", () => {
     expect(DEFAULT_SPEC_PATTERNS).toContain("AGENTS.md");
@@ -18,8 +20,11 @@ describe("patterns config", () => {
     expect(DEFAULT_SPEC_PATTERNS).toContain("_bmad-output/**/*.md");
     expect(DEFAULT_SPEC_PATTERNS).toContain(".agents/skills/**/SKILL.md");
     expect(DEFAULT_SPEC_PATTERNS).toContain("**/README.md");
+    expect(DEFAULT_SPEC_PATTERNS).toContain("**/*.{md,mdc}");
     expect(DEFAULT_SPEC_PATTERNS).toContain(".cursor/rules/**/*.{md,mdc}");
-    expect(DEFAULT_SPEC_PATTERNS.length).toBe(LEGACY_PATTERN_COUNT + 4);
+    expect(DEFAULT_SPEC_PATTERNS.length).toBe(
+      LEGACY_PATTERN_COUNT + EXTENDED_PATTERN_COUNT + CATCH_ALL_PATTERN_COUNT,
+    );
 
     const legacyTail = DEFAULT_SPEC_PATTERNS.slice(0, LEGACY_PATTERN_COUNT);
     expect(legacyTail).toEqual([
@@ -38,6 +43,16 @@ describe("patterns config", () => {
       "requirements/**/*.{md,mdc}",
       "docs/plans/**/*.{md,mdc}",
       ".github/copilot-instructions.md",
+    ]);
+  });
+
+  it("appends catch-all markdown pattern after extended entries", () => {
+    expect(DEFAULT_SPEC_PATTERNS.at(-1)).toBe("**/*.{md,mdc}");
+    expect(DEFAULT_SPEC_PATTERNS.slice(LEGACY_PATTERN_COUNT, -1)).toEqual([
+      "**/AGENTS.md",
+      "_bmad-output/**/*.md",
+      ".agents/skills/**/SKILL.md",
+      "**/README.md",
     ]);
   });
 

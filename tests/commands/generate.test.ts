@@ -65,6 +65,29 @@ describe("generateWiki", () => {
     expect(logSpy).toHaveBeenCalled();
   });
 
+  it("does not re-discover generated wiki pages on a second run with custom output dir", async () => {
+    const projectRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-generate-output-ignore-"),
+    );
+    tempDirs.push(projectRoot);
+    const outputDir = path.join(projectRoot, "site");
+
+    await fs.writeFile(
+      path.join(projectRoot, "notes.md"),
+      "# Notes\n\nSource content.",
+    );
+
+    await generateWiki({ projectRoot, outputDir });
+    await generateWiki({ projectRoot, outputDir });
+
+    const generatedNotes = await fs.readFile(
+      path.join(outputDir, "notes.md"),
+      "utf-8",
+    );
+    expect(generatedNotes).toContain("Source content.");
+    expect(generatedNotes).not.toContain("Generated wiki page");
+  });
+
   it("emits parse.file diagnostics on stderr when verbose is enabled", async () => {
     const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-out-"));
     tempDirs.push(outputDir);
@@ -196,7 +219,7 @@ describe("generateWiki", () => {
     const output = logSpy.mock.calls.flat().join(" ");
     expect(output).toContain("No spec files found");
     expect(output).toContain(
-      "Tip: specwiki looks for AGENTS.md, SPEC.md, .cursor/rules/",
+      "Tip: specwiki discovers .md and .mdc files anywhere in your project",
     );
   });
 
@@ -383,7 +406,7 @@ describe("listSpecs", () => {
     const output = logSpy.mock.calls.flat().join(" ");
     expect(output).toContain("No spec files found");
     expect(output).toContain(
-      "Tip: specwiki looks for AGENTS.md, SPEC.md, .cursor/rules/",
+      "Tip: specwiki discovers .md and .mdc files anywhere in your project",
     );
   });
 

@@ -8,7 +8,7 @@ import { buildWiki, writeHtmlWiki, writeWiki } from "../output/wiki.js";
 import type { GenerateOptions } from "../types.js";
 
 const ZERO_SPECS_TIP =
-  "Tip: specwiki looks for AGENTS.md, SPEC.md, .cursor/rules/, specs/, openspec/, and similar paths.";
+  "Tip: specwiki discovers .md and .mdc files anywhere in your project — AGENTS.md, .cursor/rules/, specs/, README.md, and similar paths.";
 
 type CliCommand = "generate" | "list";
 
@@ -53,9 +53,17 @@ export async function generateWiki(options: GenerateOptions): Promise<void> {
   });
 
   try {
+    const resolvedOutput = path.resolve(resolvedProjectRoot, outputDir);
+    const relativeOutput = path.relative(resolvedProjectRoot, resolvedOutput);
+    const outputIgnorePath =
+      relativeOutput.length > 0 && !relativeOutput.startsWith("..")
+        ? relativeOutput
+        : undefined;
+
     const specFiles = await discoverSpecs({
       projectRoot: resolvedProjectRoot,
       patterns: options.patterns,
+      ignorePaths: outputIgnorePath ? [outputIgnorePath] : undefined,
     });
 
     if (specFiles.length === 0) {
@@ -66,7 +74,6 @@ export async function generateWiki(options: GenerateOptions): Promise<void> {
     const parsed = await Promise.all(specFiles.map(parseSpecFile));
     const wiki = buildWiki(parsed);
 
-    const resolvedOutput = path.resolve(resolvedProjectRoot, outputDir);
     const written = await writeWiki(resolvedOutput, wiki);
     const htmlWritten = await writeHtmlWiki(resolvedOutput, wiki, {
       noSearch: options.noSearch,

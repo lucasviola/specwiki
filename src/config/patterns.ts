@@ -33,6 +33,9 @@ export const DEFAULT_SPEC_PATTERNS = [
   "_bmad-output/**/*.md",
   ".agents/skills/**/SKILL.md",
   "**/README.md",
+
+  // Broad markdown discovery (S17.1)
+  "**/*.{md,mdc}",
 ];
 
 const EMPTY_PATTERNS_MESSAGE =

@@ -45,7 +45,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-07-12
-last_updated: 2026-07-14T22:26:00+02:00
+last_updated: 2026-07-14T23:15:00+02:00
 project: specwiki
 project_key: NOKEY
 tracking_system: file-system
@@ -83,11 +83,11 @@ development_status:
   7-1-dogfood-wiki-on-fixture: done
   7-2-full-quality-gate-and-13-checklist: done
   epic-7-retrospective: optional
-  epic-8: in-progress
-  8-1-patterns-cli-flag: review
-  8-2-project-config-file-loader: review
-  8-3-extended-default-patterns: review
-  8-4-readme-discovery-and-folder-index: review
+  epic-8: done
+  8-1-patterns-cli-flag: done
+  8-2-project-config-file-loader: done
+  8-3-extended-default-patterns: done
+  8-4-readme-discovery-and-folder-index: done
   epic-8-retrospective: optional
   epic-9: backlog
   9-1-json-machine-readable-output: backlog
@@ -123,6 +123,11 @@ development_status:
   16-3-rich-html-content-rendering: done
   16-4-client-side-wiki-search: review
   epic-16-retrospective: optional
+  epic-17: in-progress
+  17-1-broad-markdown-discovery-by-default: review
+  17-2-specwiki-open-browser-command: backlog
+  17-3-specwiki-init-config-scaffold: backlog
+  epic-17-retrospective: optional
 
 # MVP formally closed 2026-07-12 — all E1–E7 stories done; POST-MVP begins at E8
 mvp_status: closed

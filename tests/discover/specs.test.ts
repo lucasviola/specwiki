@@ -6,9 +6,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { log } from "../../src/core/Logger.js";
 import { DEFAULT_SPEC_PATTERNS } from "../../src/config/patterns.js";
 import {
+  buildDiscoveryIgnores,
   deriveCategory,
   deriveTitle,
   discoverSpecs,
+  LARGE_SET_THRESHOLD,
 } from "../../src/discover/specs.js";
 
 const fixtureRoot = path.resolve(
@@ -41,6 +43,39 @@ function parseStderrLines(): Record<string, unknown>[] {
     .map((line) => JSON.parse(line) as Record<string, unknown>);
 }
 
+describe("buildDiscoveryIgnores", () => {
+  it("includes static ignores and optional project-relative paths", () => {
+    expect(buildDiscoveryIgnores()).toEqual([
+      "**/.git/**",
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/wiki/**",
+      "**/.specwiki/**",
+      "**/coverage/**",
+      "**/.venv/**",
+      "**/vendor/**",
+    ]);
+    expect(buildDiscoveryIgnores(["site", "docs/wiki"])).toEqual([
+      "**/.git/**",
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/wiki/**",
+      "**/.specwiki/**",
+      "**/coverage/**",
+      "**/.venv/**",
+      "**/vendor/**",
+      "site/**",
+      "docs/wiki/**",
+    ]);
+  });
+
+  it("skips empty, dot, and parent-relative ignore paths", () => {
+    expect(buildDiscoveryIgnores(["", ".", "..", "../outside"])).toEqual(
+      buildDiscoveryIgnores(),
+    );
+  });
+});
+
 describe("deriveCategory", () => {
   it.each([
     ["AGENTS.md", "root"],
@@ -61,6 +96,7 @@ describe("deriveCategory", () => {
     ["packages/nested/AGENTS.md", "other"],
     ["README.md", "root"],
     ["docs/README.md", "other"],
+    ["docs/notes/general-notes.md", "other"],
     ["src/lib/internal.md", "other"],
     [".cursor/other/file.md", "other"],
   ])("maps %s to category %s", (relativePath, expected) => {
@@ -103,7 +139,7 @@ describe("discoverSpecs", () => {
     const specs = await discoverSpecs({ projectRoot: fixtureRoot });
 
     expect(specs.length).toBeGreaterThanOrEqual(5);
-    expect(specs.length).toBe(16);
+    expect(specs.length).toBe(17);
   });
 
   it("discovers and categorizes spec files in a project tree", async () => {
@@ -178,6 +214,10 @@ describe("discoverSpecs", () => {
     expect(byPath["docs/README.md"]).toMatchObject({
       category: "other",
       title: "Readme",
+    });
+    expect(byPath["docs/notes/general-notes.md"]).toMatchObject({
+      category: "other",
+      title: "General Notes",
     });
   });
 
@@ -389,39 +429,96 @@ describe("discoverSpecs", () => {
     vi.resetModules();
   });
 
-  it("ignores node_modules, dist, wiki, and .specwiki directories", async () => {
+  it("ignores node_modules, dist, wiki, .specwiki, .git, coverage, .venv, and vendor directories", async () => {
     const projectRoot = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-discover-ignore-"),
     );
     tempDirs.push(projectRoot);
 
-    await fs.mkdir(path.join(projectRoot, "node_modules", "pkg"), {
-      recursive: true,
-    });
-    await fs.mkdir(path.join(projectRoot, "dist"), { recursive: true });
-    await fs.mkdir(path.join(projectRoot, "wiki"), { recursive: true });
-    await fs.mkdir(path.join(projectRoot, ".specwiki"), { recursive: true });
+    const ignoredDirs = [
+      "node_modules/pkg",
+      "dist",
+      "wiki",
+      ".specwiki",
+      ".git/objects",
+      "coverage/lcov-report",
+      ".venv/lib",
+      "vendor/pkg",
+    ] as const;
+
+    for (const dir of ignoredDirs) {
+      await fs.mkdir(path.join(projectRoot, dir), { recursive: true });
+      await fs.writeFile(
+        path.join(projectRoot, dir, "ignored.md"),
+        "# Ignored",
+      );
+    }
+
     await fs.writeFile(path.join(projectRoot, "AGENTS.md"), "# Agents");
-    await fs.writeFile(
-      path.join(projectRoot, "node_modules", "pkg", "AGENTS.md"),
-      "# Ignored",
-    );
-    await fs.writeFile(
-      path.join(projectRoot, "dist", "AGENTS.md"),
-      "# Ignored",
-    );
-    await fs.writeFile(
-      path.join(projectRoot, "wiki", "AGENTS.md"),
-      "# Ignored",
-    );
-    await fs.writeFile(
-      path.join(projectRoot, ".specwiki", "AGENTS.md"),
-      "# Ignored",
-    );
 
     const specs = await discoverSpecs({ projectRoot });
 
     expect(specs).toHaveLength(1);
     expect(specs[0]?.relativePath).toBe("AGENTS.md");
+  });
+
+  it("excludes custom output directories when ignorePaths is set", async () => {
+    const projectRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-discover-output-ignore-"),
+    );
+    tempDirs.push(projectRoot);
+
+    await fs.mkdir(path.join(projectRoot, "site"), { recursive: true });
+    await fs.writeFile(path.join(projectRoot, "notes.md"), "# Source notes");
+    await fs.writeFile(
+      path.join(projectRoot, "site", "notes.md"),
+      "# Generated wiki page",
+    );
+
+    const withoutIgnore = await discoverSpecs({ projectRoot });
+    expect(withoutIgnore.map((spec) => spec.relativePath).sort()).toEqual([
+      "notes.md",
+      "site/notes.md",
+    ]);
+
+    const withIgnore = await discoverSpecs({
+      projectRoot,
+      ignorePaths: ["site"],
+    });
+    expect(withIgnore.map((spec) => spec.relativePath)).toEqual(["notes.md"]);
+  });
+
+  it("emits discover.large-set when verbose and match count exceeds threshold", async () => {
+    vi.resetModules();
+    const largeMatchSet = Array.from(
+      { length: LARGE_SET_THRESHOLD + 1 },
+      (_, index) => path.join(fixtureRoot, `bulk/file-${index}.md`),
+    );
+    vi.doMock("fast-glob", () => ({
+      default: vi.fn().mockResolvedValue(largeMatchSet),
+    }));
+
+    const { discoverSpecs: discoverSpecsWithLargeSet } =
+      await import("../../src/discover/specs.js");
+    const { log: verboseLog } = await import("../../src/core/Logger.js");
+    verboseLog.setVerbose(true);
+
+    const specs = await discoverSpecsWithLargeSet({ projectRoot: fixtureRoot });
+
+    expect(specs).toHaveLength(LARGE_SET_THRESHOLD + 1);
+
+    const lines = parseStderrLines();
+    expect(lines.some((line) => line.event === "discover.large-set")).toBe(
+      true,
+    );
+    expect(lines.find((line) => line.event === "discover.large-set")).toEqual(
+      expect.objectContaining({
+        event: "discover.large-set",
+        matchCount: LARGE_SET_THRESHOLD + 1,
+      }),
+    );
+
+    vi.doUnmock("fast-glob");
+    vi.resetModules();
   });
 });

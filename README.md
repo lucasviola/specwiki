@@ -19,6 +19,9 @@ Out of the box, specwiki discovers specs from:
 | BMAD output      | `_bmad-output/**/*.md`                              |
 | Agent skills     | `.agents/skills/**/SKILL.md`                        |
 | README files     | `**/README.md` (standalone wiki pages)              |
+| All markdown     | `**/*.{md,mdc}` (any `.md` / `.mdc` in the project) |
+
+Ignored directories: `node_modules`, `dist`, `wiki`, `.specwiki`, `.git`, `coverage`, `.venv`, `vendor`.
 
 ## Install
 

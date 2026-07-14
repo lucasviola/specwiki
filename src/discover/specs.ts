@@ -4,6 +4,9 @@ import { DEFAULT_SPEC_PATTERNS } from "../config/patterns.js";
 import { log } from "../core/Logger.js";
 import type { DiscoverOptions, SpecFile } from "../types.js";
 
+/** Match count above which verbose mode emits a performance heads-up. */
+export const LARGE_SET_THRESHOLD = 500;
+
 /** Path-prefix category for discovery and list grouping. Exported for tests. */
 export function deriveCategory(relativePath: string): string {
   const normalized = relativePath.replace(/\\/g, "/");
@@ -48,6 +51,37 @@ export function deriveTitle(relativePath: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+const STATIC_DISCOVERY_IGNORES = [
+  "**/.git/**",
+  "**/node_modules/**",
+  "**/dist/**",
+  "**/wiki/**",
+  "**/.specwiki/**",
+  "**/coverage/**",
+  "**/.venv/**",
+  "**/vendor/**",
+] as const;
+
+/** Build fast-glob ignore list, optionally excluding project-relative output dirs. */
+export function buildDiscoveryIgnores(ignorePaths?: string[]): string[] {
+  const ignores: string[] = [...STATIC_DISCOVERY_IGNORES];
+
+  for (const ignorePath of ignorePaths ?? []) {
+    const normalized = ignorePath.replace(/\\/g, "/").replace(/\/$/, "");
+    if (
+      normalized.length === 0 ||
+      normalized === "." ||
+      normalized === ".." ||
+      normalized.startsWith("../")
+    ) {
+      continue;
+    }
+    ignores.push(`${normalized}/**`);
+  }
+
+  return ignores;
+}
+
 export async function discoverSpecs(
   options: DiscoverOptions,
 ): Promise<SpecFile[]> {
@@ -65,12 +99,7 @@ export async function discoverSpecs(
       absolute: true,
       onlyFiles: true,
       dot: true,
-      ignore: [
-        "**/node_modules/**",
-        "**/dist/**",
-        "**/wiki/**",
-        "**/.specwiki/**",
-      ],
+      ignore: buildDiscoveryIgnores(options.ignorePaths),
     });
   } catch (err) {
     log.error("discover.error", {
@@ -127,6 +156,10 @@ export async function discoverSpecs(
     projectRoot: options.projectRoot,
     matchCount: specs.length,
   });
+
+  if (specs.length > LARGE_SET_THRESHOLD) {
+    log.info("discover.large-set", { matchCount: specs.length });
+  }
 
   return specs;
 }

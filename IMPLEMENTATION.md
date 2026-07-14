@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-14
-**Current position:** **POST-MVP E8 in progress** — S8.2 ready for review
-**Test count:** 246 passing
+**Current position:** **POST-MVP E8 complete** — E16 in progress
+**Test count:** 272 passing
 
 ## Deliverables
 
@@ -16,8 +16,10 @@
 | HTML wiki (`wiki/html/`)                                                          | Complete — E4; **E16 S16.1 skin** in review | `src/output/html/`       |
 | Slug collision disambiguation                                                     | Complete — E5 S5.1                          | HARNESS §11 #1           |
 | CLI contracts + exit codes                                                        | Complete — E6                               | `src/cli.ts`             |
-| Custom discovery `--patterns` override                                            | Complete — E8 S8.1 (review)                 | `src/config/patterns.ts` |
-| Project config file loader                                                        | Complete — E8 S8.2 (review)                 | `src/config/loader.ts`   |
+| Custom discovery `--patterns` override                                            | Complete — E8 S8.1                          | `src/config/patterns.ts` |
+| Project config file loader                                                        | Complete — E8 S8.2                          | `src/config/loader.ts`   |
+| Extended default patterns                                                         | Complete — E8 S8.3                          | `src/discover/specs.ts`  |
+| README folder index binding                                                       | Complete — E8 S8.4                          | `src/output/wiki.ts`     |
 | MVP sign-off (HARNESS §13)                                                        | **Closed** — E7 S7.2 owner sign-off         | below                    |
 
 ## Workflow References
@@ -44,7 +46,7 @@ Epic and story definitions: [`_bmad-output/planning-artifacts/discovery/epics/ep
 | Dogfood                  | 10 specs / 8 categories / ~0.4s on `tests/fixtures/sample-project/`                                       |
 | Logging woven            | §0.8 audit table — no deferred logging epic                                                               |
 
-**Next work:** POST-MVP per [`POST-MVP-ROADMAP.md`](./_bmad-output/planning-artifacts/discovery/POST-MVP-ROADMAP.md) — recommended first targets: E8 (extended discovery) or E16 (Wikipedia HTML skin).
+**Next work:** POST-MVP per [`POST-MVP-ROADMAP.md`](./_bmad-output/planning-artifacts/discovery/POST-MVP-ROADMAP.md) — E16 (Wikipedia HTML skin) in progress; E9+ backlog.
 
 ## CLI exit codes (FR-022)
 
@@ -68,7 +70,9 @@ Usage errors emit `cli.error` on stderr (JSON) before exit 2. Runtime failures e
 | Generate time    | ~0.4s (< 60s AC)                 |
 | Markdown + HTML  | ✓ `index.md` + `html/index.html` |
 
-**Extended default patterns (FR-006 / S8.3):** `DEFAULT_SPEC_PATTERNS` now includes `**/AGENTS.md`, `_bmad-output/**/*.md`, `.agents/skills/**/SKILL.md`, and `**/README.md` appended after legacy entries. Running `specwiki list --project .` on the specwiki repository discovers root `README.md`, `_bmad-output/`, `.agents/skills/`, and nested agent files alongside existing defaults. `HARNESS.md` remains outside default patterns.
+**Extended default patterns (FR-006 / S8.3):** `DEFAULT_SPEC_PATTERNS` now includes `**/AGENTS.md`, `_bmad-output/**/*.md`, `.agents/skills/**/SKILL.md`, and `**/README.md` appended after legacy entries. Running `specwiki list --project .` on the specwiki repository discovers root `README.md`, `_bmad-output/`, `.agents/skills/`, and nested agent files alongside existing defaults.
+
+**Broad markdown discovery (FR-036 / S17.1):** `DEFAULT_SPEC_PATTERNS` appends catch-all `**/*.{md,mdc}` so zero-config generate discovers any markdown in the project. Ignore list extended with `.git`, `coverage`, `.venv`, and `vendor`. Verbose mode emits `discover.large-set` when match count exceeds 500. Custom config / `--patterns` still replace the full default list.
 
 **README folder index (FR-035 / S8.4):** When a directory contains both `README.md` and other discovered specs, the README parsed body becomes the introductory content for that category section on `wiki/index.md` and `wiki/html/index.html`. Root `README.md` replaces the auto-generated main-index boilerplate. README files still emit standalone wiki pages. Verbose generate emits `parse.readme-index` (folder bindings) and `output.index` with `readmeIndexCount`.
 
@@ -105,11 +109,11 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
 
 Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifacts/sprint-status.yaml). POST-MVP work begins after MVP sign-off (E7).
 
-- [ ] **E8 — Custom Discovery Configuration** — `--patterns`, config loader, extended defaults, `README.md` discovery and folder index pages _(in progress)_
-  - [x] S8.1 — `--patterns` CLI flag _(review)_
-  - [x] S8.2 — Project config file loader _(review)_
-  - [x] S8.3 — Extended default patterns _(review)_
-  - [x] S8.4 — README discovery and folder index _(review)_
+- [x] **E8 — Custom Discovery Configuration** — `--patterns`, config loader, extended defaults, `README.md` discovery and folder index pages _(done)_
+  - [x] S8.1 — `--patterns` CLI flag _(done)_
+  - [x] S8.2 — Project config file loader _(done)_
+  - [x] S8.3 — Extended default patterns _(done)_
+  - [x] S8.4 — README discovery and folder index _(done)_
 - [ ] **E9 — Agent Interoperability** — `--json`, `llms.txt`
 - [ ] **E10 — Team CI Freshness** — `generate --check`
 - [ ] **E11 — Live Developer Loop** — `--watch`, `serve`
@@ -122,6 +126,10 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
   - [x] S16.2 — Wikipedia layout chrome and navigation
   - [x] S16.3 — Rich HTML content rendering
   - [x] S16.4 — Client-side wiki search _(review)_
+- [ ] **E17 — CLI Developer Experience** — broad markdown discovery, `open`, `init` _(in progress — impromptu)_
+  - [x] S17.1 — Broad markdown discovery by default _(review)_
+  - [ ] S17.2 — `specwiki open` browser command
+  - [ ] S17.3 — `specwiki init` config scaffold
 
 ## HARNESS §13 Deliverables Checklist
 
@@ -208,4 +216,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-12 | E16 S16.4 | `feat(output): client-side wiki search with lunr index` — buildSearchIndex at generate time; inline JSON for file://; header search UI; `--no-search` flag; All pages index section; lunr@^2.3.9 dep; 14 new tests; 194 tests total; repo coverage 95.79%              | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-14 | E8 S8.1   | `feat(discover): add custom --patterns CLI override` — comma-aware glob parser; list/generate wiring; sanitized config diagnostics; project-root pattern guard; discover confinement; review patches applied; 32 new tests; 226 tests total; repo coverage 96.1%       | 2e23250               | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-14 | E8 S8.4   | `feat(output): README folder index binding for wiki index pages` — resolveReadmeIndexBindings; root/category intros on md+html index; parse.readme-index + output.index logging; packages/nested README fixture; 25 new tests; 272 tests total; repo coverage 95.3%    | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-14 | E8 close  | **E8 formally closed** — owner sign-off; all S8.1–S8.4 stories promoted to `done`; custom discovery configuration complete                                                                                                                                             | uncommitted           | test ✓ (272 tests)                                              |
 | _template_ | _E?_ S?_  | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                | _hash or uncommitted_ | _full §0.2 gate result_                                         |

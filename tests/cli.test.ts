@@ -73,7 +73,7 @@ describe("cli list zero-match", () => {
 
       expect(stdout).toContain("No spec files found");
       expect(stdout).toContain(
-        "Tip: specwiki looks for AGENTS.md, SPEC.md, .cursor/rules/",
+        "Tip: specwiki discovers .md and .mdc files anywhere in your project",
       );
       expect(stderr).toBe("");
     } finally {
@@ -103,7 +103,7 @@ describe("cli list zero-match", () => {
 
       expect(stdout).toContain("No spec files found");
       expect(stdout).toContain(
-        "Tip: specwiki looks for AGENTS.md, SPEC.md, .cursor/rules/",
+        "Tip: specwiki discovers .md and .mdc files anywhere in your project",
       );
 
       const lines = stderr

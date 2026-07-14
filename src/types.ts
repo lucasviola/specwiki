@@ -59,4 +59,6 @@ export interface WriteHtmlWikiOptions {
 export interface DiscoverOptions {
   projectRoot: string;
   patterns?: string[];
+  /** Project-relative directories to exclude from discovery (e.g. generate output). */
+  ignorePaths?: string[];
 }
