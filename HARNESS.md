@@ -737,6 +737,9 @@ it exists.
 2. **`specwiki generate`** — Discover → parse each file → build wiki pages → write
    `{output}/index.md`, `{output}/{slug}.md`, and `{output}/html/*.html`. Print summary with
    file counts.
+3. **`specwiki open`** — Resolve `{output}/html/index.html` under `--project`, verify it
+   exists, then launch the default browser (macOS `open`, Linux `xdg-open`, Windows `start`).
+   Exit 1 with an actionable message when the index is missing.
 
 ### Discovery rules
 
@@ -769,11 +772,11 @@ wiki/
 
 ### CLI options
 
-| Flag            | Command  | Default         | Purpose                        |
-| --------------- | -------- | --------------- | ------------------------------ |
-| `-p, --project` | both     | `process.cwd()` | Root to scan                   |
-| `-o, --output`  | generate | `wiki`          | Output dir relative to project |
-| `-v, --verbose` | generate | off             | Detailed scan/write logging    |
+| Flag            | Command              | Default         | Purpose                          |
+| --------------- | -------------------- | --------------- | -------------------------------- |
+| `-p, --project` | list, generate, open | `process.cwd()` | Root to scan or open from        |
+| `-o, --output`  | generate, open       | `wiki`          | Output dir relative to project   |
+| `-v, --verbose` | list, generate, open | off             | Detailed scan/write/open logging |
 
 ### Invariants (do not change without approval)
 

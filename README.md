@@ -48,7 +48,18 @@ npx specwiki generate --output .specwiki
 
 # Verbose mode
 npx specwiki generate --verbose
+
+# Open the HTML wiki in your default browser (run generate first)
+npx specwiki open
+
+# Open a wiki written to a custom output directory
+npx specwiki open --output .specwiki
+
+# Open a wiki in a different project
+npx specwiki open --project /path/to/repo
 ```
+
+`specwiki open` resolves `{project}/{output}/html/index.html` (same `--project` and `--output` defaults as `generate`) and launches it with your OS default browser. If the wiki has not been generated yet, it exits with a message suggesting you run `specwiki generate` first.
 
 ## Output
 
@@ -75,6 +86,7 @@ Each wiki page includes:
 ```bash
 npm run dev list
 npm run dev generate -- --verbose
+npm run dev open -- --project tests/fixtures/sample-project --output /tmp/specwiki-qa
 npm run build
 npm run typecheck
 ```

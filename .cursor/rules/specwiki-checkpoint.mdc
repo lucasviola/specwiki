@@ -1,0 +1,44 @@
+---
+description: Require HARNESS §0.3 checkpoint format with manual validation steps in every story completion
+alwaysApply: true
+---
+
+# specwiki — Story completion checkpoint (HARNESS §0.3)
+
+When finishing a story, task, or quality gate run in this repo, **always** end the user-facing message with the full HARNESS §0.3 checkpoint — not a shortened summary.
+
+## Required sections (in order)
+
+1. **What was built** — 2–4 bullets
+2. **Tests written** — list new/changed test cases
+3. **Logging (§0.8)** — checklist with `[x]` or `[ ]`
+4. **Security (§0.9)** — checklist with `[x]` or `[ ]`
+5. **Quality gate** — all six commands with pass/fail and counts
+6. **Automated code review (§0.2.5)** — reviewer model + findings table (or "skipped" with reason)
+7. **QA analysis (§0.2.6)** — AC coverage, regression risks, gaps
+8. **Manual validation steps** — **MANDATORY; never omit**
+9. **IMPLEMENTATION.md updated** — yes/no
+10. **Implement review patches?** — ask owner before commit
+
+## Manual validation steps — non-negotiable
+
+After the quality gate section, **always** include a `### Manual validation steps` block with numbered, copy-pasteable commands and expected outcomes.
+
+Sources (use in order):
+1. Story file `## QA Manual Validation` section (if present)
+2. Story `**Demo path:**` in Dev Notes
+3. Generate steps from HARNESS §0.2.6 template tailored to the task
+
+Each step must be: `N. \`command\` — expected outcome`
+
+Do **not** bury manual steps only in the story file. The owner must see them in the chat response.
+
+## Common specwiki commands
+
+```bash
+npm test
+npm test -- tests/output/wiki.test.ts -t "pattern"
+npm run dev generate -- --project tests/fixtures/sample-project --output /tmp/specwiki-qa
+npm run dev generate -- --project tests/fixtures/sample-project --verbose 2>&1 | head
+npm run dev open -- --project tests/fixtures/sample-project --output /tmp/specwiki-qa
+```
