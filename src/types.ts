@@ -31,9 +31,17 @@ export interface WikiPage {
   sections: SpecSection[];
 }
 
+export interface WikiIndexMeta {
+  rootIntro: string | null;
+  rootIntroSource: string | null;
+  categoryIntros: Map<string, { content: string; sourcePaths: string[] }>;
+  readmeIndexCount: number;
+}
+
 export interface WikiOutput {
   pages: WikiPage[];
   indexContent: string;
+  indexMeta: WikiIndexMeta;
 }
 
 export interface GenerateOptions {

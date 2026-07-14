@@ -14,14 +14,26 @@
   <div class="specwiki-center">
     <article class="specwiki-portal" id="content">
       <h1>Main Page</h1>
+      {{#hasRootIntro}}
+      <div class="specwiki-portal-intro mw-parser-output">
+        {{{rootIntroHtml}}}
+      </div>
+      {{/hasRootIntro}}
+      {{^hasRootIntro}}
       <p class="specwiki-portal-intro">
         Structured documentation generated from AI specs, agent instructions,
         and spec-driven development files in this project.
       </p>
+      {{/hasRootIntro}}
       <p><strong>{{pageCount}}</strong> {{pageCountLabel}} indexed.</p>
       {{#categories}}
       <section id="{{anchor}}" class="specwiki-category-section">
         <h2>{{label}}</h2>
+        {{#hasIntro}}
+        <div class="specwiki-category-intro mw-parser-output">
+          {{{introHtml}}}
+        </div>
+        {{/hasIntro}}
         <ul class="specwiki-portal-pages">
           {{#pages}}
           <li><a href="{{href}}">{{title}}</a> — <code>{{sourcePath}}</code></li>

@@ -89,6 +89,60 @@ describe("generateWiki", () => {
     }
   });
 
+  it("binds README content into wiki index markdown and HTML on fixture", async () => {
+    const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-out-"));
+    tempDirs.push(outputDir);
+
+    await generateWiki({
+      projectRoot: fixtureRoot,
+      outputDir,
+      verbose: true,
+    });
+
+    const indexContent = await fs.readFile(
+      path.join(outputDir, "index.md"),
+      "utf-8",
+    );
+    const htmlIndex = await fs.readFile(
+      path.join(outputDir, "html", "index.html"),
+      "utf-8",
+    );
+
+    expect(indexContent).toContain(
+      "Root README for extended default pattern discovery.",
+    );
+    expect(indexContent).not.toContain(
+      "Structured documentation generated from AI specs",
+    );
+    expect(indexContent).toContain(
+      "This nested README drives the Other category index introduction.",
+    );
+    expect(htmlIndex).toContain(
+      "Root README for extended default pattern discovery.",
+    );
+    expect(htmlIndex).toContain(
+      "This nested README drives the Other category index introduction.",
+    );
+    expect(
+      await fs.readFile(path.join(outputDir, "readme.md"), "utf-8"),
+    ).toContain("Root README for extended default pattern discovery.");
+
+    const lines = parseStderrLines();
+    expect(lines).toContainEqual(
+      expect.objectContaining({
+        event: "parse.readme-index",
+        relativePath: "packages/nested/README.md",
+        category: "other",
+      }),
+    );
+    expect(lines).toContainEqual(
+      expect.objectContaining({
+        event: "output.index",
+        readmeIndexCount: 2,
+      }),
+    );
+  });
+
   it("emits output.write and generate.summary on stderr when verbose is enabled", async () => {
     const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-out-"));
     tempDirs.push(outputDir);

@@ -12,7 +12,7 @@ import {
   writeWiki,
 } from "../../src/output/wiki.js";
 import { resetHtmlRendererCache } from "../../src/output/html/renderer.js";
-import type { ParsedSpec, WikiOutput } from "../../src/types.js";
+import type { ParsedSpec, WikiIndexMeta, WikiOutput } from "../../src/types.js";
 
 const tempDirs: string[] = [];
 let stderrSpy: ReturnType<typeof vi.spyOn>;
@@ -65,10 +65,20 @@ function sampleSpec(overrides: Partial<ParsedSpec> = {}): ParsedSpec {
   };
 }
 
+function emptyIndexMeta(): WikiIndexMeta {
+  return {
+    rootIntro: null,
+    rootIntroSource: null,
+    categoryIntros: new Map(),
+    readmeIndexCount: 0,
+  };
+}
+
 function maliciousWiki(slug: string): WikiOutput {
   const spec = sampleSpec();
   return {
     indexContent: "# Spec Wiki\n",
+    indexMeta: emptyIndexMeta(),
     pages: [
       {
         slug,
@@ -162,6 +172,133 @@ describe("buildWiki", () => {
     expect(wiki.pages[0].content).toContain(
       "## Requirements\n\nMust preserve markdown.",
     );
+  });
+
+  it("uses root README body as main index intro instead of boilerplate", () => {
+    const wiki = buildWiki([
+      sampleSpec({
+        file: {
+          path: "/tmp/README.md",
+          relativePath: "README.md",
+          category: "root",
+          title: "Readme",
+        },
+        title: "Readme",
+        rawContent: "Root README intro for the wiki index.",
+      }),
+      sampleSpec({
+        file: {
+          path: "/tmp/AGENTS.md",
+          relativePath: "AGENTS.md",
+          category: "root",
+          title: "Agents",
+        },
+        title: "Agents",
+      }),
+    ]);
+
+    expect(wiki.indexContent).toContain(
+      "Root README intro for the wiki index.",
+    );
+    expect(wiki.indexContent).not.toContain(
+      "Structured documentation generated from AI specs",
+    );
+    expect(wiki.indexContent).toContain("## Project Root");
+    expect(wiki.indexContent).toContain("[Readme](readme.md)");
+  });
+
+  it("uses folder README as category section intro above page links", () => {
+    const wiki = buildWiki([
+      sampleSpec({
+        file: {
+          path: "/tmp/packages/nested/README.md",
+          relativePath: "packages/nested/README.md",
+          category: "other",
+          title: "Readme",
+        },
+        rawContent: "Nested packages intro for Other category.",
+      }),
+      sampleSpec({
+        file: {
+          path: "/tmp/packages/nested/AGENTS.md",
+          relativePath: "packages/nested/AGENTS.md",
+          category: "other",
+          title: "Agent Instructions",
+        },
+        title: "Agent Instructions",
+      }),
+    ]);
+
+    const otherIndex = wiki.indexContent.indexOf("## Other");
+    const introIndex = wiki.indexContent.indexOf(
+      "Nested packages intro for Other category.",
+    );
+    const linkIndex = wiki.indexContent.indexOf(
+      "[Agent Instructions](packages-nested-agents.md)",
+    );
+
+    expect(otherIndex).toBeGreaterThan(-1);
+    expect(introIndex).toBeGreaterThan(otherIndex);
+    expect(linkIndex).toBeGreaterThan(introIndex);
+  });
+
+  it("omits category sections when category has only README files", () => {
+    const wiki = buildWiki([
+      sampleSpec({
+        file: {
+          path: "/tmp/orphan/README.md",
+          relativePath: "orphan/README.md",
+          category: "other",
+          title: "Readme",
+        },
+        rawContent: "Orphan README only.",
+      }),
+    ]);
+
+    expect(wiki.indexContent).not.toContain("## Other");
+    expect(wiki.pages).toHaveLength(1);
+    expect(wiki.pages[0].slug).toBe("orphan-readme");
+  });
+
+  it("emits output.index with readmeIndexCount when verbose", () => {
+    log.setVerbose(true);
+
+    buildWiki([
+      sampleSpec({
+        file: {
+          path: "/tmp/README.md",
+          relativePath: "README.md",
+          category: "root",
+          title: "Readme",
+        },
+        rawContent: "Root intro.",
+      }),
+      sampleSpec({
+        file: {
+          path: "/tmp/packages/nested/README.md",
+          relativePath: "packages/nested/README.md",
+          category: "other",
+          title: "Readme",
+        },
+        rawContent: "Nested intro.",
+      }),
+      sampleSpec({
+        file: {
+          path: "/tmp/packages/nested/AGENTS.md",
+          relativePath: "packages/nested/AGENTS.md",
+          category: "other",
+          title: "Agent Instructions",
+        },
+        title: "Agent Instructions",
+      }),
+    ]);
+
+    const indexEvent = parseStderrLines().find(
+      (line) => line.event === "output.index",
+    );
+    expect(indexEvent).toMatchObject({ readmeIndexCount: 2 });
+
+    log.setVerbose(false);
   });
 
   it("derives slug from nested paths", () => {

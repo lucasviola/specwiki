@@ -4,7 +4,9 @@ import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import Mustache from "mustache";
 import { CATEGORY_LABELS } from "../../config/patterns.js";
-import type { SpecSection, WikiPage } from "../../types.js";
+import { renderMarkdown } from "../../parse/markdown.js";
+import type { SpecSection, WikiIndexMeta, WikiPage } from "../../types.js";
+import { isReadmeFile } from "../readme-index.js";
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
@@ -27,6 +29,8 @@ interface NavCategory {
   anchor: string;
   pages: NavPage[];
   active: boolean;
+  hasIntro?: boolean;
+  introHtml?: string;
 }
 
 interface TocEntry {
@@ -74,16 +78,29 @@ export class HtmlRenderer {
 
   renderIndex(
     pages: WikiPage[],
+    indexMeta: WikiIndexMeta,
     renderOptions: HtmlRenderOptions = {},
   ): string {
-    const categories = buildNavCategories(pages);
+    const categories = buildNavCategories(pages)
+      .filter((category) => categoryVisibleInIndex(pages, category.key))
+      .map((category) => {
+        const intro = indexMeta.categoryIntros.get(category.key);
+        return {
+          ...category,
+          hasIntro: Boolean(intro),
+          introHtml: intro ? renderMarkdown(intro.content) : "",
+        };
+      });
     const pageCount = pages.length;
     const allPages = buildAllPagesList(pages);
+    const hasRootIntro = Boolean(indexMeta.rootIntro);
     const body = Mustache.render(this.indexTemplate, {
       categories,
       pageCount,
       pageCountLabel: pageCount === 1 ? "spec file" : "spec files",
       allPages,
+      hasRootIntro,
+      rootIntroHtml: hasRootIntro ? renderMarkdown(indexMeta.rootIntro!) : "",
     });
     return Mustache.render(this.layoutTemplate, {
       pageTitle: "Spec Wiki",
@@ -105,7 +122,7 @@ export class HtmlRenderer {
     const categories = buildNavCategories(allPages, page.category);
     const categoryLabel = categoryLabelFor(page.category);
     const tocEntries = buildTocEntries(page.sections);
-    const breadcrumbs = buildBreadcrumbs(page, categoryLabel);
+    const breadcrumbs = buildBreadcrumbs(page, categoryLabel, allPages);
 
     const body = Mustache.render(this.articleTemplate, {
       categories,
@@ -172,6 +189,12 @@ function buildAllPagesList(pages: WikiPage[]): AllPagesEntry[] {
     }));
 }
 
+function categoryVisibleInIndex(pages: WikiPage[], category: string): boolean {
+  return pages.some(
+    (page) => page.category === category && !isReadmeFile(page.sourcePath),
+  );
+}
+
 function buildNavCategories(
   pages: WikiPage[],
   activeCategory?: string,
@@ -188,18 +211,20 @@ function buildNavCategories(
     categoryLabelFor(a).localeCompare(categoryLabelFor(b)),
   );
 
-  return sortedKeys.map((key) => ({
-    key,
-    label: categoryLabelFor(key),
-    anchor: categoryAnchor(key),
-    active: key === activeCategory,
-    pages: (byCategory.get(key) ?? []).map((page) => ({
-      title: page.title,
-      slug: page.slug,
-      href: `${page.slug}.html`,
-      sourcePath: page.sourcePath,
-    })),
-  }));
+  return sortedKeys
+    .filter((key) => categoryVisibleInIndex(pages, key))
+    .map((key) => ({
+      key,
+      label: categoryLabelFor(key),
+      anchor: categoryAnchor(key),
+      active: key === activeCategory,
+      pages: (byCategory.get(key) ?? []).map((page) => ({
+        title: page.title,
+        slug: page.slug,
+        href: `${page.slug}.html`,
+        sourcePath: page.sourcePath,
+      })),
+    }));
 }
 
 function buildTocEntries(sections: SpecSection[]): TocEntry[] {
@@ -215,16 +240,25 @@ function buildTocEntries(sections: SpecSection[]): TocEntry[] {
 function buildBreadcrumbs(
   page: WikiPage,
   categoryLabel: string,
+  allPages: WikiPage[],
 ): BreadcrumbSegment[] {
-  return [
+  const segments: BreadcrumbSegment[] = [
     { label: "Main Page", href: "index.html", first: true },
-    {
+  ];
+
+  if (categoryVisibleInIndex(allPages, page.category)) {
+    segments.push({
       label: categoryLabel,
       href: `index.html#${categoryAnchor(page.category)}`,
       first: false,
-    },
-    { label: page.title, first: false },
-  ];
+    });
+  } else {
+    segments.push({ label: categoryLabel, first: false });
+  }
+
+  segments.push({ label: page.title, first: false });
+
+  return segments;
 }
 
 function validateArticlePage(page: WikiPage): void {

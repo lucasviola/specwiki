@@ -11,6 +11,12 @@ import {
   buildSearchIndex,
   serializeSearchIndexForInlineScript,
 } from "./html/search-index.js";
+import {
+  categoryHasNonReadmePages,
+  logIndexSummary,
+  resolveReadmeIndexBindings,
+  type ReadmeIndexBindings,
+} from "./readme-index.js";
 import type {
   ParsedSpec,
   WikiOutput,
@@ -134,7 +140,11 @@ function buildPageContent(spec: ParsedSpec): string {
   return lines.join("\n");
 }
 
-function buildIndex(pages: WikiPage[]): string {
+function buildIndex(
+  pages: WikiPage[],
+  bindings: ReadmeIndexBindings,
+  specs: ParsedSpec[],
+): string {
   const byCategory = new Map<string, WikiPage[]>();
 
   for (const page of pages) {
@@ -143,29 +153,43 @@ function buildIndex(pages: WikiPage[]): string {
     byCategory.set(page.category, list);
   }
 
-  const lines: string[] = [
-    "# Spec Wiki",
-    "",
-    "Structured documentation generated from AI specs, agent instructions,",
-    "and spec-driven development files in this project.",
-    "",
+  const lines: string[] = ["# Spec Wiki", ""];
+
+  if (bindings.rootIntro) {
+    lines.push(bindings.rootIntro, "");
+  } else {
+    lines.push(
+      "Structured documentation generated from AI specs, agent instructions,",
+      "and spec-driven development files in this project.",
+      "",
+    );
+  }
+
+  lines.push(
     `**${pages.length}** spec file${pages.length === 1 ? "" : "s"} indexed.`,
     "",
     "---",
     "",
-  ];
+  );
 
-  const sortedCategories = [...byCategory.keys()].sort((a, b) => {
-    const labelA = CATEGORY_LABELS[a] ?? a;
-    const labelB = CATEGORY_LABELS[b] ?? b;
-    return labelA.localeCompare(labelB);
-  });
+  const sortedCategories = [...byCategory.keys()]
+    .filter((category) => categoryHasNonReadmePages(specs, category))
+    .sort((a, b) => {
+      const labelA = CATEGORY_LABELS[a] ?? a;
+      const labelB = CATEGORY_LABELS[b] ?? b;
+      return labelA.localeCompare(labelB);
+    });
 
   for (const category of sortedCategories) {
     const categoryPages = byCategory.get(category)!;
     const label = CATEGORY_LABELS[category] ?? category;
+    const categoryIntro = bindings.categoryIntros.get(category);
 
     lines.push(`## ${label}`, "");
+
+    if (categoryIntro) {
+      lines.push(categoryIntro.content, "");
+    }
 
     for (const page of categoryPages) {
       lines.push(`- [${page.title}](${page.slug}.md) — \`${page.sourcePath}\``);
@@ -178,6 +202,7 @@ function buildIndex(pages: WikiPage[]): string {
 
 export function buildWiki(specs: ParsedSpec[]): WikiOutput {
   const slugByPath = assignUniqueSlugs(specs);
+  const bindings = resolveReadmeIndexBindings(specs);
 
   const pages: WikiPage[] = specs.map((spec) => ({
     slug: slugByPath.get(spec.file.relativePath) ?? pageSlug(spec),
@@ -189,9 +214,17 @@ export function buildWiki(specs: ParsedSpec[]): WikiOutput {
     sections: spec.sections,
   }));
 
+  logIndexSummary(bindings.readmeIndexCount);
+
   return {
     pages,
-    indexContent: buildIndex(pages),
+    indexContent: buildIndex(pages, bindings, specs),
+    indexMeta: {
+      rootIntro: bindings.rootIntro,
+      rootIntroSource: bindings.rootIntroSource,
+      categoryIntros: bindings.categoryIntros,
+      readmeIndexCount: bindings.readmeIndexCount,
+    },
   };
 }
 
@@ -397,7 +430,7 @@ export async function writeHtmlWiki(
   let indexHtml: string;
   try {
     log.info("output.render", { kind: "index", slug: "index" });
-    indexHtml = renderer.renderIndex(wiki.pages, renderOptions);
+    indexHtml = renderer.renderIndex(wiki.pages, wiki.indexMeta, renderOptions);
   } catch (err) {
     log.error("output.error", {
       relativePath: "html/index.html",

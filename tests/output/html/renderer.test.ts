@@ -6,7 +6,16 @@ import {
   getHtmlRenderer,
   resetHtmlRendererCache,
 } from "../../../src/output/html/renderer.js";
-import type { WikiPage } from "../../../src/types.js";
+import type { WikiIndexMeta, WikiPage } from "../../../src/types.js";
+
+function emptyIndexMeta(): WikiIndexMeta {
+  return {
+    rootIntro: null,
+    rootIntroSource: null,
+    categoryIntros: new Map(),
+    readmeIndexCount: 0,
+  };
+}
 
 function samplePage(overrides: Partial<WikiPage> = {}): WikiPage {
   return {
@@ -41,8 +50,78 @@ describe("HtmlRenderer", () => {
     resetHtmlRendererCache();
   });
 
+  it("renders root and category README intros on index page", () => {
+    const indexMeta: WikiIndexMeta = {
+      rootIntro: "# Root README\n\nProject overview from README.",
+      rootIntroSource: "README.md",
+      categoryIntros: new Map([
+        [
+          "other",
+          {
+            content: "Nested packages intro.",
+            sourcePaths: ["packages/nested/README.md"],
+          },
+        ],
+      ]),
+      readmeIndexCount: 2,
+    };
+
+    const html = renderer.renderIndex(
+      [
+        samplePage({
+          slug: "readme",
+          title: "Readme",
+          sourcePath: "README.md",
+        }),
+        samplePage({
+          slug: "packages-nested-agents",
+          title: "Agent Instructions",
+          category: "other",
+          sourcePath: "packages/nested/AGENTS.md",
+        }),
+        samplePage({
+          slug: "packages-nested-readme",
+          title: "Readme",
+          category: "other",
+          sourcePath: "packages/nested/README.md",
+        }),
+      ],
+      indexMeta,
+    );
+
+    expect(html).toContain("Project overview from README.");
+    expect(html).not.toContain(
+      "Structured documentation generated from AI specs",
+    );
+    expect(html).toContain("Nested packages intro.");
+    expect(html).toContain('id="category-other"');
+  });
+
+  it("omits category nav groups when category has only README pages", () => {
+    const html = renderer.renderArticle(
+      samplePage({
+        slug: "orphan-readme",
+        title: "Readme",
+        category: "other",
+        sourcePath: "orphan/README.md",
+      }),
+      [
+        samplePage({
+          slug: "orphan-readme",
+          title: "Readme",
+          category: "other",
+          sourcePath: "orphan/README.md",
+        }),
+      ],
+      "<p>Orphan README body</p>",
+    );
+
+    expect(html).not.toContain('href="index.html#category-other"');
+    expect(html).toContain('href="index.html"');
+  });
+
   it("renders index page with Main Page portal and category nav", () => {
-    const html = renderer.renderIndex([samplePage()]);
+    const html = renderer.renderIndex([samplePage()], emptyIndexMeta());
 
     expect(html).toMatch(/^<!DOCTYPE html>/);
     expect(html).toContain('<html lang="en">');
@@ -63,7 +142,7 @@ describe("HtmlRenderer", () => {
   });
 
   it("renders search chrome when includeSearch is enabled", () => {
-    const html = renderer.renderIndex([samplePage()], {
+    const html = renderer.renderIndex([samplePage()], emptyIndexMeta(), {
       includeSearch: true,
       searchIndexJson: '{"version":1,"documents":[]}',
     });
@@ -75,7 +154,7 @@ describe("HtmlRenderer", () => {
   });
 
   it("omits search chrome when includeSearch is disabled", () => {
-    const html = renderer.renderIndex([samplePage()], {
+    const html = renderer.renderIndex([samplePage()], emptyIndexMeta(), {
       includeSearch: false,
     });
 
@@ -204,7 +283,7 @@ describe("HtmlRenderer", () => {
 describe("HtmlRenderer asset paths", () => {
   it("resolves templates relative to the renderer module", async () => {
     const renderer = await HtmlRenderer.create();
-    const html = renderer.renderIndex([samplePage()]);
+    const html = renderer.renderIndex([samplePage()], emptyIndexMeta());
 
     expect(html).toContain('href="assets/specwiki.css"');
     expect(html).not.toMatch(/href="\/assets\//);

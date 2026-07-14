@@ -103,7 +103,7 @@ describe("discoverSpecs", () => {
     const specs = await discoverSpecs({ projectRoot: fixtureRoot });
 
     expect(specs.length).toBeGreaterThanOrEqual(5);
-    expect(specs.length).toBe(15);
+    expect(specs.length).toBe(16);
   });
 
   it("discovers and categorizes spec files in a project tree", async () => {
@@ -158,6 +158,10 @@ describe("discoverSpecs", () => {
     expect(byPath["packages/nested/AGENTS.md"]).toMatchObject({
       category: "other",
       title: "Agent Instructions",
+    });
+    expect(byPath["packages/nested/README.md"]).toMatchObject({
+      category: "other",
+      title: "Readme",
     });
     expect(byPath["_bmad-output/planning/artifact.md"]).toMatchObject({
       category: "bmad-output",

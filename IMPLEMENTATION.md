@@ -68,7 +68,9 @@ Usage errors emit `cli.error` on stderr (JSON) before exit 2. Runtime failures e
 | Generate time    | ~0.4s (< 60s AC)                 |
 | Markdown + HTML  | ✓ `index.md` + `html/index.html` |
 
-**Extended default patterns (FR-006 / S8.3):** `DEFAULT_SPEC_PATTERNS` now includes `**/AGENTS.md`, `_bmad-output/**/*.md`, `.agents/skills/**/SKILL.md`, and `**/README.md` appended after legacy entries. Running `specwiki list --project .` on the specwiki repository discovers root `README.md`, `_bmad-output/`, `.agents/skills/`, and nested agent files alongside existing defaults. `HARNESS.md` remains outside default patterns. Folder README index binding (FR-035) is S8.4.
+**Extended default patterns (FR-006 / S8.3):** `DEFAULT_SPEC_PATTERNS` now includes `**/AGENTS.md`, `_bmad-output/**/*.md`, `.agents/skills/**/SKILL.md`, and `**/README.md` appended after legacy entries. Running `specwiki list --project .` on the specwiki repository discovers root `README.md`, `_bmad-output/`, `.agents/skills/`, and nested agent files alongside existing defaults. `HARNESS.md` remains outside default patterns.
+
+**README folder index (FR-035 / S8.4):** When a directory contains both `README.md` and other discovered specs, the README parsed body becomes the introductory content for that category section on `wiki/index.md` and `wiki/html/index.html`. Root `README.md` replaces the auto-generated main-index boilerplate. README files still emit standalone wiki pages. Verbose generate emits `parse.readme-index` (folder bindings) and `output.index` with `readmeIndexCount`.
 
 ## MVP Epic Progression Checklist
 
@@ -107,7 +109,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
   - [x] S8.1 — `--patterns` CLI flag _(review)_
   - [x] S8.2 — Project config file loader _(review)_
   - [x] S8.3 — Extended default patterns _(review)_
-  - [ ] S8.4 — README discovery and folder index
+  - [x] S8.4 — README discovery and folder index _(review)_
 - [ ] **E9 — Agent Interoperability** — `--json`, `llms.txt`
 - [ ] **E10 — Team CI Freshness** — `generate --check`
 - [ ] **E11 — Live Developer Loop** — `--watch`, `serve`
@@ -205,4 +207,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-12 | E16 S16.3 | `feat(parse): rich HTML content rendering with GFM and highlight.js` — exported slugify; heading ids h2–h6 matching TOC anchors; highlight.js fenced code blocks; highlight.css asset; `.mw-parser-output` wrapper; 10 new tests; markdown.ts 100% coverage            | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E16 S16.4 | `feat(output): client-side wiki search with lunr index` — buildSearchIndex at generate time; inline JSON for file://; header search UI; `--no-search` flag; All pages index section; lunr@^2.3.9 dep; 14 new tests; 194 tests total; repo coverage 95.79%              | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-14 | E8 S8.1   | `feat(discover): add custom --patterns CLI override` — comma-aware glob parser; list/generate wiring; sanitized config diagnostics; project-root pattern guard; discover confinement; review patches applied; 32 new tests; 226 tests total; repo coverage 96.1%       | 2e23250               | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-14 | E8 S8.4   | `feat(output): README folder index binding for wiki index pages` — resolveReadmeIndexBindings; root/category intros on md+html index; parse.readme-index + output.index logging; packages/nested README fixture; 25 new tests; 272 tests total; repo coverage 95.3%    | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | _template_ | _E?_ S?_  | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                | _hash or uncommitted_ | _full §0.2 gate result_                                         |
