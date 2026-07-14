@@ -322,6 +322,209 @@ describe("cli generate --verbose", () => {
   });
 });
 
+describe("cli --patterns", () => {
+  it("uses a custom pattern override for list and generate", async () => {
+    const customRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-patterns-"),
+    );
+    const outputDir = path.join(customRoot, "generated");
+
+    try {
+      await fs.mkdir(path.join(customRoot, "custom"), { recursive: true });
+      await fs.writeFile(
+        path.join(customRoot, "AGENTS.md"),
+        "# Default-only agent file",
+      );
+      await fs.writeFile(
+        path.join(customRoot, "custom", "notes.md"),
+        "# Custom Notes\n\nCustom discovery content.",
+      );
+
+      const listResult = await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "list",
+          "--project",
+          customRoot,
+          "--patterns",
+          " custom/**/*.md ",
+        ],
+        { cwd: projectRoot },
+      );
+
+      expect(listResult.stdout).toContain("Notes — custom/notes.md");
+      expect(listResult.stdout).not.toContain("AGENTS.md");
+
+      await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "generate",
+          "--project",
+          customRoot,
+          "--output",
+          outputDir,
+          "--patterns",
+          "custom/**/*.md",
+        ],
+        { cwd: projectRoot },
+      );
+
+      expect(
+        await fs.readFile(path.join(outputDir, "custom-notes.md"), "utf-8"),
+      ).toContain("Custom discovery content.");
+      expect(
+        await fs.readFile(
+          path.join(outputDir, "html", "custom-notes.html"),
+          "utf-8",
+        ),
+      ).toContain("Custom Notes");
+      await expect(
+        fs.stat(path.join(outputDir, "agents.md")),
+      ).rejects.toMatchObject({ code: "ENOENT" });
+    } finally {
+      await fs.rm(customRoot, { force: true, recursive: true });
+    }
+  });
+
+  it("emits a sanitized override diagnostic only in verbose mode", async () => {
+    const verboseResult = await execFileAsync(
+      process.execPath,
+      [
+        "--import",
+        "tsx/esm",
+        cliPath,
+        "list",
+        "--project",
+        fixtureRoot,
+        "--patterns",
+        "specs/**/*.md, docs/plans/**/*.md",
+        "--verbose",
+      ],
+      { cwd: projectRoot },
+    );
+    const verboseLines = parseJsonStderrLines(verboseResult.stderr);
+    const override = verboseLines.filter(
+      (line) => line.event === "config.patterns-override",
+    );
+
+    expect(override).toEqual([
+      {
+        event: "config.patterns-override",
+        level: "info",
+        patternCount: 2,
+      },
+    ]);
+    expect(JSON.stringify(override)).not.toContain("specs/**/*.md");
+
+    const quietResult = await execFileAsync(
+      process.execPath,
+      [
+        "--import",
+        "tsx/esm",
+        cliPath,
+        "list",
+        "--project",
+        fixtureRoot,
+        "--patterns",
+        "specs/**/*.md",
+      ],
+      { cwd: projectRoot },
+    );
+    expect(quietResult.stderr).toBe("");
+  });
+
+  it.each([
+    "",
+    "specs/**/*.md,",
+    "**/*.{md,mdc",
+    "../**/*.md",
+    "{../**/*.md,docs/**/*.md}",
+  ])(
+    "exits 2 and emits config.error for invalid pattern input %j",
+    async (patterns) => {
+      try {
+        await execFileAsync(
+          process.execPath,
+          [
+            "--import",
+            "tsx/esm",
+            cliPath,
+            "list",
+            "--project",
+            fixtureRoot,
+            "--patterns",
+            patterns,
+          ],
+          { cwd: projectRoot },
+        );
+        expect.fail("expected invalid patterns to exit non-zero");
+      } catch (err) {
+        const execError = err as { code?: number; stderr?: string };
+        expect(execError.code).toBe(2);
+
+        const lines = parseJsonStderrLines(String(execError.stderr ?? ""));
+        expect(
+          lines.find((line) => line.event === "config.error"),
+        ).toMatchObject({
+          event: "config.error",
+          level: "error",
+          message: expect.stringContaining("Patterns must"),
+        });
+        expect(lines.find((line) => line.event === "cli.error")).toMatchObject({
+          event: "cli.error",
+          level: "error",
+          command: "list",
+        });
+        if (patterns) {
+          expect(JSON.stringify(lines)).not.toContain(patterns);
+        }
+      }
+    },
+  );
+
+  it("exits 2 and emits config.error when the patterns value is missing", async () => {
+    try {
+      await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "list",
+          "--project",
+          fixtureRoot,
+          "--patterns",
+        ],
+        { cwd: projectRoot },
+      );
+      expect.fail("expected missing patterns value to exit non-zero");
+    } catch (err) {
+      const execError = err as { code?: number; stderr?: string };
+      expect(execError.code).toBe(2);
+
+      const lines = parseJsonStderrLines(String(execError.stderr ?? ""));
+      expect(lines.find((line) => line.event === "config.error")).toMatchObject(
+        {
+          event: "config.error",
+          level: "error",
+          message: "Patterns option requires a comma-separated glob list",
+        },
+      );
+      expect(lines.find((line) => line.event === "cli.error")).toMatchObject({
+        event: "cli.error",
+        level: "error",
+        command: "list",
+      });
+    }
+  });
+});
+
 describe("cli exit codes", () => {
   it("exits 2 and emits cli.error for unknown option", async () => {
     try {

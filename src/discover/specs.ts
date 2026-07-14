@@ -77,6 +77,22 @@ export async function discoverSpecs(
     throw err;
   }
 
+  for (const filePath of entries) {
+    const relativePath = path.relative(options.projectRoot, filePath);
+    if (
+      relativePath === ".." ||
+      relativePath.startsWith(`..${path.sep}`) ||
+      path.isAbsolute(relativePath)
+    ) {
+      const message = "Discovered path is outside the project root";
+      log.error("discover.error", {
+        projectRoot: options.projectRoot,
+        message,
+      });
+      throw new Error(message);
+    }
+  }
+
   const specs = entries
     .map((filePath) => {
       const relativePath = path.relative(options.projectRoot, filePath);

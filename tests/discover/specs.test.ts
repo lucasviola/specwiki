@@ -330,6 +330,35 @@ describe("discoverSpecs", () => {
     vi.resetModules();
   });
 
+  it("rejects glob matches that resolve outside the project root", async () => {
+    const outsidePath = path.resolve(fixtureRoot, "..", "outside.md");
+    vi.resetModules();
+    vi.doMock("fast-glob", () => ({
+      default: vi.fn().mockResolvedValue([outsidePath]),
+    }));
+
+    const { discoverSpecs: discoverSpecsWithOutsideMatch } =
+      await import("../../src/discover/specs.js");
+
+    await expect(
+      discoverSpecsWithOutsideMatch({
+        projectRoot: fixtureRoot,
+        patterns: ["[.][.]/**/*.md"],
+      }),
+    ).rejects.toThrow("Discovered path is outside the project root");
+
+    const lines = parseStderrLines();
+    expect(lines.at(-1)).toMatchObject({
+      event: "discover.error",
+      level: "error",
+      projectRoot: fixtureRoot,
+      message: "Discovered path is outside the project root",
+    });
+
+    vi.doUnmock("fast-glob");
+    vi.resetModules();
+  });
+
   it("ignores node_modules, dist, wiki, and .specwiki directories", async () => {
     const projectRoot = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-discover-ignore-"),
