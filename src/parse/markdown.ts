@@ -156,10 +156,65 @@ function extractDescription(content: string): string {
   return paragraphs[0]?.slice(0, 300) ?? "";
 }
 
+function stripFrontmatterBlock(raw: string): string {
+  if (!raw.startsWith("---")) {
+    return raw;
+  }
+
+  const openingLineEnd = raw.indexOf("\n");
+  if (openingLineEnd === -1) {
+    return raw;
+  }
+
+  const closingIndex = raw.indexOf("\n---", openingLineEnd);
+  if (closingIndex === -1) {
+    return raw;
+  }
+
+  let contentStart = closingIndex + 4;
+  if (raw[contentStart] === "\r") {
+    contentStart += 1;
+  }
+  if (raw[contentStart] === "\n") {
+    contentStart += 1;
+  }
+
+  let content = raw.slice(contentStart);
+  if (content.startsWith("\r\n")) {
+    content = content.slice(2);
+  } else if (content.startsWith("\n")) {
+    content = content.slice(1);
+  }
+  return content;
+}
+
+function parseFileContent(raw: string): {
+  frontmatter: Record<string, unknown>;
+  content: string;
+  frontmatterFallback: boolean;
+} {
+  try {
+    const { data, content } = matter(raw);
+    return { frontmatter: data, content, frontmatterFallback: false };
+  } catch {
+    return {
+      frontmatter: {},
+      content: stripFrontmatterBlock(raw),
+      frontmatterFallback: true,
+    };
+  }
+}
+
 export async function parseSpecFile(file: SpecFile): Promise<ParsedSpec> {
   try {
     const raw = await fs.readFile(file.path, "utf-8");
-    const { data: frontmatter, content } = matter(raw);
+    const { frontmatter, content, frontmatterFallback } = parseFileContent(raw);
+
+    if (frontmatterFallback) {
+      log.info("parse.frontmatter-fallback", {
+        relativePath: file.relativePath,
+      });
+    }
 
     const title =
       (typeof frontmatter.title === "string" && frontmatter.title) ||

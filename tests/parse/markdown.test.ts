@@ -271,7 +271,53 @@ Second.
     expect(JSON.stringify(lines[0])).not.toMatch(/Hello world|rawContent/);
   });
 
-  it("emits parse.error on invalid frontmatter regardless of verbose", async () => {
+  it("falls back to markdown body when frontmatter YAML is invalid", async () => {
+    log.setVerbose(true);
+    const file = await writeTempSpec(
+      "experience-example.md",
+      `---
+name: Drift
+sources:
+  - {planning_artifacts}/prds/quill-2025-08-15/prd.md
+---
+
+Intro paragraph for the spec.
+
+## First Section
+
+Section body.
+`,
+    );
+
+    const parsed = await parseSpecFile(file);
+
+    expect(parsed.title).toBe("Fallback Title");
+    expect(parsed.description).toBe("Intro paragraph for the spec.");
+    expect(parsed.sections).toHaveLength(1);
+    expect(parsed.sections[0]).toMatchObject({
+      level: 2,
+      title: "First Section",
+    });
+    expect(parsed.rawContent).toContain("Intro paragraph for the spec.");
+    expect(parsed.rawContent).not.toContain("{planning_artifacts}");
+
+    const lines = parseStderrLines();
+    expect(lines).toEqual([
+      {
+        event: "parse.frontmatter-fallback",
+        level: "info",
+        relativePath: "experience-example.md",
+      },
+      {
+        event: "parse.file",
+        level: "info",
+        relativePath: "experience-example.md",
+        sectionCount: 1,
+      },
+    ]);
+  });
+
+  it("does not emit parse.frontmatter-fallback when verbose is disabled", async () => {
     log.setVerbose(false);
     const file = await writeTempSpec(
       "SPEC.md",
@@ -283,16 +329,10 @@ Body text.
 `,
     );
 
-    await expect(parseSpecFile(file)).rejects.toThrow();
+    const parsed = await parseSpecFile(file);
 
-    const lines = parseStderrLines();
-    expect(lines).toHaveLength(1);
-    expect(lines[0]).toMatchObject({
-      event: "parse.error",
-      level: "error",
-      path: "SPEC.md",
-    });
-    expect(lines[0].message).toBeTruthy();
+    expect(parsed.rawContent).toBe("Body text.\n");
+    expect(parseStderrLines()).toEqual([]);
   });
 
   it("stringifies non-Error rejections in parse.error message", async () => {

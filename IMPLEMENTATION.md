@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-14
-**Current position:** **POST-MVP E8 in progress** — S8.1 committed (`94c2571`); S8.2 next
-**Test count:** 226 passing
+**Current position:** **POST-MVP E8 in progress** — S8.2 ready for review
+**Test count:** 246 passing
 
 ## Deliverables
 
@@ -17,6 +17,7 @@
 | Slug collision disambiguation                                                     | Complete — E5 S5.1                          | HARNESS §11 #1           |
 | CLI contracts + exit codes                                                        | Complete — E6                               | `src/cli.ts`             |
 | Custom discovery `--patterns` override                                            | Complete — E8 S8.1 (review)                 | `src/config/patterns.ts` |
+| Project config file loader                                                        | Complete — E8 S8.2 (review)                 | `src/config/loader.ts`   |
 | MVP sign-off (HARNESS §13)                                                        | **Closed** — E7 S7.2 owner sign-off         | below                    |
 
 ## Workflow References
@@ -104,7 +105,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
 
 - [ ] **E8 — Custom Discovery Configuration** — `--patterns`, config loader, extended defaults, `README.md` discovery and folder index pages _(in progress)_
   - [x] S8.1 — `--patterns` CLI flag _(review)_
-  - [ ] S8.2 — Project config file loader
+  - [x] S8.2 — Project config file loader _(review)_
   - [ ] S8.3 — Extended default patterns
   - [ ] S8.4 — README discovery and folder index
 - [ ] **E9 — Agent Interoperability** — `--json`, `llms.txt`
@@ -203,5 +204,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-12 | E16 S16.2 | `feat(output): Wikipedia layout chrome and navigation` — WikiPage description/sections metadata; three-column Mustache chrome (category nav, infobox, TOC rail); Main Page index portal; output.render verbose event; 15 new/updated tests; renderer.ts 98.8% coverage | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E16 S16.3 | `feat(parse): rich HTML content rendering with GFM and highlight.js` — exported slugify; heading ids h2–h6 matching TOC anchors; highlight.js fenced code blocks; highlight.css asset; `.mw-parser-output` wrapper; 10 new tests; markdown.ts 100% coverage            | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-12 | E16 S16.4 | `feat(output): client-side wiki search with lunr index` — buildSearchIndex at generate time; inline JSON for file://; header search UI; `--no-search` flag; All pages index section; lunr@^2.3.9 dep; 14 new tests; 194 tests total; repo coverage 95.79%              | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
-| 2026-07-14 | E8 S8.1   | `feat(discover): add custom --patterns CLI override` — comma-aware glob parser; list/generate wiring; sanitized config diagnostics; project-root pattern guard; discover confinement; review patches applied; 32 new tests; 226 tests total; repo coverage 96.1%       | 94c2571               | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-14 | E8 S8.1   | `feat(discover): add custom --patterns CLI override` — comma-aware glob parser; list/generate wiring; sanitized config diagnostics; project-root pattern guard; discover confinement; review patches applied; 32 new tests; 226 tests total; repo coverage 96.1%       | 2e23250               | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | _template_ | _E?_ S?_  | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                | _hash or uncommitted_ | _full §0.2 gate result_                                         |

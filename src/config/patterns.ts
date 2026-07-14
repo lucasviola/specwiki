@@ -54,6 +54,65 @@ function escapesProjectRoot(pattern: string): boolean {
   );
 }
 
+function validateSinglePattern(pattern: string): void {
+  if (pattern.length === 0) {
+    throw new Error(EMPTY_PATTERNS_MESSAGE);
+  }
+
+  const delimiters: string[] = [];
+  let escaped = false;
+
+  for (const character of pattern) {
+    if (escaped) {
+      if (delimiters.at(-1) === CLOSING_DELIMITERS[character]) {
+        delimiters.pop();
+      }
+      escaped = false;
+      continue;
+    }
+
+    if (character === "\\") {
+      escaped = true;
+      continue;
+    }
+
+    if (character === "{" || character === "[" || character === "(") {
+      delimiters.push(character);
+      continue;
+    }
+
+    if (character === "}" || character === "]" || character === ")") {
+      const expectedOpening = CLOSING_DELIMITERS[character];
+      const activeOpening = delimiters.at(-1);
+      if (activeOpening === expectedOpening) {
+        delimiters.pop();
+      }
+    }
+  }
+
+  if (delimiters.length > 0) {
+    throw new Error(UNBALANCED_PATTERNS_MESSAGE);
+  }
+
+  if (escapesProjectRoot(pattern)) {
+    throw new Error(OUTSIDE_PROJECT_PATTERNS_MESSAGE);
+  }
+}
+
+export function validatePatternList(patterns: string[]): string[] {
+  const normalized = patterns.map((pattern) => pattern.trim());
+
+  if (normalized.length === 0) {
+    throw new Error(EMPTY_PATTERNS_MESSAGE);
+  }
+
+  for (const pattern of normalized) {
+    validateSinglePattern(pattern);
+  }
+
+  return normalized;
+}
+
 export function parsePatternList(value: string): string[] {
   const patterns: string[] = [];
   const delimiters: string[] = [];
@@ -107,15 +166,7 @@ export function parsePatternList(value: string): string[] {
 
   patterns.push(current.trim());
 
-  if (patterns.some((pattern) => pattern.length === 0)) {
-    throw new Error(EMPTY_PATTERNS_MESSAGE);
-  }
-
-  if (patterns.some(escapesProjectRoot)) {
-    throw new Error(OUTSIDE_PROJECT_PATTERNS_MESSAGE);
-  }
-
-  return patterns;
+  return validatePatternList(patterns);
 }
 
 export const CATEGORY_LABELS: Record<string, string> = {

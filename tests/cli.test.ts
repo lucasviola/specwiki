@@ -525,6 +525,143 @@ describe("cli --patterns", () => {
   });
 });
 
+describe("cli project config", () => {
+  it("uses patterns from specwiki.config.json for list and generate", async () => {
+    const customRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-config-"),
+    );
+    const outputDir = path.join(customRoot, "generated");
+
+    try {
+      await fs.mkdir(path.join(customRoot, "custom"), { recursive: true });
+      await fs.writeFile(
+        path.join(customRoot, "AGENTS.md"),
+        "# Default-only agent file",
+      );
+      await fs.writeFile(
+        path.join(customRoot, "custom", "notes.md"),
+        "# Config Notes\n\nConfig discovery content.",
+      );
+      await fs.writeFile(
+        path.join(customRoot, "specwiki.config.json"),
+        JSON.stringify({ patterns: ["custom/**/*.md"] }),
+      );
+
+      const listResult = await execFileAsync(
+        process.execPath,
+        ["--import", "tsx/esm", cliPath, "list", "--project", customRoot],
+        { cwd: projectRoot },
+      );
+
+      expect(listResult.stdout).toContain("Notes — custom/notes.md");
+      expect(listResult.stdout).not.toContain("AGENTS.md");
+
+      await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "generate",
+          "--project",
+          customRoot,
+          "--output",
+          outputDir,
+        ],
+        { cwd: projectRoot },
+      );
+
+      expect(
+        await fs.readFile(path.join(outputDir, "custom-notes.md"), "utf-8"),
+      ).toContain("Config discovery content.");
+    } finally {
+      await fs.rm(customRoot, { force: true, recursive: true });
+    }
+  });
+
+  it("emits config.load only in verbose mode", async () => {
+    const customRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-config-verbose-"),
+    );
+
+    try {
+      await fs.writeFile(
+        path.join(customRoot, "specwiki.config.json"),
+        JSON.stringify({ patterns: ["specs/**/*.md"] }),
+      );
+
+      const verboseResult = await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "list",
+          "--project",
+          customRoot,
+          "--verbose",
+        ],
+        { cwd: projectRoot },
+      );
+      const verboseLines = parseJsonStderrLines(verboseResult.stderr);
+      expect(
+        verboseLines.filter((line) => line.event === "config.load"),
+      ).toEqual([
+        {
+          event: "config.load",
+          level: "info",
+          sourcePath: "specwiki.config.json",
+        },
+      ]);
+
+      const quietResult = await execFileAsync(
+        process.execPath,
+        ["--import", "tsx/esm", cliPath, "list", "--project", customRoot],
+        { cwd: projectRoot },
+      );
+      expect(quietResult.stderr).toBe("");
+    } finally {
+      await fs.rm(customRoot, { force: true, recursive: true });
+    }
+  });
+
+  it("exits 2 and emits config.error for invalid config files", async () => {
+    const customRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-config-invalid-"),
+    );
+
+    try {
+      await fs.writeFile(
+        path.join(customRoot, "specwiki.config.json"),
+        '{"patterns":["../**/*.md"]}',
+      );
+
+      try {
+        await execFileAsync(
+          process.execPath,
+          ["--import", "tsx/esm", cliPath, "list", "--project", customRoot],
+          { cwd: projectRoot },
+        );
+        expect.fail("expected invalid config to exit non-zero");
+      } catch (err) {
+        const execError = err as { code?: number; stderr?: string };
+        expect(execError.code).toBe(2);
+
+        const lines = parseJsonStderrLines(String(execError.stderr ?? ""));
+        expect(
+          lines.find((line) => line.event === "config.error"),
+        ).toMatchObject({
+          event: "config.error",
+          level: "error",
+          message: "Patterns must stay within the project root",
+        });
+      }
+    } finally {
+      await fs.rm(customRoot, { force: true, recursive: true });
+    }
+  });
+});
+
 describe("cli exit codes", () => {
   it("exits 2 and emits cli.error for unknown option", async () => {
     try {

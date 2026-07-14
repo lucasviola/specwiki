@@ -85,7 +85,7 @@ development_status:
   epic-7-retrospective: optional
   epic-8: in-progress
   8-1-patterns-cli-flag: review
-  8-2-project-config-file-loader: backlog
+  8-2-project-config-file-loader: review
   8-3-extended-default-patterns: backlog
   8-4-readme-discovery-and-folder-index: backlog
   epic-8-retrospective: optional

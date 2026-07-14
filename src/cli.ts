@@ -8,6 +8,7 @@ import {
   listSpecs,
 } from "./commands/generate.js";
 import { parsePatternList } from "./config/patterns.js";
+import { ConfigError, resolveEffectivePatterns } from "./config/loader.js";
 import { log } from "./core/Logger.js";
 
 const USAGE_ERROR_CODES = new Set([
@@ -81,6 +82,41 @@ function emitPatternsOverride(patterns: string[] | undefined): void {
   }
 }
 
+async function resolveCommandPatterns(
+  command: string,
+  projectRoot: string,
+  cliPatterns: string[] | undefined,
+  verbose: boolean,
+): Promise<string[] | undefined> {
+  if (cliPatterns) {
+    emitPatternsOverride(cliPatterns);
+    return cliPatterns;
+  }
+
+  try {
+    const resolved = await resolveEffectivePatterns({
+      projectRoot,
+      cliPatterns,
+    });
+
+    if (resolved.configSource && verbose) {
+      log.info("config.load", { sourcePath: resolved.configSource });
+    }
+
+    return resolved.patterns;
+  } catch (err) {
+    const message =
+      err instanceof ConfigError
+        ? err.message
+        : err instanceof Error
+          ? err.message
+          : "Invalid configuration";
+    log.error("config.error", { message });
+    log.error("cli.error", { command, message });
+    process.exit(2);
+  }
+}
+
 const program = new Command();
 
 program.exitOverride();
@@ -109,11 +145,17 @@ program
   .action(async (opts) => {
     try {
       log.setVerbose(Boolean(opts.verbose));
-      emitPatternsOverride(opts.patterns);
+      const projectRoot = path.resolve(opts.project);
+      const patterns = await resolveCommandPatterns(
+        "generate",
+        projectRoot,
+        opts.patterns,
+        Boolean(opts.verbose),
+      );
       await generateWiki({
-        projectRoot: path.resolve(opts.project),
+        projectRoot,
         outputDir: opts.output,
-        patterns: opts.patterns,
+        patterns,
         verbose: opts.verbose,
         noSearch: opts.search === false,
       });
@@ -141,11 +183,17 @@ program
   .action(async (opts) => {
     try {
       log.setVerbose(Boolean(opts.verbose));
-      emitPatternsOverride(opts.patterns);
+      const projectRoot = path.resolve(opts.project);
+      const patterns = await resolveCommandPatterns(
+        "list",
+        projectRoot,
+        opts.patterns,
+        Boolean(opts.verbose),
+      );
       await listSpecs({
-        projectRoot: path.resolve(opts.project),
+        projectRoot,
         outputDir: "wiki",
-        patterns: opts.patterns,
+        patterns,
         verbose: opts.verbose,
       });
     } catch (err) {
