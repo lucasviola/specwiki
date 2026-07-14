@@ -800,3 +800,78 @@ describe("cli generate failure", () => {
     }
   });
 });
+
+describe("cli open", () => {
+  it("lists open in --help alongside generate and list", async () => {
+    const { stdout } = await execFileAsync(
+      process.execPath,
+      ["--import", "tsx/esm", cliPath, "--help"],
+      { cwd: projectRoot },
+    );
+
+    expect(stdout).toContain("generate");
+    expect(stdout).toContain("list");
+    expect(stdout).toContain("open");
+  });
+
+  it("exits 1 with actionable message when wiki index is missing", async () => {
+    const emptyProject = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-open-missing-"),
+    );
+
+    try {
+      await execFileAsync(
+        process.execPath,
+        ["--import", "tsx/esm", cliPath, "open", "--project", emptyProject],
+        { cwd: projectRoot },
+      );
+      expect.fail("expected open to exit non-zero");
+    } catch (err) {
+      const execError = err as {
+        code?: number;
+        stdout?: string;
+        stderr?: string;
+      };
+      expect(execError.code).toBe(1);
+      expect(String(execError.stdout ?? "")).toMatch(/generate/i);
+
+      const lines = parseJsonStderrLines(String(execError.stderr ?? ""));
+      const openError = lines.find((line) => line.event === "open.error");
+      expect(openError).toMatchObject({
+        event: "open.error",
+        level: "error",
+      });
+    } finally {
+      await fs.rm(emptyProject, { force: true, recursive: true });
+    }
+  });
+
+  it("exits 1 when output path escapes project root", async () => {
+    try {
+      await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "open",
+          "--project",
+          fixtureRoot,
+          "--output",
+          "../outside",
+        ],
+        { cwd: projectRoot },
+      );
+      expect.fail("expected open to exit non-zero");
+    } catch (err) {
+      const execError = err as {
+        code?: number;
+        stderr?: string;
+      };
+      expect(execError.code).toBe(1);
+
+      const lines = parseJsonStderrLines(String(execError.stderr ?? ""));
+      expect(lines.some((line) => line.event === "open.error")).toBe(true);
+    }
+  });
+});

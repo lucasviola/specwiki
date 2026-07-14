@@ -7,6 +7,7 @@ import {
   isCliErrorLogged,
   listSpecs,
 } from "./commands/generate.js";
+import { isOpenErrorLogged, openWiki } from "./commands/open.js";
 import { parsePatternList } from "./config/patterns.js";
 import { ConfigError, resolveEffectivePatterns } from "./config/loader.js";
 import { log } from "./core/Logger.js";
@@ -200,6 +201,36 @@ program
       if (!isCliErrorLogged(err)) {
         log.error("cli.error", {
           command: "list",
+          message: err instanceof Error ? err.message : String(err),
+        });
+      }
+      process.exit(1);
+    }
+  });
+
+program
+  .command("open")
+  .description("Open the generated HTML wiki in the default browser")
+  .option("-p, --project <path>", "Project root", process.cwd())
+  .option(
+    "-o, --output <dir>",
+    "Output directory (relative to project)",
+    "wiki",
+  )
+  .option("-v, --verbose", "Show detailed output")
+  .action(async (opts) => {
+    try {
+      log.setVerbose(Boolean(opts.verbose));
+      const projectRoot = path.resolve(opts.project);
+      await openWiki({
+        projectRoot,
+        outputDir: opts.output,
+        verbose: opts.verbose,
+      });
+    } catch (err) {
+      if (!isOpenErrorLogged(err) && !isCliErrorLogged(err)) {
+        log.error("cli.error", {
+          command: "open",
           message: err instanceof Error ? err.message : String(err),
         });
       }

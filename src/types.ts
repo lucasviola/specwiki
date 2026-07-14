@@ -52,6 +52,12 @@ export interface GenerateOptions {
   noSearch?: boolean;
 }
 
+export interface OpenOptions {
+  projectRoot: string;
+  outputDir: string;
+  verbose?: boolean;
+}
+
 export interface WriteHtmlWikiOptions {
   noSearch?: boolean;
 }

@@ -128,7 +128,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
   - [x] S16.4 — Client-side wiki search _(review)_
 - [ ] **E17 — CLI Developer Experience** — broad markdown discovery, `open`, `init` _(in progress — impromptu)_
   - [x] S17.1 — Broad markdown discovery by default _(review)_
-  - [ ] S17.2 — `specwiki open` browser command
+  - [x] S17.2 — `specwiki open` browser command _(review)_
   - [ ] S17.3 — `specwiki init` config scaffold
 
 ## HARNESS §13 Deliverables Checklist
@@ -183,6 +183,7 @@ Every MVP feature story shipped structured logging ACs. No deferred logging epic
 | S7.1  | (integration)                | Full verbose chain in dogfood CLI test                              |
 | S16.3 | parse/markdown.ts            | render.error (unchanged)                                            |
 | S16.4 | output/wiki.ts, search-index | output.write (search-index.json), output.search-index, output.error |
+| S17.2 | commands/open.ts, cli.ts     | cli.command, open.error, open.launch                                |
 
 User-facing summaries remain on stdout via chalk; diagnostics use JSON stderr via `Logger.ts`.
 
@@ -217,4 +218,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-14 | E8 S8.1   | `feat(discover): add custom --patterns CLI override` — comma-aware glob parser; list/generate wiring; sanitized config diagnostics; project-root pattern guard; discover confinement; review patches applied; 32 new tests; 226 tests total; repo coverage 96.1%       | 2e23250               | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-14 | E8 S8.4   | `feat(output): README folder index binding for wiki index pages` — resolveReadmeIndexBindings; root/category intros on md+html index; parse.readme-index + output.index logging; packages/nested README fixture; 25 new tests; 272 tests total; repo coverage 95.3%    | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-14 | E8 close  | **E8 formally closed** — owner sign-off; all S8.1–S8.4 stories promoted to `done`; custom discovery configuration complete                                                                                                                                             | uncommitted           | test ✓ (272 tests)                                              |
+| 2026-07-14 | E17 S17.2 | `feat(cli): specwiki open browser command` — cross-platform execFile launcher; path + symlink confinement; open.error/open.launch logging; injectable test handler; 13 new tests; 292 tests total; open.ts 93.78% coverage                                             | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | _template_ | _E?_ S?_  | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                | _hash or uncommitted_ | _full §0.2 gate result_                                         |
