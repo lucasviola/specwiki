@@ -7,6 +7,11 @@ import {
   isCliErrorLogged,
   listSpecs,
 } from "./commands/generate.js";
+import {
+  getInitExitCode,
+  initConfig,
+  isInitErrorLogged,
+} from "./commands/init.js";
 import { isOpenErrorLogged, openWiki } from "./commands/open.js";
 import { parsePatternList } from "./config/patterns.js";
 import { ConfigError, resolveEffectivePatterns } from "./config/loader.js";
@@ -205,6 +210,35 @@ program
         });
       }
       process.exit(1);
+    }
+  });
+
+program
+  .command("init")
+  .description("Scaffold specwiki.config.json with default discovery patterns")
+  .option("-p, --project <path>", "Project root", process.cwd())
+  .option(
+    "-f, --force",
+    "Overwrite specwiki.config.json when it exists (never overwrites .js config)",
+  )
+  .option("-v, --verbose", "Show detailed output")
+  .action(async (opts) => {
+    try {
+      log.setVerbose(Boolean(opts.verbose));
+      const projectRoot = path.resolve(opts.project);
+      await initConfig({
+        projectRoot,
+        force: Boolean(opts.force),
+        verbose: opts.verbose,
+      });
+    } catch (err) {
+      if (!isInitErrorLogged(err) && !isCliErrorLogged(err)) {
+        log.error("cli.error", {
+          command: "init",
+          message: err instanceof Error ? err.message : String(err),
+        });
+      }
+      process.exit(getInitExitCode(err));
     }
   });
 

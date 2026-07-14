@@ -126,7 +126,7 @@ development_status:
   epic-17: in-progress
   17-1-broad-markdown-discovery-by-default: review
   17-2-specwiki-open-browser-command: review
-  17-3-specwiki-init-config-scaffold: backlog
+  17-3-specwiki-init-config-scaffold: review
   epic-17-retrospective: optional
 
 # MVP formally closed 2026-07-12 — all E1–E7 stories done; POST-MVP begins at E8

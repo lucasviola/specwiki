@@ -58,6 +58,12 @@ export interface OpenOptions {
   verbose?: boolean;
 }
 
+export interface InitOptions {
+  projectRoot: string;
+  force?: boolean;
+  verbose?: boolean;
+}
+
 export interface WriteHtmlWikiOptions {
   noSearch?: boolean;
 }

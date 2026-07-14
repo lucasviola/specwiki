@@ -801,6 +801,169 @@ describe("cli generate failure", () => {
   });
 });
 
+describe("cli init", () => {
+  it("lists init in --help alongside generate, list, and open", async () => {
+    const { stdout } = await execFileAsync(
+      process.execPath,
+      ["--import", "tsx/esm", cliPath, "--help"],
+      { cwd: projectRoot },
+    );
+
+    expect(stdout).toContain("generate");
+    expect(stdout).toContain("list");
+    expect(stdout).toContain("open");
+    expect(stdout).toContain("init");
+  });
+
+  it("documents --force in init --help", async () => {
+    const { stdout } = await execFileAsync(
+      process.execPath,
+      ["--import", "tsx/esm", cliPath, "init", "--help"],
+      { cwd: projectRoot },
+    );
+
+    expect(stdout).toContain("--force");
+    expect(stdout).toMatch(/overwrite/i);
+    expect(stdout).toMatch(/\.js/i);
+  });
+
+  it("creates specwiki.config.json and list loads it", async () => {
+    const initRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-init-"),
+    );
+    await fs.writeFile(
+      path.join(initRoot, "notes.md"),
+      "# Notes\n\nInit scaffold test.",
+    );
+
+    try {
+      const initResult = await execFileAsync(
+        process.execPath,
+        ["--import", "tsx/esm", cliPath, "init", "--project", initRoot],
+        { cwd: projectRoot },
+      );
+
+      expect(initResult.stdout).toContain("Created specwiki.config.json");
+      expect(initResult.stdout).toContain("specwiki list");
+      expect(initResult.stdout).toContain("specwiki generate");
+
+      const configPath = path.join(initRoot, "specwiki.config.json");
+      const config = JSON.parse(await fs.readFile(configPath, "utf-8")) as {
+        patterns: string[];
+      };
+      expect(config.patterns.length).toBeGreaterThan(0);
+
+      const listResult = await execFileAsync(
+        process.execPath,
+        ["--import", "tsx/esm", cliPath, "list", "--project", initRoot],
+        { cwd: projectRoot },
+      );
+      expect(listResult.stdout).toContain("Notes — notes.md");
+    } finally {
+      await fs.rm(initRoot, { force: true, recursive: true });
+    }
+  });
+
+  it("exits 2 when config exists without --force", async () => {
+    const initRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-init-exists-"),
+    );
+
+    try {
+      await fs.writeFile(
+        path.join(initRoot, "specwiki.config.json"),
+        '{"patterns":["specs/**/*.md"]}',
+      );
+
+      try {
+        await execFileAsync(
+          process.execPath,
+          ["--import", "tsx/esm", cliPath, "init", "--project", initRoot],
+          { cwd: projectRoot },
+        );
+        expect.fail("expected init to exit non-zero");
+      } catch (err) {
+        const execError = err as {
+          code?: number;
+          stdout?: string;
+          stderr?: string;
+        };
+        expect(execError.code).toBe(2);
+        expect(String(execError.stdout ?? "")).toMatch(/already exists/i);
+
+        const lines = parseJsonStderrLines(String(execError.stderr ?? ""));
+        expect(lines.some((line) => line.event === "init.error")).toBe(true);
+      }
+    } finally {
+      await fs.rm(initRoot, { force: true, recursive: true });
+    }
+  });
+
+  it("overwrites json with --force but rejects js config", async () => {
+    const initRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-init-force-"),
+    );
+
+    try {
+      await fs.writeFile(
+        path.join(initRoot, "specwiki.config.json"),
+        '{"patterns":["custom/**/*.md"]}',
+      );
+
+      const forceResult = await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "init",
+          "--project",
+          initRoot,
+          "--force",
+        ],
+        { cwd: projectRoot },
+      );
+      expect(forceResult.stdout).toContain("Created specwiki.config.json");
+
+      const config = JSON.parse(
+        await fs.readFile(path.join(initRoot, "specwiki.config.json"), "utf-8"),
+      ) as { patterns: string[] };
+      expect(config.patterns).toContain("**/*.{md,mdc}");
+
+      await fs.writeFile(
+        path.join(initRoot, "specwiki.config.js"),
+        'export default { patterns: ["specs/**/*.md"] };',
+      );
+      await fs.rm(path.join(initRoot, "specwiki.config.json"));
+
+      try {
+        await execFileAsync(
+          process.execPath,
+          [
+            "--import",
+            "tsx/esm",
+            cliPath,
+            "init",
+            "--project",
+            initRoot,
+            "--force",
+          ],
+          { cwd: projectRoot },
+        );
+        expect.fail("expected init to exit non-zero when js config exists");
+      } catch (err) {
+        const execError = err as { code?: number; stderr?: string };
+        expect(execError.code).toBe(2);
+
+        const lines = parseJsonStderrLines(String(execError.stderr ?? ""));
+        expect(lines.some((line) => line.event === "init.error")).toBe(true);
+      }
+    } finally {
+      await fs.rm(initRoot, { force: true, recursive: true });
+    }
+  });
+});
+
 describe("cli open", () => {
   it("lists open in --help alongside generate and list", async () => {
     const { stdout } = await execFileAsync(
