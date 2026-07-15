@@ -773,6 +773,42 @@ describe("writeHtmlWiki", () => {
     expect(css).toContain(".specwiki-theme-toggle[hidden]");
   });
 
+  it("writes responsive layout, drawer, and overflow containment styles", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-responsive-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([sampleSpec()]);
+    await writeHtmlWiki(outputDir, wiki);
+
+    const css = await fs.readFile(
+      path.join(outputDir, "html", "assets", "specwiki.css"),
+      "utf-8",
+    );
+    expect(css).toContain("@media (max-width: 719px)");
+    expect(css).toMatch(
+      /\.specwiki-layout,\s*\.specwiki-layout-article\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/s,
+    );
+    expect(css).toMatch(
+      /\.specwiki-nav-enhanced \.specwiki-nav-drawer\s*\{[^}]*position:\s*fixed[^}]*transform:\s*translateX\(-100%\)/s,
+    );
+    expect(css).toContain(
+      ".specwiki-nav-open .specwiki-nav-drawer {\n    transform: translateX(0);",
+    );
+    expect(css).toContain(
+      "html.specwiki-nav-open,\n  .specwiki-nav-open body.specwiki {\n    overflow: hidden;",
+    );
+    expect(css).toMatch(
+      /\.specwiki-search\s*\{[^}]*min-width:\s*0[^}]*flex:\s*1 1 auto/s,
+    );
+    expect(css).toMatch(/\.infobox\s*\{[^}]*float:\s*none[^}]*width:\s*auto/s);
+    expect(css).toMatch(
+      /\.mw-parser-output table\s*\{[^}]*display:\s*block[^}]*overflow-x:\s*auto/s,
+    );
+    expect(css).toMatch(/\.mw-parser-output pre\s*\{[^}]*overflow-x:\s*auto/s);
+  });
+
   it("writes html/assets/highlight.css with syntax highlighting theme", async () => {
     const outputDir = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-html-"),

@@ -24,6 +24,18 @@
 <body class="specwiki">
   <header class="specwiki-header">
     <div class="specwiki-header-inner">
+      <button
+        id="specwiki-nav-toggle"
+        type="button"
+        hidden
+        class="specwiki-nav-toggle"
+        aria-label="Open category navigation"
+        aria-controls="specwiki-nav-drawer"
+        aria-expanded="false"
+      >
+        <span aria-hidden="true">☰</span>
+        <span class="specwiki-nav-toggle-label">Menu</span>
+      </button>
       <a href="index.html" class="specwiki-logo"><span class="specwiki-logo-bracket">[[</span>specwiki<span class="specwiki-logo-bracket">]]</span></a>
       {{#includeSearch}}
       <div class="specwiki-search">
@@ -54,11 +66,80 @@
   <div class="specwiki-main">
     {{{body}}}
   </div>
+  <div
+    id="specwiki-nav-backdrop"
+    class="specwiki-nav-backdrop"
+    hidden
+    aria-hidden="true"
+  ></div>
   {{#includeSearch}}
   <script type="application/json" id="search-index">{{{searchIndexJson}}}</script>
   <script src="assets/lunr.min.js"></script>
   <script src="assets/search.js"></script>
   {{/includeSearch}}
+  <script data-specwiki-nav-drawer>
+    (function () {
+      "use strict";
+      var root = document.documentElement;
+      var toggle = document.getElementById("specwiki-nav-toggle");
+      var drawer = document.getElementById("specwiki-nav-drawer");
+      var close = document.getElementById("specwiki-nav-close");
+      var backdrop = document.getElementById("specwiki-nav-backdrop");
+      if (!toggle || !drawer || !close || !backdrop) {
+        return;
+      }
+
+      var narrow = window.matchMedia("(max-width: 719px)");
+
+      function setOpen(open, restoreFocus) {
+        root.classList.toggle("specwiki-nav-open", open);
+        toggle.setAttribute("aria-expanded", String(open));
+        drawer.setAttribute("aria-hidden", String(!open));
+        drawer.inert = !open;
+        backdrop.hidden = !open;
+        if (restoreFocus) {
+          toggle.focus();
+        }
+      }
+
+      function syncViewport() {
+        if (narrow.matches) {
+          setOpen(false, false);
+        } else {
+          root.classList.remove("specwiki-nav-open");
+          toggle.setAttribute("aria-expanded", "false");
+          drawer.removeAttribute("aria-hidden");
+          drawer.inert = false;
+          backdrop.hidden = true;
+        }
+      }
+
+      root.classList.add("specwiki-nav-enhanced");
+      toggle.hidden = false;
+      close.hidden = false;
+      toggle.addEventListener("click", function () {
+        setOpen(toggle.getAttribute("aria-expanded") !== "true", false);
+      });
+      close.addEventListener("click", function () {
+        setOpen(false, true);
+      });
+      backdrop.addEventListener("click", function () {
+        setOpen(false, true);
+      });
+      document.addEventListener("keydown", function (event) {
+        if (
+          event.key === "Escape" &&
+          toggle.getAttribute("aria-expanded") === "true"
+        ) {
+          setOpen(false, true);
+        }
+      });
+      if (narrow.addEventListener) {
+        narrow.addEventListener("change", syncViewport);
+      }
+      syncViewport();
+    })();
+  </script>
   <script data-specwiki-theme-toggle>
     (function () {
       "use strict";

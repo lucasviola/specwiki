@@ -179,6 +179,43 @@ describe("HtmlRenderer", () => {
     expect(html).not.toContain("console.");
   });
 
+  it("renders an accessible progressively enhanced navigation drawer", () => {
+    const html = renderer.renderIndex([samplePage()], emptyIndexMeta());
+
+    expect(html).toMatch(
+      /id="specwiki-nav-toggle"[\s\S]*?type="button"[\s\S]*?hidden[\s\S]*?aria-controls="specwiki-nav-drawer"[\s\S]*?aria-expanded="false"/,
+    );
+    expect(html).toContain('aria-label="Open category navigation"');
+    expect(html).toContain('id="specwiki-nav-drawer"');
+    expect(html).toContain('id="specwiki-nav-close"');
+    expect(html).toContain('aria-label="Close category navigation"');
+    expect(html).toContain('id="specwiki-nav-backdrop"');
+    expect(html).toContain("data-specwiki-nav-drawer");
+    expect(html).toContain('root.classList.add("specwiki-nav-enhanced")');
+    expect(html).toContain(
+      'toggle.setAttribute("aria-expanded", String(open))',
+    );
+    expect(html).toContain("drawer.inert = !open");
+    expect(html).toContain("drawer.inert = false");
+    expect(html).toContain('event.key === "Escape"');
+    expect(html).toContain('backdrop.addEventListener("click"');
+    expect(html).toContain('close.addEventListener("click"');
+    expect(html).not.toContain("console.");
+    expect(html).not.toContain("fetch(");
+  });
+
+  it("uses the same responsive drawer shell on article pages", () => {
+    const page = samplePage();
+    const html = renderer.renderArticle(page, [page], "<p>Body</p>");
+
+    expect(html).toContain(
+      '<aside id="specwiki-nav-drawer" class="specwiki-nav-drawer">',
+    );
+    expect(html).toContain('<nav class="category-nav"');
+    expect(html).toContain('id="specwiki-nav-close"');
+    expect(html).toContain('class="toc"');
+  });
+
   it("renders search chrome when includeSearch is enabled", () => {
     const html = renderer.renderIndex([samplePage()], emptyIndexMeta(), {
       includeSearch: true,

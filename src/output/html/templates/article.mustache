@@ -1,16 +1,27 @@
 <div class="specwiki-layout specwiki-layout-article">
-  <nav class="category-nav" aria-label="Categories">
-    {{#categories}}
-    <div class="category-nav-group{{#active}} category-nav-active{{/active}}">
-      <a href="index.html#{{anchor}}" class="category-nav-heading">{{label}}</a>
-      <ul class="category-nav-pages">
-        {{#pages}}
-        <li><a href="{{href}}">{{title}}</a></li>
-        {{/pages}}
-      </ul>
-    </div>
-    {{/categories}}
-  </nav>
+  <aside id="specwiki-nav-drawer" class="specwiki-nav-drawer">
+    <button
+      type="button"
+      id="specwiki-nav-close"
+      hidden
+      class="specwiki-nav-close"
+      aria-label="Close category navigation"
+    >
+      <span aria-hidden="true">×</span>
+    </button>
+    <nav class="category-nav" aria-label="Categories">
+      {{#categories}}
+      <div class="category-nav-group{{#active}} category-nav-active{{/active}}">
+        <a href="index.html#{{anchor}}" class="category-nav-heading">{{label}}</a>
+        <ul class="category-nav-pages">
+          {{#pages}}
+          <li><a href="{{href}}">{{title}}</a></li>
+          {{/pages}}
+        </ul>
+      </div>
+      {{/categories}}
+    </nav>
+  </aside>
   <div class="specwiki-center">
     <nav class="breadcrumb" aria-label="Breadcrumb">
       {{#breadcrumbs}}

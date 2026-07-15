@@ -45,7 +45,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-07-12
-last_updated: 2026-07-15T15:25:00+02:00
+last_updated: 2026-07-15T15:52:00+02:00
 project: specwiki
 project_key: NOKEY
 tracking_system: file-system
@@ -130,6 +130,7 @@ development_status:
   epic-17-retrospective: optional
   epic-19: in-progress
   19-1-dark-mode-pre-paint-theme-toggle: review
+  19-2-responsive-layout-and-mobile-navigation-drawer: review
   epic-19-retrospective: optional
 
 # MVP formally closed 2026-07-12 — all E1–E7 stories done; POST-MVP begins at E8
