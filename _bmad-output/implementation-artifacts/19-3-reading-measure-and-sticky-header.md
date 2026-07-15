@@ -4,7 +4,7 @@ baseline_commit: c73388698fe8ddc53034537d443287e96ab8f88b
 
 # Story 19.3: Reading Measure and Sticky Header
 
-Status: review
+Status: done
 
 ## Story
 

@@ -58,6 +58,159 @@ describe("cli list --verbose", () => {
   });
 });
 
+describe("cli JSON output", () => {
+  it("prints one list result on stdout and diagnostics only on stderr", async () => {
+    const { stdout, stderr } = await execFileAsync(
+      process.execPath,
+      [
+        "--import",
+        "tsx/esm",
+        cliPath,
+        "list",
+        "--json",
+        "--verbose",
+        "--project",
+        fixtureRoot,
+      ],
+      { cwd: projectRoot },
+    );
+
+    const result = JSON.parse(stdout) as {
+      categories: Array<{
+        name: string;
+        files: Array<{ relativePath: string; title: string; category: string }>;
+      }>;
+    };
+    const stderrLines = parseJsonStderrLines(stderr);
+
+    expect(result.categories.map((category) => category.name)).toEqual(
+      [...result.categories.map((category) => category.name)].sort(),
+    );
+    expect(
+      result.categories.flatMap((category) => category.files),
+    ).toContainEqual({
+      relativePath: "AGENTS.md",
+      title: "Agent Instructions",
+      category: "root",
+    });
+    expect(stdout).not.toContain("\u001b");
+    expect(stdout).not.toMatch(/Found |Tip:/);
+    expect(stderrLines).toContainEqual(
+      expect.objectContaining({
+        event: "output.json",
+        command: "list",
+        categoryCount: result.categories.length,
+      }),
+    );
+  });
+
+  it("writes the wiki then prints a generate JSON result", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-json-"),
+    );
+
+    try {
+      const { stdout, stderr } = await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "generate",
+          "--json",
+          "--verbose",
+          "--project",
+          fixtureRoot,
+          "--output",
+          outputDir,
+        ],
+        { cwd: projectRoot },
+      );
+
+      const result = JSON.parse(stdout) as {
+        specCount: number;
+        outputDir: string;
+        pages: Array<Record<string, unknown>>;
+      };
+      const stderrLines = parseJsonStderrLines(stderr);
+
+      expect(result.specCount).toBe(result.pages.length);
+      expect(result.outputDir).toBe(path.resolve(outputDir));
+      expect(result.pages[0]).toEqual({
+        slug: expect.any(String),
+        title: expect.any(String),
+        category: expect.any(String),
+        sourcePath: expect.any(String),
+        description: expect.any(String),
+      });
+      expect(
+        await fs.stat(path.join(outputDir, "html", "index.html")),
+      ).toBeDefined();
+      expect(stderrLines).toContainEqual(
+        expect.objectContaining({
+          event: "output.json",
+          command: "generate",
+          specCount: result.specCount,
+          pageCount: result.pages.length,
+        }),
+      );
+    } finally {
+      await fs.rm(outputDir, { force: true, recursive: true });
+    }
+  });
+
+  it("returns JSON empty results without a human tip or output directory", async () => {
+    const emptyRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-json-empty-"),
+    );
+    const outputDir = path.join(emptyRoot, "wiki");
+
+    try {
+      const listResult = await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "list",
+          "--json",
+          "--project",
+          emptyRoot,
+        ],
+        { cwd: projectRoot },
+      );
+      expect(JSON.parse(listResult.stdout)).toEqual({ categories: [] });
+      expect(listResult.stderr).toBe("");
+
+      const generateResult = await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "generate",
+          "--json",
+          "--project",
+          emptyRoot,
+          "--output",
+          outputDir,
+        ],
+        { cwd: projectRoot },
+      );
+      expect(JSON.parse(generateResult.stdout)).toEqual({
+        specCount: 0,
+        outputDir: path.resolve(outputDir),
+        pages: [],
+      });
+      await expect(fs.stat(outputDir)).rejects.toMatchObject({
+        code: "ENOENT",
+      });
+    } finally {
+      await fs.rm(emptyRoot, { force: true, recursive: true });
+    }
+  });
+});
+
 describe("cli list zero-match", () => {
   it("exits 0 with helpful tip on empty project", async () => {
     const emptyRoot = await fs.mkdtemp(

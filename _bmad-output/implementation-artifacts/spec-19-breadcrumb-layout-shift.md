@@ -2,7 +2,7 @@
 title: "Fix article layout shift triggered by long breadcrumbs"
 type: "bugfix"
 created: "2026-07-15"
-status: "in-review"
+status: "done"
 review_loop_iteration: 0
 baseline_commit: "822e4ced502c053b97b2a108e2daf48cd3acc82d"
 context:

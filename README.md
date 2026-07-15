@@ -49,6 +49,15 @@ npx specwiki generate --output .specwiki
 # Verbose mode
 npx specwiki generate --verbose
 
+# Machine-readable discovery results for scripts and AI agents
+npx specwiki list --json
+
+# Machine-readable generation summary (stdout is one JSON document)
+npx specwiki generate --json
+
+# Keep JSON stdout clean while sending verbose diagnostics to stderr
+npx specwiki list --json --verbose
+
 # Open the HTML wiki in your default browser (run generate first)
 npx specwiki open
 
@@ -60,6 +69,14 @@ npx specwiki open --project /path/to/repo
 ```
 
 `specwiki open` resolves `{project}/{output}/html/index.html` (same `--project` and `--output` defaults as `generate`) and launches it with your OS default browser. If the wiki has not been generated yet, it exits with a message suggesting you run `specwiki generate` first.
+
+### JSON output
+
+Use `--json` with `list` or `generate` when another program needs to consume the result.
+`list --json` returns discovered files grouped by category; `generate --json` returns the
+generated page count, resolved output directory, and page metadata. The JSON result is the
+only CLI output on stdout. With `--verbose`, structured diagnostics including `output.json`
+are written to stderr.
 
 ## Output
 

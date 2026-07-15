@@ -1,32 +1,33 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-15
-**Current position:** **E19 breadcrumb layout bugfix complete** — awaiting owner review
-**Test count:** 339 passing
+**Current position:** **E9 S9.1 JSON machine-readable output complete** — awaiting owner review
+**Test count:** 346 passing
 
 ## Deliverables
 
-| Deliverable                                                                       | Status                                      | Reference                |
-| --------------------------------------------------------------------------------- | ------------------------------------------- | ------------------------ |
-| `IMPLEMENTATION.md` build log                                                     | Complete through E7                         | this file                |
-| Quality gate scripts (`test`, `lint`, `format`, `coverage`, `typecheck`, `build`) | Verified — full §0.2 gate green (S1.2)      | `package.json`           |
-| Structured logger (`src/core/Logger.ts`)                                          | Complete — E1 S1.3                          | `src/core/Logger.ts`     |
-| `specwiki list` + discover logging                                                | Complete — E2                               | `src/discover/specs.ts`  |
-| Markdown wiki (`wiki/*.md`)                                                       | Complete — E3                               | `src/output/wiki.ts`     |
-| HTML wiki (`wiki/html/`)                                                          | Complete — E4; **E16 S16.1 skin** in review | `src/output/html/`       |
-| Slug collision disambiguation                                                     | Complete — E5 S5.1                          | HARNESS §11 #1           |
-| CLI contracts + exit codes                                                        | Complete — E6                               | `src/cli.ts`             |
-| Custom discovery `--patterns` override                                            | Complete — E8 S8.1                          | `src/config/patterns.ts` |
-| Project config file loader                                                        | Complete — E8 S8.2                          | `src/config/loader.ts`   |
-| Extended default patterns                                                         | Complete — E8 S8.3                          | `src/discover/specs.ts`  |
-| README folder index binding                                                       | Complete — E8 S8.4                          | `src/output/wiki.ts`     |
-| HTML dark theme                                                                   | Complete — E19 S19.1, awaiting review       | `src/output/html/`       |
-| Responsive HTML layout and mobile navigation                                      | Complete — E19 S19.2, awaiting review       | `src/output/html/`       |
-| Wide-screen reading measure and sticky header                                     | Complete — E19 S19.3, awaiting review       | `src/output/html/`       |
-| Accessible keyboard-driven HTML search                                            | Complete — E19 S19.4, awaiting review       | `src/output/html/`       |
-| Collapsible category navigation                                                   | Complete — E19 S19.5, awaiting review       | `src/output/html/`       |
-| Tablet breadcrumb layout stability                                                | Complete — E19 bugfix, awaiting review      | `src/output/html/`       |
-| MVP sign-off (HARNESS §13)                                                        | **Closed** — E7 S7.2 owner sign-off         | below                    |
+| Deliverable                                                                       | Status                                      | Reference                  |
+| --------------------------------------------------------------------------------- | ------------------------------------------- | -------------------------- |
+| `IMPLEMENTATION.md` build log                                                     | Complete through E7                         | this file                  |
+| Quality gate scripts (`test`, `lint`, `format`, `coverage`, `typecheck`, `build`) | Verified — full §0.2 gate green (S1.2)      | `package.json`             |
+| Structured logger (`src/core/Logger.ts`)                                          | Complete — E1 S1.3                          | `src/core/Logger.ts`       |
+| `specwiki list` + discover logging                                                | Complete — E2                               | `src/discover/specs.ts`    |
+| Markdown wiki (`wiki/*.md`)                                                       | Complete — E3                               | `src/output/wiki.ts`       |
+| HTML wiki (`wiki/html/`)                                                          | Complete — E4; **E16 S16.1 skin** in review | `src/output/html/`         |
+| Slug collision disambiguation                                                     | Complete — E5 S5.1                          | HARNESS §11 #1             |
+| CLI contracts + exit codes                                                        | Complete — E6                               | `src/cli.ts`               |
+| Custom discovery `--patterns` override                                            | Complete — E8 S8.1                          | `src/config/patterns.ts`   |
+| Project config file loader                                                        | Complete — E8 S8.2                          | `src/config/loader.ts`     |
+| Extended default patterns                                                         | Complete — E8 S8.3                          | `src/discover/specs.ts`    |
+| README folder index binding                                                       | Complete — E8 S8.4                          | `src/output/wiki.ts`       |
+| JSON machine-readable command output                                              | Complete — E9 S9.1, awaiting review         | `src/commands/generate.ts` |
+| HTML dark theme                                                                   | Complete — E19 S19.1, awaiting review       | `src/output/html/`         |
+| Responsive HTML layout and mobile navigation                                      | Complete — E19 S19.2, awaiting review       | `src/output/html/`         |
+| Wide-screen reading measure and sticky header                                     | Complete — E19 S19.3, awaiting review       | `src/output/html/`         |
+| Accessible keyboard-driven HTML search                                            | Complete — E19 S19.4, awaiting review       | `src/output/html/`         |
+| Collapsible category navigation                                                   | Complete — E19 S19.5, awaiting review       | `src/output/html/`         |
+| Tablet breadcrumb layout stability                                                | Complete — E19 bugfix, awaiting review      | `src/output/html/`         |
+| MVP sign-off (HARNESS §13)                                                        | **Closed** — E7 S7.2 owner sign-off         | below                      |
 
 ## Workflow References
 
@@ -120,7 +121,8 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
   - [x] S8.2 — Project config file loader _(done)_
   - [x] S8.3 — Extended default patterns _(done)_
   - [x] S8.4 — README discovery and folder index _(done)_
-- [ ] **E9 — Agent Interoperability** — `--json`, `llms.txt`
+- [ ] **E9 — Agent Interoperability** — `--json`, `llms.txt` _(in progress)_
+  - [x] S9.1 — JSON machine-readable output _(review)_
 - [ ] **E10 — Team CI Freshness** — `generate --check`
 - [ ] **E11 — Live Developer Loop** — `--watch`, `serve`
 - [ ] **E12 — Semantic Framework Enrichment** — Cursor badges, OpenSpec grouping, BMAD cards
@@ -245,4 +247,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-15 | E19 S19.3  | `feat(output): add regression-safe reading measure and sticky header` — coherent 70ch article grid only at ≥1200px; full-column table/code escape; exact 43px sticky offsets; portal geometry unchanged; 720px/375px baseline geometry preserved; 1 new test; 334 tests total                                      | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-15 | E19 S19.5  | `feat(output): add collapsible category navigation` — native multi-page category disclosures default closed on index and active-open on articles; count badges and tokenized chevrons; single-page groups remain visible; 3 new tests; 337 tests total                                                             | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-15 | E19 bugfix | `fix(output): stack tablet article infobox` — stacks the infobox below 1200px so wrapped breadcrumbs cannot shift article content; preserves desktop float and mobile drawer rules; 2 new tests; 339 tests total                                                                                                   | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-15 | E9 S9.1    | `feat(cli): add stable JSON output for list and generate` — restricted machine-readable schemas, zero-match JSON, verbose `output.json` diagnostics, and command/CLI regression coverage; 346 tests total                                                                                                          | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | _template_ | _E?_ S?_   | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                                                            | _hash or uncommitted_ | _full §0.2 gate result_                                         |

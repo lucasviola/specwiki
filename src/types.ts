@@ -50,6 +50,36 @@ export interface GenerateOptions {
   patterns?: string[];
   verbose?: boolean;
   noSearch?: boolean;
+  json?: boolean;
+}
+
+export interface JsonListFile {
+  relativePath: string;
+  title: string;
+  category: string;
+}
+
+export interface JsonListCategory {
+  name: string;
+  files: JsonListFile[];
+}
+
+export interface JsonListResult {
+  categories: JsonListCategory[];
+}
+
+export interface JsonGeneratedPage {
+  slug: string;
+  title: string;
+  category: string;
+  sourcePath: string;
+  description: string;
+}
+
+export interface JsonGenerateResult {
+  specCount: number;
+  outputDir: string;
+  pages: JsonGeneratedPage[];
 }
 
 export interface OpenOptions {

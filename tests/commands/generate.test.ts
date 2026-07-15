@@ -47,6 +47,70 @@ function parseStderrLines(): Record<string, unknown>[] {
 }
 
 describe("generateWiki", () => {
+  it("prints a stable JSON result after writing the wiki", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-json-"),
+    );
+    tempDirs.push(outputDir);
+
+    await generateWiki({
+      projectRoot: fixtureRoot,
+      outputDir,
+      json: true,
+    });
+
+    const result = JSON.parse(String(logSpy.mock.calls[0]?.[0])) as {
+      specCount: number;
+      outputDir: string;
+      pages: Array<Record<string, unknown>>;
+    };
+
+    expect(result.specCount).toBe(result.pages.length);
+    expect(result.outputDir).toBe(path.resolve(outputDir));
+    expect(result.pages.map((page) => page.sourcePath).slice(0, 4)).toEqual([
+      ".agents/skills/bmad-skill/SKILL.md",
+      "_bmad-output/planning/artifact.md",
+      ".cursor/rules/example.mdc",
+      ".cursor/skills/my-skill/SKILL.md",
+    ]);
+    expect(Object.keys(result.pages[0] ?? {})).toEqual([
+      "slug",
+      "title",
+      "category",
+      "sourcePath",
+      "description",
+    ]);
+    expect(result.pages).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          slug: expect.any(String),
+          title: expect.any(String),
+          category: expect.any(String),
+          sourcePath: expect.any(String),
+          description: expect.any(String),
+        }),
+      ]),
+    );
+    expect(await fs.stat(path.join(outputDir, "index.md"))).toBeDefined();
+  });
+
+  it("prints an empty JSON result without creating output for zero specs", async () => {
+    const projectRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-empty-"),
+    );
+    const outputDir = path.join(projectRoot, "wiki");
+    tempDirs.push(projectRoot);
+
+    await generateWiki({ projectRoot, outputDir, json: true });
+
+    expect(JSON.parse(String(logSpy.mock.calls[0]?.[0]))).toEqual({
+      specCount: 0,
+      outputDir: path.resolve(outputDir),
+      pages: [],
+    });
+    await expect(fs.stat(outputDir)).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
   it("writes wiki output for discovered specs", async () => {
     const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-out-"));
     tempDirs.push(outputDir);
@@ -350,6 +414,159 @@ const stripAnsi = (value: string) =>
   value.replace(/\u001b\[[0-9;]*m/g, "");
 
 describe("listSpecs", () => {
+  it("prints a JSON-only category result in discovery order", async () => {
+    await listSpecs({
+      projectRoot: fixtureRoot,
+      outputDir: "wiki",
+      json: true,
+    });
+
+    const result = JSON.parse(String(logSpy.mock.calls[0]?.[0])) as {
+      categories: Array<{
+        name: string;
+        files: Array<{ relativePath: string; title: string; category: string }>;
+      }>;
+    };
+
+    expect(
+      result.categories.map((category) => ({
+        name: category.name,
+        relativePaths: category.files.map((file) => file.relativePath),
+      })),
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "name": "agent-skills",
+          "relativePaths": [
+            ".agents/skills/bmad-skill/SKILL.md",
+          ],
+        },
+        {
+          "name": "bmad-output",
+          "relativePaths": [
+            "_bmad-output/planning/artifact.md",
+          ],
+        },
+        {
+          "name": "cursor-rules",
+          "relativePaths": [
+            ".cursor/rules/example.mdc",
+          ],
+        },
+        {
+          "name": "cursor-skills",
+          "relativePaths": [
+            ".cursor/skills/my-skill/SKILL.md",
+          ],
+        },
+        {
+          "name": "docs-specs",
+          "relativePaths": [
+            "docs/specs/architecture.md",
+          ],
+        },
+        {
+          "name": "github",
+          "relativePaths": [
+            ".github/copilot-instructions.md",
+          ],
+        },
+        {
+          "name": "openspec",
+          "relativePaths": [
+            "openspec/change.md",
+          ],
+        },
+        {
+          "name": "other",
+          "relativePaths": [
+            "docs/notes/general-notes.md",
+            "docs/README.md",
+            "packages/nested/AGENTS.md",
+            "packages/nested/README.md",
+          ],
+        },
+        {
+          "name": "plans",
+          "relativePaths": [
+            "docs/plans/roadmap.md",
+          ],
+        },
+        {
+          "name": "requirements",
+          "relativePaths": [
+            "requirements/req-001.md",
+          ],
+        },
+        {
+          "name": "root",
+          "relativePaths": [
+            "AGENTS.md",
+            "README.md",
+            "SPEC.md",
+          ],
+        },
+        {
+          "name": "specs",
+          "relativePaths": [
+            "specs/feature.md",
+          ],
+        },
+      ]
+    `);
+    expect(result.categories.map((category) => category.name)).toEqual(
+      [...result.categories.map((category) => category.name)].sort(),
+    );
+    expect(result.categories).toContainEqual(
+      expect.objectContaining({
+        name: "root",
+        files: expect.arrayContaining([
+          {
+            relativePath: "AGENTS.md",
+            title: "Agent Instructions",
+            category: "root",
+          },
+        ]),
+      }),
+    );
+    expect(
+      result.categories
+        .find((category) => category.name === "other")
+        ?.files.map((file) => file.relativePath),
+    ).toEqual([
+      "docs/notes/general-notes.md",
+      "docs/README.md",
+      "packages/nested/AGENTS.md",
+      "packages/nested/README.md",
+    ]);
+    expect(Object.keys(result.categories[0]?.files[0] ?? {})).toEqual([
+      "relativePath",
+      "title",
+      "category",
+    ]);
+    expect(logSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("prints an empty JSON categories result for zero specs", async () => {
+    const emptyRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-empty-list-"),
+    );
+    tempDirs.push(emptyRoot);
+
+    await listSpecs({
+      projectRoot: emptyRoot,
+      outputDir: "wiki",
+      json: true,
+    });
+
+    expect(JSON.parse(String(logSpy.mock.calls[0]?.[0])))
+      .toMatchInlineSnapshot(`
+      {
+        "categories": [],
+      }
+    `);
+  });
+
   it("groups discovered specs by category with headers", async () => {
     await listSpecs({
       projectRoot: fixtureRoot,

@@ -4,7 +4,7 @@ baseline_commit: e8b2995b867291f38e3a2d421b911d42c7df34f3
 
 # Story 19.2: Responsive Layout and Mobile Navigation Drawer
 
-Status: review
+Status: done
 
 ## Story
 

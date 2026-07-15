@@ -4,7 +4,7 @@ baseline_commit: uncommitted
 
 # Story 19.5: Collapsible Category Navigation
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 

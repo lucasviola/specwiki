@@ -11,11 +11,15 @@ Read every section before writing a single line. This document is the ground tru
 > - **One task at a time** — never implement an entire phase (or multiple bullets) in a
 >   single turn. Stop after each bullet for owner review and commit (§0.3–§0.4).
 > - Follow Test-Driven Development on every task (§0.1).
-> - Run the full quality gate after every task (§0.2). **Do not** run e2e/browser tests
+> - **Quality-gate and review scope:** Run and return the full quality gate, automated code
+>   review, QA analysis, and §0.3 code-review checkpoint **only when a task changes code**.
+>   When the prompt is not about code, do not return a code-review checkpoint; simple
+>   Markdown-only changes and discovery runs do not require these steps.
+> - Run the full quality gate after every code-changing task (§0.2). **Do not** run e2e/browser tests
 >   or record demo videos unless the owner explicitly asks (§0.2.1).
 > - Run **automated code review** (§0.2.5) and **QA analysis** (§0.2.6) via subagents on a
->   **different LLM** than the implementer — include both in the §0.3 checkpoint summary.
-> - **Stop and ask for confirmation** after every task — do not start the next task until
+>   **different LLM** than the implementer for code-changing tasks — include both in the §0.3 checkpoint summary.
+> - **Stop and ask for confirmation** after every code-changing task — do not start the next task until
 >   the owner approves the checkpoint **and** the commit is on the branch (§0.3). Ask whether
 >   to implement code-review patches **before** committing.
 > - **Update project logs** after every task (§0.4). Skipping this is as serious as
@@ -101,10 +105,12 @@ Adjust thresholds and exclusions to match the project.
 
 For HTML output, verify rendered structure and escaping — not pixel equality. Test the _intent_ of rendering (correct tags, escaped titles, TOC links).
 
-### 0.2 Quality gate — run after every task
+### 0.2 Quality gate — run after code-changing tasks
 
-After finishing a task (Red → Green → Refactor complete), run **all** of the following
+After finishing a code-changing task (Red → Green → Refactor complete), run **all** of the following
 commands in order. Do not proceed to the next task until all pass.
+
+Simple Markdown-only changes and discovery runs do not require the quality gate.
 
 ```bash
 npm run test        # all tests must pass
@@ -145,7 +151,7 @@ When the owner **does** request e2e work:
 - Output lives in gitignored directories (`e2e/artifacts/`, `test-results/`, etc.).
 - Do not `git add` video files. Commit only spec/helper changes.
 
-### 0.2.5 Automated code review — mandatory after every task
+### 0.2.5 Automated code review — mandatory after code-changing tasks
 
 After §0.2 passes and **before** the §0.3 checkpoint, run an adversarial code review
 using a **subagent on a different LLM** than the one that implemented the task. The
@@ -154,7 +160,7 @@ unless the owner approves.
 
 #### When to run
 
-- **Every task/story** — no exceptions, including doc-only tasks (review prose and structure).
+- **Every code-changing task/story** — Markdown-only changes and discovery runs are exempt.
 - **Order:** §0.1 TDD → §0.2 quality gate → **§0.2.5 code review** → §0.2.6 QA analysis → §0.3 checkpoint.
 
 #### Subagent invocation
@@ -219,7 +225,7 @@ When a story file exists under `_bmad-output/implementation-artifacts/`, append 
 - `## Senior Developer Review (AI)` — review date, outcome, reviewer model, action items
 - Checkboxes for Patch/Defer items; mark Patch items `[x]` only after owner-approved fixes
 
-### 0.2.6 QA analysis — mandatory after every task
+### 0.2.6 QA analysis — mandatory after code-changing tasks
 
 Immediately after §0.2.5, launch a **QA analysis subagent on a different LLM** (may be the
 same reviewer family as §0.2.5, but must differ from the implementer). Goal: validate that
@@ -261,10 +267,12 @@ Tailor steps to the task — every step must be **actionable** (command + expect
 If the QA subagent is unavailable, produce the four sections yourself in the §0.3 checkpoint.
 Label: `QA model: Inline analysis (subagent unavailable — <reason>)`.
 
-### 0.3 Code review checkpoint — after every task
+### 0.3 Code review checkpoint — after code-changing tasks
 
-After §0.2, §0.2.5, and §0.2.6 complete, **stop and present the checkpoint** to the owner.
+After §0.2, §0.2.5, and §0.2.6 complete for a code-changing task, **stop and present the checkpoint** to the owner.
 Do not start the next task until approved. Do this even if the next task feels trivial.
+
+Simple Markdown-only changes and discovery runs do not require this checkpoint.
 
 Format your checkpoint message exactly like this:
 

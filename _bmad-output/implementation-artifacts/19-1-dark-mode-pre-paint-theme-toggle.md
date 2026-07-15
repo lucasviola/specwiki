@@ -4,7 +4,7 @@ baseline_commit: 880693d9ba4da39cd89dce61c2b09e93e31dc9fe
 
 # Story 19.1: Dark Mode with Pre-Paint Theme and Toggle
 
-Status: review
+Status: done
 
 ## Story
 

@@ -148,6 +148,7 @@ program
     parsePatternsOption,
   )
   .option("--no-search", "Skip client-side search index and JS")
+  .option("--json", "Print a machine-readable JSON result")
   .action(async (opts) => {
     try {
       log.setVerbose(Boolean(opts.verbose));
@@ -164,6 +165,7 @@ program
         patterns,
         verbose: opts.verbose,
         noSearch: opts.search === false,
+        json: opts.json,
       });
     } catch (err) {
       if (!isCliErrorLogged(err)) {
@@ -181,6 +183,7 @@ program
   .description("List discovered spec files without generating")
   .option("-p, --project <path>", "Project root to scan", process.cwd())
   .option("-v, --verbose", "Show detailed discover diagnostics on stderr")
+  .option("--json", "Print a machine-readable JSON result")
   .option(
     "--patterns <globs>",
     "Comma-separated glob patterns (replaces defaults)",
@@ -201,6 +204,7 @@ program
         outputDir: "wiki",
         patterns,
         verbose: opts.verbose,
+        json: opts.json,
       });
     } catch (err) {
       if (!isCliErrorLogged(err)) {
