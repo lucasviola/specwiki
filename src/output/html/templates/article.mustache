@@ -11,7 +11,21 @@
     </button>
     <nav class="category-nav" aria-label="Categories">
       {{#categories}}
-      <div class="category-nav-group{{#active}} category-nav-active{{/active}}">
+      {{#collapsible}}
+      <details class="category-nav-group{{#active}} category-nav-active{{/active}}" data-category="{{key}}" {{#open}}open{{/open}}>
+        <summary class="category-nav-summary">
+          <a href="index.html#{{anchor}}" class="category-nav-heading">{{label}}</a>
+          <span class="category-nav-count" aria-label="{{pageCount}} pages">{{pageCount}}</span>
+        </summary>
+        <ul class="category-nav-pages">
+          {{#pages}}
+          <li><a href="{{href}}">{{title}}</a></li>
+          {{/pages}}
+        </ul>
+      </details>
+      {{/collapsible}}
+      {{^collapsible}}
+      <div class="category-nav-group{{#active}} category-nav-active{{/active}}" data-category="{{key}}">
         <a href="index.html#{{anchor}}" class="category-nav-heading">{{label}}</a>
         <ul class="category-nav-pages">
           {{#pages}}
@@ -19,6 +33,7 @@
           {{/pages}}
         </ul>
       </div>
+      {{/collapsible}}
       {{/categories}}
     </nav>
   </aside>

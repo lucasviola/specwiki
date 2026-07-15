@@ -28,6 +28,9 @@ interface NavCategory {
   label: string;
   anchor: string;
   pages: NavPage[];
+  pageCount: number;
+  collapsible: boolean;
+  open: boolean;
   active: boolean;
   hasIntro?: boolean;
   introHtml?: string;
@@ -218,6 +221,9 @@ function buildNavCategories(
       label: categoryLabelFor(key),
       anchor: categoryAnchor(key),
       active: key === activeCategory,
+      open: key === activeCategory,
+      pageCount: (byCategory.get(key) ?? []).length,
+      collapsible: (byCategory.get(key) ?? []).length > 1,
       pages: (byCategory.get(key) ?? []).map((page) => ({
         title: page.title,
         slug: page.slug,

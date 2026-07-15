@@ -869,6 +869,32 @@ describe("writeHtmlWiki", () => {
     );
   });
 
+  it("writes disclosure navigation styles with tokenized badges", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-category-nav-"),
+    );
+    tempDirs.push(outputDir);
+
+    await writeHtmlWiki(outputDir, buildWiki([sampleSpec()]));
+
+    const css = await fs.readFile(
+      path.join(outputDir, "html", "assets", "specwiki.css"),
+      "utf-8",
+    );
+    expect(css).toContain(".category-nav-summary");
+    expect(css).toContain(
+      ".category-nav-group > summary::-webkit-details-marker",
+    );
+    expect(css).toContain(".category-nav-group > summary::before");
+    expect(css).toContain(".category-nav-group[open] > summary::before");
+    expect(css).toContain(".category-nav-count");
+    expect(css).toContain("var(--background-color-interactive-subtle)");
+    expect(css).toContain("var(--color-base--subtle)");
+    expect(css).toContain("@media (prefers-reduced-motion: reduce)");
+    expect(css).toContain(".specwiki-nav-enhanced .specwiki-nav-drawer");
+    expect(css).toContain(".specwiki-search-results");
+  });
+
   it("writes html/assets/highlight.css with syntax highlighting theme", async () => {
     const outputDir = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-html-"),

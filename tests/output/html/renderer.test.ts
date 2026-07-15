@@ -141,6 +141,57 @@ describe("HtmlRenderer", () => {
     expect(html).not.toContain("<style>");
   });
 
+  it("renders collapsible category navigation with route-aware defaults", () => {
+    const rootFirst = samplePage({
+      slug: "root-first",
+      title: "Root First",
+      sourcePath: "FIRST.md",
+    });
+    const rootSecond = samplePage({
+      slug: "root-second",
+      title: "Root Second",
+      sourcePath: "SECOND.md",
+    });
+    const onlyOther = samplePage({
+      slug: "other-only",
+      title: "Other Only",
+      category: "other",
+      sourcePath: "other/ONLY.md",
+    });
+
+    const indexHtml = renderer.renderIndex(
+      [rootFirst, rootSecond, onlyOther],
+      emptyIndexMeta(),
+    );
+    expect(indexHtml).toMatch(
+      /<details class="category-nav-group" data-category="root"\s*>/,
+    );
+    expect(indexHtml).not.toContain(
+      '<details class="category-nav-group" data-category="root" open>',
+    );
+    expect(indexHtml).toContain('<summary class="category-nav-summary">');
+    expect(indexHtml).toContain('href="index.html#category-root"');
+    expect(indexHtml).toContain(
+      '<span class="category-nav-count" aria-label="2 pages">2</span>',
+    );
+    expect(indexHtml).toContain(
+      '<div class="category-nav-group" data-category="other">',
+    );
+    expect(indexHtml).not.toContain('data-category="other" open');
+
+    const articleHtml = renderer.renderArticle(
+      rootFirst,
+      [rootFirst, rootSecond, onlyOther],
+      "<p>Body</p>",
+    );
+    expect(articleHtml).toContain(
+      '<details class="category-nav-group category-nav-active" data-category="root" open>',
+    );
+    expect(articleHtml).toContain(
+      '<div class="category-nav-group" data-category="other">',
+    );
+  });
+
   it("renders the [[specwiki]] wordmark and generator meta in the layout", () => {
     const html = renderer.renderIndex([samplePage()], emptyIndexMeta());
 
@@ -318,6 +369,14 @@ describe("HtmlRenderer", () => {
 
     expect(() => renderer.renderArticle(page, [page], "<p>Body</p>")).toThrow(
       /Missing required template fields/,
+    );
+  });
+
+  it("throws when an article category is missing", () => {
+    const page = samplePage({ category: "" });
+
+    expect(() => renderer.renderArticle(page, [page], "<p>Body</p>")).toThrow(
+      /Missing required template fields: category/,
     );
   });
 
