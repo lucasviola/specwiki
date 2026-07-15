@@ -4,6 +4,7 @@ import { DEFAULT_SPEC_PATTERNS } from "../config/patterns.js";
 import { log } from "../core/Logger.js";
 import { discoverSpecs } from "../discover/specs.js";
 import { parseSpecFile } from "../parse/markdown.js";
+import { writeLlmsTxt } from "../output/llms.js";
 import { buildWiki, writeHtmlWiki, writeWiki } from "../output/wiki.js";
 import type {
   GenerateOptions,
@@ -155,6 +156,9 @@ export async function generateWiki(options: GenerateOptions): Promise<void> {
     const htmlWritten = await writeHtmlWiki(resolvedOutput, wiki, {
       noSearch: options.noSearch,
     });
+    if (options.emitLlmsTxt) {
+      await writeLlmsTxt(resolvedOutput, wiki.pages);
+    }
 
     log.info("generate.summary", {
       pageCount: wiki.pages.length,

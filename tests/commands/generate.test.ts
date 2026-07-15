@@ -47,6 +47,43 @@ function parseStderrLines(): Record<string, unknown>[] {
 }
 
 describe("generateWiki", () => {
+  it("writes an llms.txt manifest only when explicitly enabled", async () => {
+    const defaultOutput = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-llms-default-"),
+    );
+    const enabledOutput = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-llms-enabled-"),
+    );
+    tempDirs.push(defaultOutput, enabledOutput);
+
+    await generateWiki({
+      projectRoot: fixtureRoot,
+      outputDir: defaultOutput,
+    });
+    await expect(
+      fs.stat(path.join(defaultOutput, "llms.txt")),
+    ).rejects.toMatchObject({
+      code: "ENOENT",
+    });
+
+    await generateWiki({
+      projectRoot: fixtureRoot,
+      outputDir: enabledOutput,
+      emitLlmsTxt: true,
+      verbose: true,
+    });
+
+    await expect(
+      fs.readFile(path.join(enabledOutput, "llms.txt"), "utf-8"),
+    ).resolves.toContain("# Spec Wiki");
+    expect(parseStderrLines()).toContainEqual(
+      expect.objectContaining({
+        event: "output.write",
+        relativePath: "llms.txt",
+      }),
+    );
+  });
+
   it("prints a stable JSON result after writing the wiki", async () => {
     const outputDir = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-json-"),

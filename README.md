@@ -55,6 +55,9 @@ npx specwiki list --json
 # Machine-readable generation summary (stdout is one JSON document)
 npx specwiki generate --json
 
+# Generate an llms.txt manifest grouped by wiki category
+npx specwiki generate --emit-llms-txt
+
 # Keep JSON stdout clean while sending verbose diagnostics to stderr
 npx specwiki list --json --verbose
 
@@ -78,6 +81,12 @@ generated page count, resolved output directory, and page metadata. The JSON res
 only CLI output on stdout. With `--verbose`, structured diagnostics including `output.json`
 are written to stderr.
 
+### llms.txt export
+
+Use `generate --emit-llms-txt` to add `llms.txt` to the generated wiki root. The
+opt-in manifest starts with a project summary, groups every generated page by category,
+and links to its local Markdown wiki page with its description when available.
+
 ## Output
 
 Running `specwiki generate` creates:
@@ -85,6 +94,7 @@ Running `specwiki generate` creates:
 ```
 wiki/
 ├── index.md          # Landing page with categorized links
+├── llms.txt          # Optional AI-oriented manifest (--emit-llms-txt)
 ├── agents.md         # One page per discovered spec
 ├── cursor-rules-*.md
 └── html/

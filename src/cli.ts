@@ -149,6 +149,7 @@ program
   )
   .option("--no-search", "Skip client-side search index and JS")
   .option("--json", "Print a machine-readable JSON result")
+  .option("--emit-llms-txt", "Write an llms.txt manifest alongside the wiki")
   .action(async (opts) => {
     try {
       log.setVerbose(Boolean(opts.verbose));
@@ -166,6 +167,7 @@ program
         verbose: opts.verbose,
         noSearch: opts.search === false,
         json: opts.json,
+        emitLlmsTxt: opts.emitLlmsTxt,
       });
     } catch (err) {
       if (!isCliErrorLogged(err)) {

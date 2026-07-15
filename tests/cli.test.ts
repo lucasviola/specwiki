@@ -159,6 +159,46 @@ describe("cli JSON output", () => {
     }
   });
 
+  it("writes an llms.txt manifest when generate receives --emit-llms-txt", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-llms-"),
+    );
+
+    try {
+      const { stderr } = await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "generate",
+          "--emit-llms-txt",
+          "--verbose",
+          "--project",
+          fixtureRoot,
+          "--output",
+          outputDir,
+        ],
+        { cwd: projectRoot },
+      );
+
+      const manifest = await fs.readFile(
+        path.join(outputDir, "llms.txt"),
+        "utf-8",
+      );
+      expect(manifest).toMatch(/^# Spec Wiki\n/);
+      expect(manifest).toContain("## Project Root");
+      expect(parseJsonStderrLines(stderr)).toContainEqual(
+        expect.objectContaining({
+          event: "output.write",
+          relativePath: "llms.txt",
+        }),
+      );
+    } finally {
+      await fs.rm(outputDir, { force: true, recursive: true });
+    }
+  });
+
   it("returns JSON empty results without a human tip or output directory", async () => {
     const emptyRoot = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-cli-json-empty-"),

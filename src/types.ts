@@ -51,6 +51,7 @@ export interface GenerateOptions {
   verbose?: boolean;
   noSearch?: boolean;
   json?: boolean;
+  emitLlmsTxt?: boolean;
 }
 
 export interface JsonListFile {

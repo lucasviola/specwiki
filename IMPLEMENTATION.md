@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-15
-**Current position:** **E9 S9.1 JSON machine-readable output complete** — awaiting owner review
-**Test count:** 346 passing
+**Current position:** **E9 S9.2 wiki/llms.txt export complete** — awaiting owner review
+**Test count:** 352 passing
 
 ## Deliverables
 
@@ -21,6 +21,7 @@
 | Extended default patterns                                                         | Complete — E8 S8.3                          | `src/discover/specs.ts`    |
 | README folder index binding                                                       | Complete — E8 S8.4                          | `src/output/wiki.ts`       |
 | JSON machine-readable command output                                              | Complete — E9 S9.1, awaiting review         | `src/commands/generate.ts` |
+| Opt-in `wiki/llms.txt` export                                                     | Complete — E9 S9.2, awaiting review         | `src/output/llms.ts`       |
 | HTML dark theme                                                                   | Complete — E19 S19.1, awaiting review       | `src/output/html/`         |
 | Responsive HTML layout and mobile navigation                                      | Complete — E19 S19.2, awaiting review       | `src/output/html/`         |
 | Wide-screen reading measure and sticky header                                     | Complete — E19 S19.3, awaiting review       | `src/output/html/`         |
@@ -123,6 +124,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
   - [x] S8.4 — README discovery and folder index _(done)_
 - [ ] **E9 — Agent Interoperability** — `--json`, `llms.txt` _(in progress)_
   - [x] S9.1 — JSON machine-readable output _(review)_
+  - [x] S9.2 — wiki/llms.txt export _(review)_
 - [ ] **E10 — Team CI Freshness** — `generate --check`
 - [ ] **E11 — Live Developer Loop** — `--watch`, `serve`
 - [ ] **E12 — Semantic Framework Enrichment** — Cursor badges, OpenSpec grouping, BMAD cards
@@ -248,4 +250,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-15 | E19 S19.5  | `feat(output): add collapsible category navigation` — native multi-page category disclosures default closed on index and active-open on articles; count badges and tokenized chevrons; single-page groups remain visible; 3 new tests; 337 tests total                                                             | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-15 | E19 bugfix | `fix(output): stack tablet article infobox` — stacks the infobox below 1200px so wrapped breadcrumbs cannot shift article content; preserves desktop float and mobile drawer rules; 2 new tests; 339 tests total                                                                                                   | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-15 | E9 S9.1    | `feat(cli): add stable JSON output for list and generate` — restricted machine-readable schemas, zero-match JSON, verbose `output.json` diagnostics, and command/CLI regression coverage; 346 tests total                                                                                                          | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-15 | E9 S9.2    | `feat(output): add opt-in wiki llms.txt export` — category-grouped manifest from generated page metadata; safe output logging/confinement; command and CLI regression coverage; 352 tests total                                                                                                                    | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | _template_ | _E?_ S?_   | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                                                            | _hash or uncommitted_ | _full §0.2 gate result_                                         |
