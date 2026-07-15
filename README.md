@@ -50,6 +50,14 @@ npx specwiki list
 npm install -g specwiki
 ```
 
+#### Quick start
+
+```bash
+npm run build
+npm link
+specwiki init && specwiki generate && specwiki open
+```
+
 ### For contributors
 
 Clone this repo, then:
@@ -59,14 +67,6 @@ npm install
 npm run build
 npm run setup-hooks   # optional: install git hooks
 npm link              # optional: use `specwiki` globally from source
-```
-
-## Quick start
-
-```bash
-npx specwiki list      # preview what will be indexed
-npx specwiki generate  # write wiki/ (markdown + HTML)
-npx specwiki open      # open the HTML wiki in your browser
 ```
 
 ## Usage
