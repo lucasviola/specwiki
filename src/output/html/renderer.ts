@@ -166,7 +166,7 @@ export class HtmlRenderer {
   }
 
   static async readHighlightCss(): Promise<string> {
-    const highlightPath = require.resolve("highlight.js/styles/github.min.css");
+    const highlightPath = path.join(ASSETS_DIR, HIGHLIGHT_CSS_FILENAME);
     return fs.readFile(highlightPath, "utf-8");
   }
 }

@@ -752,6 +752,27 @@ describe("writeHtmlWiki", () => {
     expect(css).toContain(".specwiki-header");
   });
 
+  it("writes light and dark semantic theme tokens with a system fallback", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-theme-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([sampleSpec()]);
+    await writeHtmlWiki(outputDir, wiki);
+
+    const css = await fs.readFile(
+      path.join(outputDir, "html", "assets", "specwiki.css"),
+      "utf-8",
+    );
+    expect(css).toContain("@media (prefers-color-scheme: dark)");
+    expect(css).toContain(':root[data-theme="light"]');
+    expect(css).toContain(':root[data-theme="dark"]');
+    expect(css).toContain("--background-color-interactive-subtle");
+    expect(css).toContain("--specwiki-syntax-keyword");
+    expect(css).toContain(".specwiki-theme-toggle[hidden]");
+  });
+
   it("writes html/assets/highlight.css with syntax highlighting theme", async () => {
     const outputDir = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-html-"),
@@ -766,6 +787,9 @@ describe("writeHtmlWiki", () => {
       "utf-8",
     );
     expect(css).toContain(".hljs");
+    expect(css).toContain("var(--specwiki-syntax-text)");
+    expect(css).toContain("var(--specwiki-syntax-keyword)");
+    expect(css).not.toMatch(/#[\da-f]{3,8}\b/i);
   });
 
   it("writes article HTML with infobox, breadcrumb, TOC, and category nav", async () => {

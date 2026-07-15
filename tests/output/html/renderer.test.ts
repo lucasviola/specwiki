@@ -141,6 +141,44 @@ describe("HtmlRenderer", () => {
     expect(html).not.toContain("<style>");
   });
 
+  it("renders the [[specwiki]] wordmark and generator meta in the layout", () => {
+    const html = renderer.renderIndex([samplePage()], emptyIndexMeta());
+
+    expect(html).toContain('<meta name="generator" content="specwiki">');
+    expect(html).toContain('class="specwiki-logo"');
+    expect(html).toContain(
+      '<span class="specwiki-logo-bracket">[[</span>specwiki<span class="specwiki-logo-bracket">]]</span>',
+    );
+  });
+
+  it("renders a storage-safe theme initializer before stylesheets", () => {
+    const html = renderer.renderIndex([samplePage()], emptyIndexMeta());
+    const initializer = html.indexOf("data-specwiki-theme-init");
+    const stylesheet = html.indexOf(
+      '<link rel="stylesheet" href="assets/specwiki.css">',
+    );
+
+    expect(initializer).toBeGreaterThan(-1);
+    expect(initializer).toBeLessThan(stylesheet);
+    expect(html).toContain('localStorage.getItem("specwiki-theme")');
+    expect(html).toContain('theme === "light" || theme === "dark"');
+    expect(html).toContain("document.documentElement.dataset.theme = theme");
+    expect(html).not.toContain("fetch(");
+  });
+
+  it("renders an accessible progressively enhanced theme toggle", () => {
+    const html = renderer.renderIndex([samplePage()], emptyIndexMeta());
+
+    expect(html).toContain('id="specwiki-theme-toggle"');
+    expect(html).toContain('type="button"');
+    expect(html).toContain('aria-label="Switch color theme"');
+    expect(html).toContain('aria-pressed="false"');
+    expect(html).toMatch(/id="specwiki-theme-toggle"[^>]*hidden/);
+    expect(html).toContain("data-specwiki-theme-toggle");
+    expect(html).toContain('localStorage.setItem("specwiki-theme"');
+    expect(html).not.toContain("console.");
+  });
+
   it("renders search chrome when includeSearch is enabled", () => {
     const html = renderer.renderIndex([samplePage()], emptyIndexMeta(), {
       includeSearch: true,
@@ -243,6 +281,7 @@ describe("HtmlRenderer", () => {
     expect(css).toContain("--color-primary");
     expect(css).toContain("--font-family-base");
     expect(css).toContain(".specwiki-header");
+    expect(css).toContain(".specwiki-logo-bracket");
     expect(css).toContain(".category-nav");
     expect(css).toContain(".infobox");
     expect(css).toContain(".toc");

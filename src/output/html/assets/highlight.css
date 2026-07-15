@@ -1,0 +1,101 @@
+pre code.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 1em;
+}
+
+code.hljs {
+  padding: 3px 5px;
+}
+
+.hljs {
+  color: var(--specwiki-syntax-text);
+  background: var(--specwiki-syntax-background);
+}
+
+.hljs-doctag,
+.hljs-keyword,
+.hljs-meta .hljs-keyword,
+.hljs-template-tag,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable.language_ {
+  color: var(--specwiki-syntax-keyword);
+}
+
+.hljs-title,
+.hljs-title.class_,
+.hljs-title.class_.inherited__,
+.hljs-title.function_ {
+  color: var(--specwiki-syntax-title);
+}
+
+.hljs-attr,
+.hljs-attribute,
+.hljs-literal,
+.hljs-meta,
+.hljs-number,
+.hljs-operator,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-id,
+.hljs-variable {
+  color: var(--specwiki-syntax-literal);
+}
+
+.hljs-meta .hljs-string,
+.hljs-regexp,
+.hljs-string {
+  color: var(--specwiki-syntax-string);
+}
+
+.hljs-built_in,
+.hljs-symbol {
+  color: var(--specwiki-syntax-built-in);
+}
+
+.hljs-code,
+.hljs-comment,
+.hljs-formula {
+  color: var(--specwiki-syntax-comment);
+}
+
+.hljs-name,
+.hljs-quote,
+.hljs-selector-pseudo,
+.hljs-selector-tag {
+  color: var(--specwiki-syntax-tag);
+}
+
+.hljs-subst,
+.hljs-emphasis,
+.hljs-strong {
+  color: var(--specwiki-syntax-text);
+}
+
+.hljs-section {
+  color: var(--specwiki-syntax-section);
+  font-weight: 700;
+}
+
+.hljs-bullet {
+  color: var(--specwiki-syntax-bullet);
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: 700;
+}
+
+.hljs-addition {
+  color: var(--specwiki-syntax-addition);
+  background-color: var(--specwiki-syntax-addition-background);
+}
+
+.hljs-deletion {
+  color: var(--specwiki-syntax-deletion);
+  background-color: var(--specwiki-syntax-deletion-background);
+}

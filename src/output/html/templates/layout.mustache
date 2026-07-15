@@ -3,6 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="generator" content="specwiki">
+  <script data-specwiki-theme-init>
+    (function () {
+      "use strict";
+      try {
+        var theme = localStorage.getItem("specwiki-theme");
+        if (theme === "light" || theme === "dark") {
+          document.documentElement.dataset.theme = theme;
+        }
+      } catch {}
+    })();
+  </script>
   <title>{{pageTitle}} — Spec Wiki</title>
   <link rel="stylesheet" href="assets/specwiki.css">
   {{#includeHighlightCss}}
@@ -12,7 +24,7 @@
 <body class="specwiki">
   <header class="specwiki-header">
     <div class="specwiki-header-inner">
-      <a href="index.html" class="specwiki-logo">Spec Wiki</a>
+      <a href="index.html" class="specwiki-logo"><span class="specwiki-logo-bracket">[[</span>specwiki<span class="specwiki-logo-bracket">]]</span></a>
       {{#includeSearch}}
       <div class="specwiki-search">
         <label for="specwiki-search-input" class="specwiki-search-label">Search</label>
@@ -26,6 +38,17 @@
         <div id="specwiki-search-results" class="specwiki-search-results" hidden></div>
       </div>
       {{/includeSearch}}
+      <button
+        type="button"
+        id="specwiki-theme-toggle"
+        hidden
+        class="specwiki-theme-toggle"
+        aria-label="Switch color theme"
+        aria-pressed="false"
+      >
+        <span aria-hidden="true">◐</span>
+        <span>Theme</span>
+      </button>
     </div>
   </header>
   <div class="specwiki-main">
@@ -36,5 +59,48 @@
   <script src="assets/lunr.min.js"></script>
   <script src="assets/search.js"></script>
   {{/includeSearch}}
+  <script data-specwiki-theme-toggle>
+    (function () {
+      "use strict";
+      var root = document.documentElement;
+      var toggle = document.getElementById("specwiki-theme-toggle");
+      if (!toggle) {
+        return;
+      }
+
+      function isDark() {
+        if (root.dataset.theme) {
+          return root.dataset.theme === "dark";
+        }
+        return window.matchMedia("(prefers-color-scheme: dark)").matches;
+      }
+
+      function syncToggle() {
+        var dark = isDark();
+        toggle.setAttribute("aria-pressed", String(dark));
+        toggle.title = dark ? "Switch to light theme" : "Switch to dark theme";
+        toggle.hidden = false;
+      }
+
+      toggle.addEventListener("click", function () {
+        var theme = isDark() ? "light" : "dark";
+        root.dataset.theme = theme;
+        try {
+          localStorage.setItem("specwiki-theme", theme);
+        } catch {}
+        syncToggle();
+      });
+
+      var preference = window.matchMedia("(prefers-color-scheme: dark)");
+      if (preference.addEventListener) {
+        preference.addEventListener("change", function () {
+          if (!root.dataset.theme) {
+            syncToggle();
+          }
+        });
+      }
+      syncToggle();
+    })();
+  </script>
 </body>
 </html>

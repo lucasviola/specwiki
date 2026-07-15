@@ -1,5 +1,110 @@
 /* Spec Wiki layout — Vector-inspired chrome (S16.1 baseline + S16.2 navigation) */
 
+:root {
+  color-scheme: light;
+  --background-color-base: #ffffff;
+  --background-color-base--hover: #eaecf0;
+  --background-color-code: #f6f8fa;
+  --background-color-interactive-subtle: #f8f9fa;
+  --color-base: #202122;
+  --color-base--hover: #404244;
+  --color-base--active: #000000;
+  --color-base--subtle: #54595d;
+  --color-primary: #3366cc;
+  --color-primary--hover: #2a4b8d;
+  --color-primary--active: #233566;
+  --border-color-base: #72777d;
+  --border-color-divider: #72777d;
+  --specwiki-shadow-color: rgba(0, 0, 0, 0.16);
+  --specwiki-syntax-text: #24292e;
+  --specwiki-syntax-background: #f6f8fa;
+  --specwiki-syntax-keyword: #cf222e;
+  --specwiki-syntax-title: #8250df;
+  --specwiki-syntax-literal: #0550ae;
+  --specwiki-syntax-string: #0a3069;
+  --specwiki-syntax-built-in: #953800;
+  --specwiki-syntax-comment: #57606a;
+  --specwiki-syntax-tag: #116329;
+  --specwiki-syntax-section: #0969da;
+  --specwiki-syntax-bullet: #7d4e00;
+  --specwiki-syntax-addition: #1a7f37;
+  --specwiki-syntax-addition-background: #dafbe1;
+  --specwiki-syntax-deletion: #cf222e;
+  --specwiki-syntax-deletion-background: #ffebe9;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --background-color-base: #16181c;
+    --background-color-base--hover: #2b2f36;
+    --background-color-code: #202328;
+    --background-color-interactive-subtle: #202328;
+    --color-base: #eaecf0;
+    --color-base--hover: #ffffff;
+    --color-base--active: #ffffff;
+    --color-base--subtle: #b6bdc6;
+    --color-primary: #6b8fe8;
+    --color-primary--hover: #9bb4f0;
+    --color-primary--active: #bdccf5;
+    --border-color-base: #72777d;
+    --border-color-divider: #72777d;
+    --specwiki-shadow-color: rgba(0, 0, 0, 0.48);
+    --specwiki-syntax-text: #e6edf3;
+    --specwiki-syntax-background: #202328;
+    --specwiki-syntax-keyword: #ff7b72;
+    --specwiki-syntax-title: #d2a8ff;
+    --specwiki-syntax-literal: #79c0ff;
+    --specwiki-syntax-string: #a5d6ff;
+    --specwiki-syntax-built-in: #ffa657;
+    --specwiki-syntax-comment: #9ca6b1;
+    --specwiki-syntax-tag: #7ee787;
+    --specwiki-syntax-section: #58a6ff;
+    --specwiki-syntax-bullet: #f2cc60;
+    --specwiki-syntax-addition: #aff5b4;
+    --specwiki-syntax-addition-background: #033a16;
+    --specwiki-syntax-deletion: #ffdcd7;
+    --specwiki-syntax-deletion-background: #67060c;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background-color-base: #16181c;
+  --background-color-base--hover: #2b2f36;
+  --background-color-code: #202328;
+  --background-color-interactive-subtle: #202328;
+  --color-base: #eaecf0;
+  --color-base--hover: #ffffff;
+  --color-base--active: #ffffff;
+  --color-base--subtle: #b6bdc6;
+  --color-primary: #6b8fe8;
+  --color-primary--hover: #9bb4f0;
+  --color-primary--active: #bdccf5;
+  --border-color-base: #72777d;
+  --border-color-divider: #72777d;
+  --specwiki-shadow-color: rgba(0, 0, 0, 0.48);
+  --specwiki-syntax-text: #e6edf3;
+  --specwiki-syntax-background: #202328;
+  --specwiki-syntax-keyword: #ff7b72;
+  --specwiki-syntax-title: #d2a8ff;
+  --specwiki-syntax-literal: #79c0ff;
+  --specwiki-syntax-string: #a5d6ff;
+  --specwiki-syntax-built-in: #ffa657;
+  --specwiki-syntax-comment: #9ca6b1;
+  --specwiki-syntax-tag: #7ee787;
+  --specwiki-syntax-section: #58a6ff;
+  --specwiki-syntax-bullet: #f2cc60;
+  --specwiki-syntax-addition: #aff5b4;
+  --specwiki-syntax-addition-background: #033a16;
+  --specwiki-syntax-deletion: #ffdcd7;
+  --specwiki-syntax-deletion-background: #67060c;
+}
+
 * {
   box-sizing: var(--box-sizing-base, border-box);
 }
@@ -71,7 +176,7 @@ body.specwiki {
   background-color: var(--background-color-base);
   border: 1px solid var(--border-color-divider);
   border-radius: var(--border-radius-base, 2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px var(--specwiki-shadow-color);
   max-height: 18rem;
   overflow-y: auto;
 }
@@ -105,7 +210,7 @@ body.specwiki {
 .specwiki-search-snippet {
   display: block;
   padding: 0 0.625rem 0.5rem;
-  color: var(--color-base--subtle, #54595d);
+  color: var(--color-base--subtle);
   font-size: 0.8125rem;
   font-weight: normal;
 }
@@ -121,10 +226,44 @@ body.specwiki {
   text-decoration: none;
   font-weight: var(--font-weight-bold);
   font-size: 1rem;
+  font-family: var(--font-family-monospace);
+  letter-spacing: -0.02em;
 }
 
 .specwiki-logo:hover {
   color: var(--color-base--hover);
+}
+
+.specwiki-logo-bracket {
+  color: var(--color-primary);
+}
+
+.specwiki-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2rem;
+  padding: 0.25rem 0.625rem;
+  border: 1px solid var(--border-color-base);
+  border-radius: var(--border-radius-base, 2px);
+  color: var(--color-base);
+  background-color: var(--background-color-base);
+  font: inherit;
+  cursor: pointer;
+}
+
+.specwiki-theme-toggle:hover {
+  color: var(--color-base--hover);
+  background-color: var(--background-color-base--hover);
+}
+
+.specwiki-theme-toggle:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.specwiki-theme-toggle[hidden] {
+  display: none;
 }
 
 .specwiki-main {
