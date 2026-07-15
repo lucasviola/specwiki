@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-15
-**Current position:** **E13 S13.1 npm publish preparation, Task 1 complete** — awaiting owner review before publish-gate work
-**Test count:** 356 passing
+**Current position:** **E13 S13.2 GitHub Actions CI workflow complete** — awaiting owner review before commit
+**Test count:** 362 passing
 
 ## Deliverables
 
@@ -29,6 +29,7 @@
 | Collapsible category navigation                                                   | Complete — E19 S19.5, awaiting review       | `src/output/html/`         |
 | Tablet breadcrumb layout stability                                                | Complete — E19 bugfix, awaiting review      | `src/output/html/`         |
 | npm package publish contract                                                      | In progress — E13 S13.1 Task 1              | `package.json`, `LICENSE`  |
+| GitHub Actions CI workflow                                                        | Complete — E13 S13.2, awaiting review       | `.github/workflows/ci.yml` |
 | MVP sign-off (HARNESS §13)                                                        | **Closed** — E7 S7.2 owner sign-off         | below                      |
 
 ## Workflow References
@@ -254,4 +255,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-15 | E9 S9.1          | `feat(cli): add stable JSON output for list and generate` — restricted machine-readable schemas, zero-match JSON, verbose `output.json` diagnostics, and command/CLI regression coverage; 346 tests total                                                                                                          | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-15 | E9 S9.2          | `feat(output): add opt-in wiki llms.txt export` — category-grouped manifest from generated page metadata; safe output logging/confinement; command and CLI regression coverage; 352 tests total                                                                                                                    | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-15 | E13 S13.1 Task 1 | `chore(package): define npm publish contract` — package allowlist for built artifacts, explicit contributor hook setup, MIT license, and four manifest contract tests; 356 tests total                                                                                                                             | uncommitted           | test ✓ · lint ✓ · format ⚠ unrelated owner edit · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-15 | E13 S13.2        | `ci: add GitHub Actions quality gate on push and PR` — ubuntu-latest + Node 20; npm ci then canonical §0.2 scripts as separate steps; six workflow contract tests; no publish/registry automation; 362 tests total                                                                                                 | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | _template_ | _E?_ S?_         | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                                                            | _hash or uncommitted_ | _full §0.2 gate result_                                                              |

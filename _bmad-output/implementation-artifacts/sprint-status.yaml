@@ -107,7 +107,7 @@ development_status:
   epic-12-retrospective: optional
   epic-13: in-progress
   13-1-npm-publish-preparation: in-progress
-  13-2-github-actions-ci-workflow: backlog
+  13-2-github-actions-ci-workflow: review
   epic-13-retrospective: optional
   epic-14: backlog
   14-1-ssg-export: backlog
