@@ -4,7 +4,7 @@
 
 <br><br>
 
-[![CI](https://img.shields.io/github/actions/workflow/status/lucas/specwiki/ci.yml?branch=main&label=CI&logo=githubactions&logoColor=white)](https://github.com/lucas/specwiki/actions/workflows/ci.yml)
+[![CI](https://github.com/lucasviola/specwiki/actions/workflows/ci.yml/badge.svg)](https://github.com/lucasviola/specwiki/actions/workflows/ci.yml)
 [![version](https://img.shields.io/badge/version-0.1.0-blue)](package.json)
 [![node](https://img.shields.io/badge/node-%3E%3D20-339933?logo=node.js&logoColor=white)](package.json)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
