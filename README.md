@@ -44,7 +44,7 @@ Ignored directories: `node_modules`, `dist`, `wiki`, `.specwiki`, `.git`, `cover
 
 ```bash
 # Try without installing
-npx specwiki list
+npx specwiki generate && npx specwiki open
 
 # Or install globally
 npm install -g specwiki
