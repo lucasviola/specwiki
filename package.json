@@ -6,8 +6,13 @@
   "bin": {
     "specwiki": "./dist/cli.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "prepare": "git config core.hooksPath .githooks",
+    "setup-hooks": "git config core.hooksPath .githooks",
     "build": "tsc && node scripts/copy-html-assets.mjs",
     "dev": "tsx src/cli.ts",
     "start": "node dist/cli.js",
