@@ -7,6 +7,7 @@
     "_bmad-output/**/*.md",
     ".agents/**/*.md",
     ".cursor/rules/**/*.{md,mdc}",
-    "tests/fixtures/**/*.{md,mdc}"
+    "tests/fixtures/**/*.{md,mdc}",
+    "docs/**/*.{md,mdc}"
   ]
 }
