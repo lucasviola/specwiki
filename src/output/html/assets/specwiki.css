@@ -33,6 +33,7 @@
   --specwiki-syntax-addition-background: #dafbe1;
   --specwiki-syntax-deletion: #cf222e;
   --specwiki-syntax-deletion-background: #ffebe9;
+  --specwiki-header-block-size: calc(var(--size-tool) + 1px);
 }
 
 :root[data-theme="light"] {
@@ -125,6 +126,9 @@ body.specwiki {
 }
 
 .specwiki-header {
+  position: sticky;
+  top: 0;
+  z-index: 15;
   background-color: var(--background-color-base);
   border-bottom: 1px solid var(--border-color-divider);
   padding: 0 var(--padding-horizontal-base);
@@ -509,9 +513,9 @@ body.specwiki {
   background-color: var(--background-color-interactive-subtle);
   overflow-y: auto;
   position: sticky;
-  top: 0;
+  top: var(--specwiki-header-block-size);
   align-self: start;
-  max-height: calc(100vh - var(--size-tool));
+  max-height: calc(100vh - var(--specwiki-header-block-size));
 }
 
 .toc-heading {
@@ -569,6 +573,19 @@ body.specwiki {
 .mw-parser-output h5,
 .mw-parser-output h6 {
   position: relative;
+}
+
+.specwiki-article-body .mw-parser-output h1,
+.specwiki-article-body .mw-parser-output h2,
+.specwiki-article-body .mw-parser-output h3,
+.specwiki-article-body .mw-parser-output h4,
+.specwiki-article-body .mw-parser-output h5,
+.specwiki-article-body .mw-parser-output h6,
+.specwiki-category-section,
+.specwiki-all-pages {
+  scroll-margin-top: calc(
+    var(--specwiki-header-block-size) + var(--padding-horizontal-base)
+  );
 }
 
 .mw-parser-output .heading-permalink {
@@ -677,6 +694,22 @@ body.specwiki {
   border: none;
   border-top: 1px solid var(--border-color-divider);
   margin: calc(var(--padding-horizontal-base) * 2) 0;
+}
+
+@media (min-width: 1200px) {
+  .specwiki-article-body .mw-parser-output {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 70ch) minmax(0, 1fr);
+  }
+
+  .specwiki-article-body .mw-parser-output > * {
+    grid-column: 2;
+  }
+
+  .specwiki-article-body .mw-parser-output > table,
+  .specwiki-article-body .mw-parser-output > pre {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 719px) {

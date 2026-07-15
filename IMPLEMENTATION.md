@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-15
-**Current position:** **E19 S19.4 complete** — search interaction upgrade awaiting owner review
-**Test count:** 333 passing
+**Current position:** **E19 S19.3 complete** — regression-safe reading measure and sticky header awaiting owner review
+**Test count:** 334 passing
 
 ## Deliverables
 
@@ -22,6 +22,7 @@
 | README folder index binding                                                       | Complete — E8 S8.4                          | `src/output/wiki.ts`     |
 | HTML dark theme                                                                   | Complete — E19 S19.1, awaiting review       | `src/output/html/`       |
 | Responsive HTML layout and mobile navigation                                      | Complete — E19 S19.2, awaiting review       | `src/output/html/`       |
+| Wide-screen reading measure and sticky header                                     | Complete — E19 S19.3, awaiting review       | `src/output/html/`       |
 | Accessible keyboard-driven HTML search                                            | Complete — E19 S19.4, awaiting review       | `src/output/html/`       |
 | MVP sign-off (HARNESS §13)                                                        | **Closed** — E7 S7.2 owner sign-off         | below                    |
 
@@ -136,7 +137,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
 - [ ] **E19 — Wiki UX Uplift (Strategy A)** — dark mode, responsive, reading measure, search UX, scroll-spy TOC, dashboard, portals, backlinks, callouts, Mermaid _(in progress)_
   - [x] S19.1 — Dark mode with pre-paint theme and toggle _(review)_
   - [x] S19.2 — Responsive layout and mobile navigation drawer _(review)_
-  - [ ] S19.3 — Reading measure and sticky header _(parked — implementation removed after layout regression)_
+  - [x] S19.3 — Reading measure and sticky header _(review — wide-screen grid preserves breakpoint/mobile geometry)_
   - [x] S19.4 — Search interaction upgrade _(review)_
 
 ## HARNESS §13 Deliverables Checklist
@@ -195,6 +196,7 @@ Every MVP feature story shipped structured logging ACs. No deferred logging epic
 | S17.3 | commands/init.ts, cli.ts     | cli.command, init.error, init.write                                 |
 | S19.1 | output/wiki.ts (unchanged)   | output.write covers specwiki.css and highlight.css                  |
 | S19.2 | output/wiki.ts (unchanged)   | output.write covers modified specwiki.css                           |
+| S19.3 | output/wiki.ts (unchanged)   | output.write covers modified specwiki.css                           |
 
 User-facing summaries remain on stdout via chalk; diagnostics use JSON stderr via `Logger.ts`.
 
@@ -235,4 +237,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-15 | E19 S19.1 | `feat(output): add flicker-free persistent HTML dark mode` — pre-paint saved-theme initializer; accessible header toggle; system/no-JS fallback; semantic light/dark and syntax tokens; local variable-based highlight asset; 5 new tests; 318 tests total                                                         | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-15 | E19 S19.2 | `feat(output): add responsive HTML layout and mobile navigation drawer` — single-column layout below 720px; accessible progressive drawer with inert closed state and mobile-safe scroll lock; in-flow no-JS nav and TOC; compact 320px header; contained table/code overflow; 3 new tests; 321 tests total        | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-15 | E19 S19.4 | `feat(output): upgrade HTML search interactions` — accessible combobox/listbox keyboard flow; merged human-readable category groups; highlighted result cards; explicit empty state; bidirectional drawer precedence; visible active-option scrolling; safe DOM rendering; 13 new tests; 333 tests total           | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
+| 2026-07-15 | E19 S19.3 | `feat(output): add regression-safe reading measure and sticky header` — coherent 70ch article grid only at ≥1200px; full-column table/code escape; exact 43px sticky offsets; portal geometry unchanged; 720px/375px baseline geometry preserved; 1 new test; 334 tests total                                      | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓ |
 | _template_ | _E?_ S?_  | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                                                            | _hash or uncommitted_ | _full §0.2 gate result_                                         |

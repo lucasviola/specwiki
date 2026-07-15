@@ -809,6 +809,44 @@ describe("writeHtmlWiki", () => {
     expect(css).toMatch(/\.mw-parser-output pre\s*\{[^}]*overflow-x:\s*auto/s);
   });
 
+  it("writes a coherent article measure and sticky header without fragmenting layout", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-reading-measure-"),
+    );
+    tempDirs.push(outputDir);
+
+    await writeHtmlWiki(outputDir, buildWiki([sampleSpec()]));
+
+    const css = await fs.readFile(
+      path.join(outputDir, "html", "assets", "specwiki.css"),
+      "utf-8",
+    );
+    expect(css).toContain(
+      "--specwiki-header-block-size: calc(var(--size-tool) + 1px);",
+    );
+    expect(css).toMatch(
+      /\.specwiki-header\s*\{[^}]*position:\s*sticky[^}]*top:\s*0[^}]*z-index:\s*15/s,
+    );
+    expect(css).toMatch(
+      /@media \(min-width: 1200px\)[\s\S]*?\.specwiki-article-body \.mw-parser-output\s*\{[^}]*display:\s*grid[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\) minmax\(0,\s*70ch\) minmax\(0,\s*1fr\)/,
+    );
+    expect(css).toMatch(
+      /\.specwiki-article-body \.mw-parser-output > \*\s*\{[^}]*grid-column:\s*2/s,
+    );
+    expect(css).toMatch(
+      /\.specwiki-article-body \.mw-parser-output > table,\s*\.specwiki-article-body \.mw-parser-output > pre\s*\{[^}]*grid-column:\s*1\s*\/\s*-1/s,
+    );
+    expect(css).toMatch(
+      /\.toc\s*\{[^}]*top:\s*var\(--specwiki-header-block-size\)[^}]*max-height:\s*calc\(100vh - var\(--specwiki-header-block-size\)\)/s,
+    );
+    expect(css).toMatch(
+      /\.specwiki-article-body \.mw-parser-output h1,[^{]*\.specwiki-category-section,\s*\.specwiki-all-pages\s*\{[^}]*scroll-margin-top:\s*calc\(\s*var\(--specwiki-header-block-size\)\s*\+\s*var\(--padding-horizontal-base\)\s*\)/s,
+    );
+    expect(css).not.toMatch(
+      /\.specwiki-article-body \.mw-parser-output > :not\(table\):not\(pre\)\s*\{[^}]*width:/s,
+    );
+  });
+
   it("writes accessible search card, theme, and narrow-header styles", async () => {
     const outputDir = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-html-search-style-"),
