@@ -741,6 +741,14 @@ body.specwiki {
   margin: calc(var(--padding-horizontal-base) * 2) 0;
 }
 
+@media (max-width: 1199px) {
+  .infobox {
+    float: none;
+    width: auto;
+    margin: 0 0 var(--padding-horizontal-base);
+  }
+}
+
 @media (min-width: 1200px) {
   .specwiki-article-body .mw-parser-output {
     display: grid;
@@ -827,12 +835,6 @@ body.specwiki {
     max-height: none;
     border-top: 1px solid var(--border-color-divider);
     border-left: 0;
-  }
-
-  .infobox {
-    float: none;
-    width: auto;
-    margin: 0 0 var(--padding-horizontal-base);
   }
 
   .mw-parser-output {

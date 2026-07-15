@@ -809,6 +809,32 @@ describe("writeHtmlWiki", () => {
     expect(css).toMatch(/\.mw-parser-output pre\s*\{[^}]*overflow-x:\s*auto/s);
   });
 
+  it("stacks infoboxes below the wide reading-layout boundary", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-infobox-tablet-"),
+    );
+    tempDirs.push(outputDir);
+
+    await writeHtmlWiki(outputDir, buildWiki([sampleSpec()]));
+
+    const css = await fs.readFile(
+      path.join(outputDir, "html", "assets", "specwiki.css"),
+      "utf-8",
+    );
+    expect(css).toMatch(
+      /@media \(max-width: 1199px\)[\s\S]*?\.infobox\s*\{[^}]*float:\s*none[^}]*width:\s*auto/s,
+    );
+    expect(css).toMatch(
+      /\.infobox\s*\{[^}]*float:\s*right[^}]*width:\s*16rem/s,
+    );
+    expect(css).toMatch(
+      /@media \(min-width: 1200px\)[\s\S]*?\.specwiki-article-body \.mw-parser-output\s*\{[^}]*display:\s*grid/s,
+    );
+    expect(css).toMatch(
+      /@media \(max-width: 719px\)[\s\S]*?\.specwiki-nav-enhanced \.specwiki-nav-drawer\s*\{[^}]*position:\s*fixed/s,
+    );
+  });
+
   it("writes a coherent article measure and sticky header without fragmenting layout", async () => {
     const outputDir = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-html-reading-measure-"),

@@ -346,6 +346,18 @@ describe("HtmlRenderer", () => {
     expect(html).toContain(`<code>${escaped}</code>`);
   });
 
+  it("escapes a long final breadcrumb label", () => {
+    const title = 'IMPLEMENTATION <script>alert("x")</script> Guide';
+    const page = samplePage({ title });
+
+    const html = renderer.renderArticle(page, [page], "<p>Body</p>");
+
+    expect(html).toContain(
+      "IMPLEMENTATION &lt;script&gt;alert(&quot;x&quot;)&lt;&#x2F;script&gt; Guide",
+    );
+    expect(html).not.toContain(`IMPLEMENTATION ${title}`);
+  });
+
   it("omits TOC rail when page has no sections", () => {
     const page = samplePage({ sections: [] });
     const html = renderer.renderArticle(page, [page], "<p>Body</p>");
