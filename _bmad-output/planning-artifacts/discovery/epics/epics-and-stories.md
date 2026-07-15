@@ -896,6 +896,90 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 
 ---
 
+### E20 — SpecWiki.ai Landing Page
+
+**Value proposition:** Make AI knowledge useful to humans. The public site explains how `[[specwiki]]` turns AI-oriented project knowledge into a navigable, trustworthy wiki for the people who need to understand and use it.
+
+**Audience:** Developers and technical teams evaluating SpecWiki, plus non-author stakeholders who need a clear human-facing view of AI-generated project knowledge.
+
+**Brand and logo:** Use the canonical `[[specwiki]]` text wordmark from [`docs/brand/BRAND.md`](../../../../docs/brand/BRAND.md), never a substitute icon or title-cased “Spec Wiki.” Use the light SVG on light surfaces and the dark SVG on dark surfaces; preserve at least `1em` clear space. The landing page inherits the documented monospace typography and primary bracket accent, while remaining a distinct product-marketing surface rather than generated wiki output.
+
+**Dependency:** E20 starts only after **E13 — Distribution & Publish**, specifically **S13.1 — npm publish preparation**, has completed and the `specwiki` package is published to npm. The landing page’s primary CTA may then direct visitors to a real, installable package rather than a pre-release workflow.
+
+**Hosting:** Publish the production static site at `https://specwiki.ai` with HTTPS. The deployment provider is intentionally left open; the implementation must document the selected provider, build command, DNS configuration, and preview/release workflow.
+
+| Story | Summary                                            | Outcome                                                                          |
+| ----- | -------------------------------------------------- | -------------------------------------------------------------------------------- |
+| S20.1 | Landing-page narrative and brand treatment         | A clear, on-brand explanation of why AI knowledge needs a human-useful wiki      |
+| S20.2 | Responsive, accessible landing-page implementation | A fast public page that works across screen sizes and keyboard/screen-reader use |
+| S20.3 | specwiki.ai hosting and release workflow           | The page is reliably published at the production domain                          |
+
+#### S20.1 — Landing-page narrative and brand treatment
+
+**As** a prospective user, **I want** a concise explanation of how SpecWiki makes AI knowledge useful to humans, **so that** I can decide whether it solves my team’s documentation-discovery problem.
+
+**INVEST:** I✓ N✓ V✓ E✓ S✓ T✓
+**Depends on:** Canonical brand kit in `docs/brand/BRAND.md`
+**Demo path:** Open the landing-page preview → hero states “Make AI knowledge useful to humans” → scroll through the product explanation and CTA.
+
+**Functional:**
+
+- [ ] Hero uses the exact value proposition: **“Make AI knowledge useful to humans.”**
+- [ ] Page explains the problem (AI-era knowledge is difficult for people to find and understand), the product approach (generate a navigable wiki from project knowledge), and the human outcome (shared, usable understanding).
+- [ ] Copy includes a primary call to action appropriate to the available product path (for example, install, view documentation, or view source), with destination confirmed before implementation.
+- [ ] Canonical `[[specwiki]]` wordmark is visible in the header and follows all variant, color, typography, casing, and clear-space rules in `docs/brand/BRAND.md`.
+- [ ] Logo has meaningful accessible text; decorative duplicates are hidden from assistive technology.
+
+**Quality measures:**
+
+- [ ] Content review verifies the value proposition is present verbatim and the product claims are supportable.
+- [ ] Brand review verifies only canonical logo assets and documented colors are used.
+
+#### S20.2 — Responsive, accessible landing-page implementation
+
+**As** a visitor, **I want** the landing page to be readable and usable on desktop and mobile, **so that** I can understand SpecWiki regardless of device or input method.
+
+**INVEST:** I✓ N✓ V✓ E✓ S✓ T✓
+**Depends on:** S20.1
+**Demo path:** Open the deployed preview at desktop and 320px widths → navigate all calls to action with a keyboard → verify readable structure and no horizontal page overflow.
+
+**Functional:**
+
+- [ ] Implement a static landing page with semantic landmarks, a single `h1`, descriptive links, visible keyboard focus, and contrast that meets WCAG 2.1 AA.
+- [ ] Layout adapts without page-level horizontal overflow from 320px through desktop widths.
+- [ ] Images and SVG assets are optimized and include appropriate alternative text or are marked decorative.
+- [ ] Page loads without requiring client-side JavaScript for the core value proposition, navigation, or primary CTA.
+- [ ] Core CLI package behavior and frozen generated-wiki output contracts remain unchanged.
+
+**Quality measures:**
+
+- [ ] Automated checks cover the selected page build and static asset validation.
+- [ ] Manual accessibility check verifies keyboard navigation, focus visibility, heading order, and light/dark logo contrast.
+
+#### S20.3 — specwiki.ai hosting and release workflow
+
+**As** a prospective user, **I want** `specwiki.ai` to load the official landing page securely, **so that** I can trust the product’s public entry point.
+
+**INVEST:** I✓ N✓ V✓ E✓ S✓ T✓
+**Depends on:** S20.2 and owner-selected deployment provider
+**Demo path:** Visit `https://specwiki.ai` → HTTPS loads the production landing page → navigate a primary CTA and confirm it reaches its intended destination.
+
+**Functional:**
+
+- [ ] Configure the selected static-site provider to publish the landing-page build at `https://specwiki.ai` with HTTPS.
+- [ ] Document the build command, deployment configuration, DNS records, environment variables (if any), and rollback process; no secrets are committed.
+- [ ] A pull-request preview or equivalent pre-production verification path exists before production deployment.
+- [ ] Production releases are reproducible from the repository and do not depend on local-only assets or undocumented manual steps.
+
+**Quality measures:**
+
+- [ ] Deployment verification confirms `https://specwiki.ai` serves the current production page with a valid certificate.
+- [ ] Release documentation is sufficient for another maintainer to deploy and roll back safely.
+
+**E20 gate:** E13 S13.1 is complete and `specwiki` is published to npm; `https://specwiki.ai` presents an accessible, responsive, on-brand landing page that clearly communicates “Make AI knowledge useful to humans,” uses the canonical `[[specwiki]]` wordmark correctly, and has a documented, reproducible release path.
+
+---
+
 ## Traceability Summary
 
 ### MVP epics (E1–E7) — **closed** (2026-07-12)
@@ -910,19 +994,20 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 | E6 CLI         | Flags + exit codes | S6.1–S6.2 | closed | cli.command + cli.error       |
 | E7 Sign-off    | Dogfood + §13      | S7.1–S7.2 | closed | Full pipeline log audit       |
 
-### POST-MVP epics (E8–E16) — **backlog**
+### POST-MVP epics (E8–E20) — **backlog**
 
-| Epic                | Stories     | FR binding             | Status  |
-| ------------------- | ----------- | ---------------------- | ------- |
-| E8 Custom discovery | S8.1–S8.4   | FR-005, FR-006, FR-035 | backlog |
-| E9 Agent I/O        | S9.1–S9.2   | FR-017, FR-023         | backlog |
-| E10 Team CI         | S10.1       | FR-024                 | backlog |
-| E11 Live loop       | S11.1–S11.2 | FR-025, FR-026         | backlog |
-| E12 Semantic        | S12.1–S12.3 | FR-010                 | backlog |
-| E13 Distribution    | S13.1–S13.2 | FR-027, FR-028         | backlog |
-| E14 Ecosystem       | S14.1–S14.3 | FR-018, FR-029         | backlog |
-| E15 IDE             | S15.1       | —                      | backlog |
-| E16 Wiki HTML skin  | S16.1–S16.4 | FR-032–FR-034          | backlog |
+| Epic                | Stories     | FR binding                                   | Status  |
+| ------------------- | ----------- | -------------------------------------------- | ------- |
+| E8 Custom discovery | S8.1–S8.4   | FR-005, FR-006, FR-035                       | backlog |
+| E9 Agent I/O        | S9.1–S9.2   | FR-017, FR-023                               | backlog |
+| E10 Team CI         | S10.1       | FR-024                                       | backlog |
+| E11 Live loop       | S11.1–S11.2 | FR-025, FR-026                               | backlog |
+| E12 Semantic        | S12.1–S12.3 | FR-010                                       | backlog |
+| E13 Distribution    | S13.1–S13.2 | FR-027, FR-028                               | backlog |
+| E14 Ecosystem       | S14.1–S14.3 | FR-018, FR-029                               | backlog |
+| E15 IDE             | S15.1       | —                                            | backlog |
+| E16 Wiki HTML skin  | S16.1–S16.4 | FR-032–FR-034                                | backlog |
+| E20 specwiki.ai     | S20.1–S20.3 | New public web surface; depends on E13 S13.1 | backlog |
 
 ---
 
@@ -942,7 +1027,7 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 1. **E1** — S1.1 (`IMPLEMENTATION.md`) → S1.3 (`Logger.ts`) → S1.2 verify
 2. **E2 → E3 → E4** — Core journeys; logging in same story as feature
 3. **E5 → E6 → E7** — Trustworthy output, CLI, sign-off
-4. **POST-MVP:** E8 → E15; **E16** (wiki HTML skin) recommended after E4, before or parallel with E8 S8.3
+4. **POST-MVP:** E8 → E15; **E16** (wiki HTML skin) recommended after E4, before or parallel with E8 S8.3; **E20** follows E13 S13.1, once the package is published to npm, a deployment provider is selected, and its CTA destination is confirmed.
 
 ---
 

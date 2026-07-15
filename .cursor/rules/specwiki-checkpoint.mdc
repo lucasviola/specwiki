@@ -5,7 +5,9 @@ alwaysApply: true
 
 # specwiki — Story completion checkpoint (HARNESS §0.3)
 
-When finishing a story, task, or quality gate run in this repo, **always** end the user-facing message with the full HARNESS §0.3 checkpoint — not a shortened summary.
+When finishing a **code-changing** story or task, or when the owner explicitly requests a quality-gate run, end the user-facing message with the full HARNESS §0.3 checkpoint — not a shortened summary.
+
+Do not run the quality gate, automated code review, QA analysis, or return a §0.3 checkpoint for non-code prompts or non-executable metadata changes. This includes questions, discovery, and updates such as Markdown documentation or sprint-status YAML. Respond with a concise result instead.
 
 ## Required sections (in order)
 

@@ -10,11 +10,12 @@ Read every section before writing a single line. This document is the ground tru
 >
 > - **One task at a time** — never implement an entire phase (or multiple bullets) in a
 >   single turn. Stop after each bullet for owner review and commit (§0.3–§0.4).
-> - Follow Test-Driven Development on every task (§0.1).
+> - Follow Test-Driven Development on every code-changing task (§0.1).
 > - **Quality-gate and review scope:** Run and return the full quality gate, automated code
 >   review, QA analysis, and §0.3 code-review checkpoint **only when a task changes code**.
->   When the prompt is not about code, do not return a code-review checkpoint; simple
->   Markdown-only changes and discovery runs do not require these steps.
+>   When the prompt does not change code, do not return a code-review checkpoint; simple
+>   documentation-only, non-executable metadata-only (for example, sprint-status YAML), and
+>   discovery changes do not require these steps.
 > - Run the full quality gate after every code-changing task (§0.2). **Do not** run e2e/browser tests
 >   or record demo videos unless the owner explicitly asks (§0.2.1).
 > - Run **automated code review** (§0.2.5) and **QA analysis** (§0.2.6) via subagents on a
@@ -22,7 +23,7 @@ Read every section before writing a single line. This document is the ground tru
 > - **Stop and ask for confirmation** after every code-changing task — do not start the next task until
 >   the owner approves the checkpoint **and** the commit is on the branch (§0.3). Ask whether
 >   to implement code-review patches **before** committing.
-> - **Update project logs** after every task (§0.4). Skipping this is as serious as
+> - **Update project logs** after every code-changing task (§0.4). Skipping this is as serious as
 >   skipping tests.
 > - **Minimal comments** — do not annotate every function or variable; comment only where
 >   logic is genuinely hard to follow (§0.6).
@@ -56,9 +57,10 @@ Before writing or changing any code, confirm you are working on **exactly one** 
 If you are tempted to implement multiple systems, wire the entry point, and add tests in
 one go — **stop**. That violates this harness.
 
-At the end of every task turn, your message must be a §0.3 checkpoint (not a phase
-summary). Do not mark a phase "complete" until every bullet has its own checkpoint,
-commit, and project log entry.
+At the end of every **code-changing** task turn, your message must be a §0.3 checkpoint
+(not a phase summary). Do not mark a phase "complete" until every code-changing bullet
+has its own checkpoint, commit, and project log entry. Non-code prompts and
+non-executable metadata updates are exempt.
 
 ### 0.0.1 Model selection
 
@@ -110,7 +112,8 @@ For HTML output, verify rendered structure and escaping — not pixel equality. 
 After finishing a code-changing task (Red → Green → Refactor complete), run **all** of the following
 commands in order. Do not proceed to the next task until all pass.
 
-Simple Markdown-only changes and discovery runs do not require the quality gate.
+Documentation-only, non-executable metadata-only (for example, sprint-status YAML), and
+discovery changes do not require the quality gate.
 
 ```bash
 npm run test        # all tests must pass
@@ -272,7 +275,8 @@ Label: `QA model: Inline analysis (subagent unavailable — <reason>)`.
 After §0.2, §0.2.5, and §0.2.6 complete for a code-changing task, **stop and present the checkpoint** to the owner.
 Do not start the next task until approved. Do this even if the next task feels trivial.
 
-Simple Markdown-only changes and discovery runs do not require this checkpoint.
+Documentation-only, non-executable metadata-only (for example, sprint-status YAML), and
+discovery changes do not require this checkpoint.
 
 Format your checkpoint message exactly like this:
 
@@ -362,14 +366,14 @@ explicit owner approval.
 If the owner approves the code but has not committed yet, **wait** — do not begin the
 next task.
 
-### 0.4 Project logs — mandatory after every task
+### 0.4 Project logs — mandatory after every code-changing task
 
 **Primary spec tasks (§9):** log in **`IMPLEMENTATION.md`**.
 
 Update the correct file in the **same turn** as the §0.3 checkpoint, before asking to
 proceed.
 
-**After every task, do all three:**
+**After every code-changing task, do all three:**
 
 1. **Check boxes** — In the progression checklist, mark the bullet complete. Add a short
    inline note if behaviour is partial.
