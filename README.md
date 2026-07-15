@@ -1,12 +1,16 @@
-# specwiki
+# [[specwiki]]
 
-Transform AI specs in any project into structured, wiki-like documentation.
+Transform AI specs into structured wiki-like documentation.
 
-`specwiki` scans your codebase for agent instructions, spec-driven development files, and AI-generated specs — then builds a browsable wiki with an index, categorized pages, and optional HTML output.
+**One command → categorized wiki from scattered agent specs.**
+
+[[specwiki]] Your AI live documentation. A library that discovers AI agent instructions, spec-driven development artifacts, and general markdown files scattered across a repository and synthesizes them into a browsable wiki.
+
+**Requires Node.js 20+.** MIT licensed.
 
 ## What it finds
 
-Out of the box, specwiki discovers specs from:
+Out of the box, [[specwiki]] discovers specs from:
 
 | Source           | Patterns                                            |
 | ---------------- | --------------------------------------------------- |
@@ -25,10 +29,33 @@ Ignored directories: `node_modules`, `dist`, `wiki`, `.specwiki`, `.git`, `cover
 
 ## Install
 
+### For users
+
+```bash
+# Try without installing
+npx specwiki list
+
+# Or install globally
+npm install -g specwiki
+```
+
+### For contributors
+
+Clone this repo, then:
+
 ```bash
 npm install
 npm run build
-npm link   # optional: use `specwiki` globally
+npm run setup-hooks   # optional: install git hooks
+npm link              # optional: use `specwiki` globally from source
+```
+
+## Quick start
+
+```bash
+npx specwiki list      # preview what will be indexed
+npx specwiki generate  # write wiki/ (markdown + HTML)
+npx specwiki open      # open the HTML wiki in your browser
 ```
 
 ## Usage
@@ -108,6 +135,21 @@ Each wiki page includes:
 - Auto-generated table of contents from headings
 - Full spec content, preserved as markdown
 
+## Tech stack
+
+[[specwiki]] is a Node.js CLI written in **TypeScript**. It runs on **Node.js 20+** with no runtime beyond npm dependencies. It is supposed to be fast, deterministic and reliable.
+
+| Layer     | Libraries                                                                                                                                                                                                                                       |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| CLI       | [Commander](https://github.com/tj/commander.js), [chalk](https://github.com/chalk/chalk)                                                                                                                                                        |
+| Discovery | [fast-glob](https://github.com/mrmlnc/fast-glob)                                                                                                                                                                                                |
+| Parsing   | [gray-matter](https://github.com/jonschlinkert/gray-matter) (frontmatter), [marked](https://marked.js.org/) (GFM markdown)                                                                                                                      |
+| HTML wiki | [Mustache](https://mustache.github.io/) templates, [highlight.js](https://highlightjs.org/) (code blocks), [lunr](https://lunrjs.com/) (client-side search), [Wikimedia UI Base](https://www.npmjs.com/package/wikimedia-ui-base) design tokens |
+
+Generated HTML is **self-contained** — bundled CSS/JS, system fonts only, and `file://`-safe output so you can open `wiki/html/` locally without a server or CDN.
+
+Contributor tooling: **Vitest** (tests + coverage), **ESLint**, **Prettier**, **tsx** (dev runner).
+
 ## Development
 
 ```bash
@@ -116,6 +158,7 @@ npm run dev generate -- --verbose
 npm run dev open -- --project tests/fixtures/sample-project --output /tmp/specwiki-qa
 npm run build
 npm run typecheck
+npm test
 ```
 
 ## License

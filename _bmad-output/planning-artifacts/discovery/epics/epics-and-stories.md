@@ -736,6 +736,32 @@ Each story: functional enrichment ACs; `parse.enrich` / `output.enrich` (verbose
 **Logging & diagnostics:** N/A CI config; local gate passes before commit.  
 **Quality measures:** CI runs full §0.2 gate.
 
+#### S13.3 — Publication readiness and launch marketing
+
+**As** an open-source maintainer preparing the first npm release,  
+**I want** a UX-led README review and channel-specific launch copy grounded in market research,  
+**so that** the public-facing package story is clear, credible, and ready to promote on Reddit, LinkedIn, and other developer channels.
+
+**INVEST:** I✓ N✓ V✓ E✓ S✓ T✓  
+**Depends on:** S13.1 (consumer install path and npm contract documented); may run in parallel with S13.2.  
+**Demo path:** Review `README.md` and `docs/marketing/launch-copy.md` — README passes a publication checklist; launch pack includes at least Reddit, LinkedIn, Hacker News, and X/Twitter variants aligned with product brief positioning.
+
+**Binds:** Product brief go-to-market; `docs/brand/BRAND.md`; domain-research Personas A–C
+
+**Functional:**
+
+- [ ] Sally (UX designer agent) reviews `README.md` against a publication checklist: value proposition above the fold; consumer install (`npx specwiki`) vs contributor setup clearly separated; Node ≥20 requirement; license; quick-start commands that match shipped CLI; no stale dev-only paths as the primary install story
+- [ ] UX review produces a structured findings report with severity (blocker / should-fix / nice-to-have) and concrete rewrite suggestions; owner approves README edits before merge
+- [ ] Market research (web-backed) documents target audience (Persona A wedge), competitive alternatives, positioning statement, recommended launch channels, and messaging guardrails (what specwiki is / is not)
+- [ ] Launch copy pack generated for at least: Reddit (r/programming or r/cursor-style sub), LinkedIn, Hacker News (Show HN), X/Twitter, and one additional channel (Dev.to or Product Hunt draft)
+- [ ] All public copy uses canonical `[[specwiki]]` wordmark rules from `docs/brand/BRAND.md`; no substitute branding
+- [ ] Artifacts land under `docs/marketing/` (research + launch copy + README review report); README updated in repo root when approved
+- [ ] Story does not publish to npm, post to social platforms, or automate marketing — deliverables and owner-approved README only
+
+**Logging & diagnostics:** N/A — content/marketing story; no runtime Logger changes.
+
+**Quality measures:** Owner review of README and launch copy; editorial pass for accuracy against current CLI commands; no HARNESS §0.2 gate required unless README edits break documented command examples (run spot-check: `npx specwiki --help` matches README).
+
 ---
 
 ### E14 — Ecosystem Export & Intelligence
@@ -1003,7 +1029,7 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 | E10 Team CI         | S10.1       | FR-024                                       | backlog |
 | E11 Live loop       | S11.1–S11.2 | FR-025, FR-026                               | backlog |
 | E12 Semantic        | S12.1–S12.3 | FR-010                                       | backlog |
-| E13 Distribution    | S13.1–S13.2 | FR-027, FR-028                               | backlog |
+| E13 Distribution    | S13.1–S13.3 | FR-027, FR-028; go-to-market (S13.3)         | backlog |
 | E14 Ecosystem       | S14.1–S14.3 | FR-018, FR-029                               | backlog |
 | E15 IDE             | S15.1       | —                                            | backlog |
 | E16 Wiki HTML skin  | S16.1–S16.4 | FR-032–FR-034                                | backlog |

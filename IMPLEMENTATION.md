@@ -1,7 +1,7 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-15
-**Current position:** **E13 S13.2 GitHub Actions CI workflow complete** — awaiting owner review before commit
+**Current position:** **E13 S13.3 publication readiness complete** — marketing artifacts + README update awaiting owner review
 **Test count:** 362 passing
 
 ## Deliverables
@@ -30,6 +30,7 @@
 | Tablet breadcrumb layout stability                                                | Complete — E19 bugfix, awaiting review      | `src/output/html/`         |
 | npm package publish contract                                                      | In progress — E13 S13.1 Task 1              | `package.json`, `LICENSE`  |
 | GitHub Actions CI workflow                                                        | Complete — E13 S13.2, awaiting review       | `.github/workflows/ci.yml` |
+| Publication README + launch marketing pack                                        | Complete — E13 S13.3, awaiting review       | `docs/marketing/`          |
 | MVP sign-off (HARNESS §13)                                                        | **Closed** — E7 S7.2 owner sign-off         | below                      |
 
 ## Workflow References
@@ -256,4 +257,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-15 | E9 S9.2          | `feat(output): add opt-in wiki llms.txt export` — category-grouped manifest from generated page metadata; safe output logging/confinement; command and CLI regression coverage; 352 tests total                                                                                                                    | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-15 | E13 S13.1 Task 1 | `chore(package): define npm publish contract` — package allowlist for built artifacts, explicit contributor hook setup, MIT license, and four manifest contract tests; 356 tests total                                                                                                                             | uncommitted           | test ✓ · lint ✓ · format ⚠ unrelated owner edit · coverage ✓ · typecheck ✓ · build ✓ |
 | 2026-07-15 | E13 S13.2        | `ci: add GitHub Actions quality gate on push and PR` — ubuntu-latest + Node 20; npm ci then canonical §0.2 scripts as separate steps; six workflow contract tests; no publish/registry automation; 362 tests total                                                                                                 | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
+| 2026-07-15 | E13 S13.3        | `docs(marketing): publication README review, market research, and launch copy` — UX-led README rewrite (consumer install first, quick-start, [[specwiki]] wordmark); `docs/marketing/readme-review.md`, `market-research.md`, `launch-copy.md`; CLI help spot-checked; doc-only (no quality gate)                  | uncommitted           | N/A (doc-only)                                                                       |
 | _template_ | _E?_ S?_         | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                                                            | _hash or uncommitted_ | _full §0.2 gate result_                                                              |
