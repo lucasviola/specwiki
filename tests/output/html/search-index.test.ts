@@ -5,6 +5,7 @@ import {
   SEARCH_INDEX_VERSION,
   buildSearchIndex,
   extractBodyExcerpt,
+  serializeSearchIndexForInlineScript,
   stripMarkdown,
 } from "../../../src/output/html/search-index.js";
 import type { WikiPage } from "../../../src/types.js";
@@ -57,9 +58,27 @@ describe("buildSearchIndex", () => {
       slug: "agents",
       title: "Agents",
       category: "root",
+      categoryLabel: "Project Root",
       description: "Agent instructions.",
       body: expect.any(String),
     });
+  });
+
+  it("uses a bounded plain-text body fallback when description is empty", () => {
+    const body = `<script>alert("body")</script> ${"word ".repeat(600)}`;
+    const index = buildSearchIndex([
+      samplePage({ description: "", content: body }),
+    ]);
+
+    expect(index.documents[0].description).toBe("");
+    expect(index.documents[0].body.length).toBe(BODY_EXCERPT_MAX);
+    expect(index.documents[0].body).not.toContain("<script>");
+  });
+
+  it("uses an unknown category key as its human-readable fallback label", () => {
+    const index = buildSearchIndex([samplePage({ category: "custom-guides" })]);
+
+    expect(index.documents[0].categoryLabel).toBe("custom-guides");
   });
 
   it("document count matches buildWiki page count", () => {
@@ -115,5 +134,22 @@ describe("stripMarkdown", () => {
     const excerpt = extractBodyExcerpt(longBody, BODY_EXCERPT_MAX);
 
     expect(excerpt.length).toBe(BODY_EXCERPT_MAX);
+  });
+});
+
+describe("serializeSearchIndexForInlineScript", () => {
+  it("escapes HTML-like user text without changing the parsed values", () => {
+    const index = buildSearchIndex([
+      samplePage({
+        title: '</script><script>alert("title")</script>',
+        description: "<img src=x onerror=alert(1)>",
+        content: "<script>alert('body')</script>",
+      }),
+    ]);
+
+    const serialized = serializeSearchIndexForInlineScript(index);
+
+    expect(serialized).not.toContain("<");
+    expect(JSON.parse(serialized)).toEqual(index);
   });
 });

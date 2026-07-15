@@ -222,10 +222,20 @@ describe("HtmlRenderer", () => {
       searchIndexJson: '{"version":1,"documents":[]}',
     });
 
-    expect(html).toContain('id="specwiki-search-input"');
+    expect(html).toMatch(
+      /id="specwiki-search-input"[\s\S]*?role="combobox"[\s\S]*?aria-autocomplete="list"[\s\S]*?aria-controls="specwiki-search-results"[\s\S]*?aria-expanded="false"/,
+    );
+    expect(html).toMatch(
+      /id="specwiki-search-results"[\s\S]*?role="listbox"[\s\S]*?hidden/,
+    );
+    expect(html).toContain('id="specwiki-search-groups"');
+    expect(html).toContain('id="specwiki-search-status"');
+    expect(html).toContain('role="status"');
+    expect(html).toContain('aria-live="polite"');
     expect(html).toContain('id="search-index"');
     expect(html).toContain('src="assets/lunr.min.js"');
     expect(html).toContain('src="assets/search.js"');
+    expect(html).not.toContain("fetch(");
   });
 
   it("omits search chrome when includeSearch is disabled", () => {

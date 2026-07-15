@@ -1,4 +1,5 @@
 import type { WikiPage } from "../../types.js";
+import { CATEGORY_LABELS } from "../../config/patterns.js";
 
 export const SEARCH_INDEX_VERSION = 1;
 export const BODY_EXCERPT_MAX = 2000;
@@ -7,6 +8,7 @@ export interface SearchIndexDocument {
   slug: string;
   title: string;
   category: string;
+  categoryLabel: string;
   description: string;
   body: string;
 }
@@ -54,6 +56,7 @@ export function buildSearchIndex(pages: WikiPage[]): SearchIndex {
       slug: page.slug,
       title: page.title,
       category: page.category,
+      categoryLabel: CATEGORY_LABELS[page.category] ?? page.category,
       description: page.description,
       body: extractBodyExcerpt(page.content),
     })),

@@ -809,6 +809,28 @@ describe("writeHtmlWiki", () => {
     expect(css).toMatch(/\.mw-parser-output pre\s*\{[^}]*overflow-x:\s*auto/s);
   });
 
+  it("writes accessible search card, theme, and narrow-header styles", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-search-style-"),
+    );
+    tempDirs.push(outputDir);
+
+    await writeHtmlWiki(outputDir, buildWiki([sampleSpec()]));
+
+    const css = await fs.readFile(
+      path.join(outputDir, "html", "assets", "specwiki.css"),
+      "utf-8",
+    );
+    expect(css).toContain("--specwiki-search-match-background");
+    expect(css).toContain(".specwiki-search-category");
+    expect(css).toContain('.specwiki-search-option[aria-selected="true"]');
+    expect(css).toContain(".specwiki-search-match");
+    expect(css).toContain(".specwiki-search-empty");
+    expect(css).toMatch(
+      /@media \(max-width: 719px\)[\s\S]*?\.specwiki-search-results\s*\{[^}]*max-width:\s*calc\(100vw - 1rem\)/,
+    );
+  });
+
   it("writes html/assets/highlight.css with syntax highlighting theme", async () => {
     const outputDir = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-html-"),
@@ -1102,7 +1124,7 @@ describe("writeHtmlWiki", () => {
     ).resolves.toContain("lunr");
     await expect(
       fs.readFile(path.join(outputDir, "html", "assets", "search.js"), "utf-8"),
-    ).resolves.toContain("specwiki-search-input");
+    ).resolves.toContain('event.key === "/"');
   });
 
   it("embeds search UI and inline index in HTML when search enabled", async () => {
@@ -1120,6 +1142,9 @@ describe("writeHtmlWiki", () => {
     );
 
     expect(indexHtml).toContain('id="specwiki-search-input"');
+    expect(indexHtml).toContain('role="combobox"');
+    expect(indexHtml).toContain('role="listbox"');
+    expect(indexHtml).toContain('aria-expanded="false"');
     expect(indexHtml).toContain('id="search-index"');
     expect(indexHtml).toContain('src="assets/lunr.min.js"');
     expect(indexHtml).toContain('src="assets/search.js"');
@@ -1155,6 +1180,7 @@ describe("writeHtmlWiki", () => {
     );
     expect(indexHtml).not.toContain("specwiki-search-input");
     expect(indexHtml).not.toContain("search-index");
+    expect(indexHtml).not.toContain('role="combobox"');
     expect(indexHtml).toContain('id="all-pages"');
   });
 

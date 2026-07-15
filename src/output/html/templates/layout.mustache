@@ -46,8 +46,26 @@
           class="specwiki-search-input"
           placeholder="Search specs…"
           autocomplete="off"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-controls="specwiki-search-results"
+          aria-expanded="false"
         >
-        <div id="specwiki-search-results" class="specwiki-search-results" hidden></div>
+        <div
+          id="specwiki-search-results"
+          class="specwiki-search-results"
+          role="listbox"
+          hidden
+        >
+          <div id="specwiki-search-groups"></div>
+          <p
+            id="specwiki-search-status"
+            class="specwiki-search-empty"
+            role="status"
+            aria-live="polite"
+            hidden
+          ></p>
+        </div>
       </div>
       {{/includeSearch}}
       <button
