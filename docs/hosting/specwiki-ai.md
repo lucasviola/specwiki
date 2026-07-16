@@ -10,16 +10,16 @@ Production landing page for **[[specwiki]]** at `https://specwiki.ai`.
 | **Build command**    | `npm run build:site`                                                           |
 | **Deploy workflow**  | [`.github/workflows/deploy-site.yml`](../../.github/workflows/deploy-site.yml) |
 | **Default URL**      | `https://lucasviola.github.io/specwiki/` (until custom domain is configured)   |
-| **Custom domain**    | `specwiki.ai` (opt-in via `--with-cname` after DNS is configured)              |
+| **Custom domain**    | `specwiki.ai` (via `--with-cname` in the deploy workflow)                      |
 | **Secrets required** | None — workflow uses the built-in `GITHUB_TOKEN`                               |
 
 ## How deployment works
 
-1. **Pull request** — `deploy-site.yml` runs landing-page tests, builds `dist/landing-site/` **without** `CNAME`, and publishes a **GitHub Pages preview** linked from the PR checks panel. Review the preview before merging.
-2. **Merge to `main`** — the workflow deploys to **`https://lucasviola.github.io/specwiki/`** (no custom domain required).
+1. **Pull request** — `deploy-site.yml` runs landing-page tests, builds `dist/landing-site/` **with** `CNAME`, and publishes a **GitHub Pages preview** linked from the PR checks panel. Review the preview before merging.
+2. **Merge to `main`** — the workflow deploys to production at **`https://specwiki.ai`** once DNS and GitHub Pages custom-domain settings are configured (otherwise **`https://lucasviola.github.io/specwiki/`**).
 3. **Manual deploy** — run **Actions → Deploy specwiki.ai → Run workflow** (`workflow_dispatch`).
 
-The build script [`scripts/build-landing-site.mjs`](../../scripts/build-landing-site.mjs) copies `site/` into `dist/landing-site/` and adds `.nojekyll` so GitHub Pages serves static files as-is. **CNAME is omitted by default.** After you own `specwiki.ai` and configure DNS, change the workflow build step to `npm run build:site -- --with-cname` and add the custom domain in **Settings → Pages**.
+The build script [`scripts/build-landing-site.mjs`](../../scripts/build-landing-site.mjs) copies `site/` into `dist/landing-site/` and adds `.nojekyll` so GitHub Pages serves static files as-is. The deploy workflow passes `--with-cname` so production and preview builds include `CNAME` for `specwiki.ai`.
 
 ## One-time setup (repository maintainer)
 
@@ -28,13 +28,12 @@ The build script [`scripts/build-landing-site.mjs`](../../scripts/build-landing-
 1. Open **Settings → Pages** for `lucasviola/specwiki`.
 2. Under **Build and deployment**, set **Source** to **GitHub Actions**.
 
-### 2. Configure the custom domain (after you own specwiki.ai)
+### 2. Configure the custom domain
 
-Skip this section until you have purchased the domain.
+1. In **Settings → Pages → Custom domain**, enter `specwiki.ai` and save.
+2. Enable **Enforce HTTPS** once the certificate is issued (may take up to 24 hours after DNS propagates).
 
-1. Update `.github/workflows/deploy-site.yml` — change the build step to `npm run build:site -- --with-cname`.
-2. In **Settings → Pages → Custom domain**, enter `specwiki.ai` and save.
-3. Enable **Enforce HTTPS** once the certificate is issued (may take up to 24 hours after DNS propagates).
+The deploy workflow already builds with `--with-cname` so the published artifact includes the `CNAME` file.
 
 ### 3. DNS records (at your domain registrar)
 

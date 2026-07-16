@@ -36,7 +36,7 @@ jobs:
         run: npm test -- tests/site/landing.test.ts
 
       - name: Build landing site
-        run: npm run build:site
+        run: npm run build:site -- --with-cname
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

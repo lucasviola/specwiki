@@ -84,12 +84,10 @@ describe("S20.3 deploy-site workflow", () => {
     );
   });
 
-  it("builds without CNAME until specwiki.ai is owned", () => {
+  it("builds with CNAME for the specwiki.ai custom domain", () => {
     const workflow = readWorkflow();
 
-    expect(workflow).toMatch(/npm run build:site/);
-    expect(workflow).not.toMatch(/--with-cname/);
-    expect(workflow).not.toMatch(/--skip-cname/);
+    expect(workflow).toMatch(/npm run build:site -- --with-cname/);
   });
 
   it("uploads the reproducible landing-site artifact path", () => {
