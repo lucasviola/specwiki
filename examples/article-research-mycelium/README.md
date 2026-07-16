@@ -5,8 +5,8 @@ Loose research notes for a magazine-style article on **mycelium (fungal root) pa
 There is no product code here — only markdown research. [[specwiki]] still turns the folder into a categorized wiki, which is useful when an article outline lives as many small notes.
 
 ```bash
-npx specwiki generate --project examples/article-research-mycelium
-npx specwiki open --project examples/article-research-mycelium
+npx @lucasviola/specwiki generate --project examples/article-research-mycelium
+npx @lucasviola/specwiki open --project examples/article-research-mycelium
 ```
 
 ## Working title

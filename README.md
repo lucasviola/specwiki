@@ -44,10 +44,10 @@ Ignored directories: `node_modules`, `dist`, `wiki`, `.specwiki`, `.git`, `cover
 
 ```bash
 # Try without installing
-npx specwiki generate && npx specwiki open
+npx @lucasviola/specwiki generate && npx @lucasviola/specwiki open
 
-# Or install globally
-npm install -g specwiki
+# Or install globally (then use the `specwiki` command)
+npm install -g @lucasviola/specwiki
 ```
 
 #### Quick start
@@ -88,46 +88,48 @@ npm run publish:package -- --dry-run
 npm run publish:package -- --confirm
 ```
 
-Publishing to the npm registry is an explicit maintainer action after these checks pass. Requires **Node.js 20+** and npm maintainer access to the `specwiki` package. This repository does not automate registry credentials or release versioning.
+Publishing to the npm registry is an explicit maintainer action after these checks pass. Requires **Node.js 20+** and npm maintainer access to the `@lucasviola/specwiki` package. This repository does not automate registry credentials or release versioning.
 
 ## Usage
 
+Use `npx @lucasviola/specwiki …` without a global install, or `specwiki …` after `npm install -g @lucasviola/specwiki`.
+
 ```bash
 # List spec files found in the current project
-npx specwiki list
+npx @lucasviola/specwiki list
 
 # Generate wiki documentation
-npx specwiki generate
+npx @lucasviola/specwiki generate
 
 # Scan a different project
-npx specwiki generate --project /path/to/repo
+npx @lucasviola/specwiki generate --project /path/to/repo
 
 # Custom output directory (must stay inside --project)
-npx specwiki generate --output .specwiki
+npx @lucasviola/specwiki generate --output .specwiki
 
 # Verbose mode
-npx specwiki generate --verbose
+npx @lucasviola/specwiki generate --verbose
 
 # Machine-readable discovery results for scripts and AI agents
-npx specwiki list --json
+npx @lucasviola/specwiki list --json
 
 # Machine-readable generation summary (stdout is one JSON document)
-npx specwiki generate --json
+npx @lucasviola/specwiki generate --json
 
 # Generate an llms.txt manifest grouped by wiki category
-npx specwiki generate --emit-llms-txt
+npx @lucasviola/specwiki generate --emit-llms-txt
 
 # Keep JSON stdout clean while sending verbose diagnostics to stderr
-npx specwiki list --json --verbose
+npx @lucasviola/specwiki list --json --verbose
 
 # Open the HTML wiki in your default browser (run generate first)
-npx specwiki open
+npx @lucasviola/specwiki open
 
 # Open a wiki written to a custom output directory
-npx specwiki open --output .specwiki
+npx @lucasviola/specwiki open --output .specwiki
 
 # Open a wiki in a different project
-npx specwiki open --project /path/to/repo
+npx @lucasviola/specwiki open --project /path/to/repo
 ```
 
 `specwiki open` resolves `{project}/{output}/html/index.html` (same `--project` and `--output` defaults as `generate`) and launches it with your OS default browser. Both commands require `--output` to stay within `--project` (symlinks that escape the project are rejected). If the wiki has not been generated yet, it exits with a message suggesting you run `specwiki generate` first.

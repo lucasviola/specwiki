@@ -1,8 +1,11 @@
 {
-  "name": "specwiki",
+  "name": "@lucasviola/specwiki",
   "version": "1.0.0",
   "description": "Transform AI specs into structured wiki-like documentation",
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "bin": {
     "specwiki": "./dist/cli.js"
   },

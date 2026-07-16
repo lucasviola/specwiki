@@ -7,6 +7,6 @@ Tiny mock project used to showcase BMAD technical research discovered by [[specw
 The research artifacts live under `_bmad-output/`. Run:
 
 ```bash
-npx specwiki generate --project examples/bmad-research-relay
-npx specwiki open --project examples/bmad-research-relay
+npx @lucasviola/specwiki generate --project examples/bmad-research-relay
+npx @lucasviola/specwiki open --project examples/bmad-research-relay
 ```

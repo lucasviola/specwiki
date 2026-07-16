@@ -88,7 +88,7 @@ export function runPublishPackage(argv = process.argv.slice(2)) {
     console.log(`publish-package: dry-run succeeded for ${name}@${version}`);
   } else {
     console.log(`publish-package: published ${name}@${version} to npm`);
-    console.log(`Verify: npx specwiki@${version} --version`);
+    console.log(`Verify: npx ${name}@${version} --version`);
   }
 }
 

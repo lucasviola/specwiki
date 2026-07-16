@@ -65,12 +65,14 @@ describe("S20.1 v2 landing page — hero narrative (AC 1–2)", () => {
 
 describe("S20.1 v2 landing page — hero quick start and agent prompt (AC 3)", () => {
   it("shows the npx quick-start command in a terminal block", () => {
-    expect(text).toContain("npx specwiki generate && npx specwiki open");
+    expect(text).toContain(
+      "npx @lucasviola/specwiki generate && npx @lucasviola/specwiki open",
+    );
     expect(html).toMatch(/class="[^"]*terminal[^"]*"/);
   });
 
   it("shows the global install command", () => {
-    expect(text).toContain("npm install -g specwiki");
+    expect(text).toContain("npm install -g @lucasviola/specwiki");
   });
 
   it("provides a copy-pasteable agent install prompt", () => {
@@ -124,10 +126,10 @@ describe("S20.1 v2 landing page — how it works (AC 5)", () => {
 describe("S20.1 v2 landing page — live example (AC 6)", () => {
   it("shows the real generate/open commands for the example project", () => {
     expect(text).toContain(
-      "npx specwiki generate --project examples/agent-harness-parcel",
+      "npx @lucasviola/specwiki generate --project examples/agent-harness-parcel",
     );
     expect(text).toContain(
-      "npx specwiki open --project examples/agent-harness-parcel",
+      "npx @lucasviola/specwiki open --project examples/agent-harness-parcel",
     );
   });
 

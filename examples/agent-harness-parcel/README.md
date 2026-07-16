@@ -13,8 +13,8 @@ This folder is a minimal **agent harness** — the three root files many AI tool
 Generate a wiki from this harness:
 
 ```bash
-npx specwiki generate --project examples/agent-harness-parcel
-npx specwiki open --project examples/agent-harness-parcel
+npx @lucasviola/specwiki generate --project examples/agent-harness-parcel
+npx @lucasviola/specwiki open --project examples/agent-harness-parcel
 ```
 
 ## Quick start (fictional)

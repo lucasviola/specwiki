@@ -9,16 +9,16 @@ Each folder is a standalone `--project` root. Generate a wiki, then open it:
 npm run build
 
 # 1) BMAD technical research
-npx specwiki generate --project examples/bmad-research-relay --output /tmp/specwiki-bmad
-npx specwiki open --project examples/bmad-research-relay --output /tmp/specwiki-bmad
+npx @lucasviola/specwiki generate --project examples/bmad-research-relay --output /tmp/specwiki-bmad
+npx @lucasviola/specwiki open --project examples/bmad-research-relay --output /tmp/specwiki-bmad
 
 # 2) Agent harness (README + AGENTS + CLAUDE)
-npx specwiki generate --project examples/agent-harness-parcel --output /tmp/specwiki-harness
-npx specwiki open --project examples/agent-harness-parcel --output /tmp/specwiki-harness
+npx @lucasviola/specwiki generate --project examples/agent-harness-parcel --output /tmp/specwiki-harness
+npx @lucasviola/specwiki open --project examples/agent-harness-parcel --output /tmp/specwiki-harness
 
 # 3) Article research notes
-npx specwiki generate --project examples/article-research-mycelium --output /tmp/specwiki-article
-npx specwiki open --project examples/article-research-mycelium --output /tmp/specwiki-article
+npx @lucasviola/specwiki generate --project examples/article-research-mycelium --output /tmp/specwiki-article
+npx @lucasviola/specwiki open --project examples/article-research-mycelium --output /tmp/specwiki-article
 ```
 
 | Example                                                      | What it demonstrates                                           |

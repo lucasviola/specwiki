@@ -12,6 +12,8 @@ type PackageJson = {
   bin: Record<string, string>;
   files: string[];
   license: string;
+  name: string;
+  publishConfig?: { access: string };
   scripts: Record<string, string>;
 };
 
@@ -48,6 +50,13 @@ describe("npm publish contract", () => {
 
     expect(scripts.prepare).toBeUndefined();
     expect(scripts["setup-hooks"]).toBe("git config core.hooksPath .githooks");
+  });
+
+  it("publishes under the scoped npm package name", () => {
+    const pkg = readPackageJson();
+
+    expect(pkg.name).toBe("@lucasviola/specwiki");
+    expect(pkg.publishConfig).toEqual({ access: "public" });
   });
 
   it("protects npm publish with the prepublish quality gate", () => {

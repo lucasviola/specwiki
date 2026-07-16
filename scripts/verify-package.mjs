@@ -117,6 +117,17 @@ function readPackageNameVersion() {
 }
 
 /**
+ * npm pack filename for scoped and unscoped package names.
+ *
+ * @param {string} name
+ * @param {string} version
+ */
+export function tarballFileName(name, version) {
+  const base = name.startsWith("@") ? name.slice(1).replace("/", "-") : name;
+  return `${base}-${version}.tgz`;
+}
+
+/**
  * @param {{ skipBuild?: boolean }} [options]
  */
 export function runVerifyPackage(options = {}) {
@@ -139,9 +150,10 @@ export function runVerifyPackage(options = {}) {
     });
 
     const { name, version } = readPackageNameVersion();
-    tarballPath = path.join(packDir, `${name}-${version}.tgz`);
+    const tarballName = tarballFileName(name, version);
+    tarballPath = path.join(packDir, tarballName);
     if (!fs.existsSync(tarballPath)) {
-      throw new Error(`expected tarball at ${name}-${version}.tgz`);
+      throw new Error(`expected tarball at ${tarballName}`);
     }
 
     const entries = listTarballEntries(tarballPath);

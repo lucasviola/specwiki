@@ -12,6 +12,7 @@ import {
   FORBIDDEN_TAR_PREFIXES,
   REQUIRED_TAR_ENTRIES,
   npmSubprocessEnv,
+  tarballFileName,
   validateTarballEntries,
 } from "../../scripts/verify-package.mjs";
 
@@ -151,6 +152,13 @@ describe("verify package", () => {
     expect(() => validateTarballEntries(entries)).toThrow(/forbidden entries/);
     expect(FORBIDDEN_TAR_PREFIXES).toContain("package/src/");
     expect(FORBIDDEN_TAR_PREFIXES).toContain("package/tests/");
+  });
+
+  it("builds tarball filenames for scoped package names", () => {
+    expect(tarballFileName("@lucasviola/specwiki", "1.0.0")).toBe(
+      "lucasviola-specwiki-1.0.0.tgz",
+    );
+    expect(tarballFileName("specwiki", "0.1.0")).toBe("specwiki-0.1.0.tgz");
   });
 
   it("strips npm publish dry-run config from nested npm subprocess env", () => {
