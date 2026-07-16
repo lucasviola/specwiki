@@ -232,3 +232,80 @@ describe("S20.1 v2 landing page — dark-first design tokens (AC 11–12)", () =
     expect(text).not.toMatch(/testimonial/i);
   });
 });
+
+describe("S20.2 landing page — semantic structure and no-JS core (AC 1, 4–5)", () => {
+  it("uses header, main, and footer landmarks", () => {
+    expect(html).toMatch(/<header[\s>]/);
+    expect(html).toMatch(/<main[\s>]/);
+    expect(html).toMatch(/<footer[\s>]/);
+  });
+
+  it("delivers the value proposition and primary CTA without JavaScript", () => {
+    expect(html).not.toMatch(/<script/i);
+    expect(html).toMatch(/<h1[\s>]/);
+    expect(html).toMatch(/class="[^"]*cta[^"]*"/);
+    expect(text).toContain("Make AI knowledge useful to humans.");
+  });
+
+  it("primary nav has an accessible name", () => {
+    expect(html).toMatch(/<nav[^>]+aria-label="/);
+  });
+});
+
+describe("S20.2 landing page — keyboard focus and skip link (AC 1)", () => {
+  it("CSS defines visible :focus-visible outlines on interactive elements", () => {
+    expect(css).toMatch(/:focus-visible/);
+    expect(css).toMatch(/outline:\s*2px solid var\(--color-primary\)/);
+  });
+
+  it("provides a skip link to main content", () => {
+    expect(html).toMatch(/class="[^"]*skip-link[^"]*"/);
+    expect(html).toMatch(/href="#main-content"/);
+    expect(html).toMatch(/<main[^>]+id="main-content"[^>]+tabindex="-1"/);
+  });
+});
+
+describe("S20.2 landing page — responsive overflow containment (AC 2)", () => {
+  it("wraps the coverage table in a horizontal scroll container", () => {
+    expect(html).toMatch(/class="[^"]*coverage-table-wrap[^"]*"/);
+    expect(css).toMatch(/\.coverage-table-wrap[\s\S]*?overflow-x:\s*auto/);
+  });
+
+  it("uses min() in grid minmax so panels fit within 320px viewports", () => {
+    expect(css).toMatch(/minmax\(min\(100%/);
+  });
+
+  it("constrains terminal and file-tree overflow locally", () => {
+    expect(css).toMatch(/\.terminal-body[\s\S]*?overflow-x:\s*auto/);
+    expect(css).toMatch(/\.file-tree[\s\S]*?overflow-x:\s*auto/);
+  });
+
+  it("includes a narrow-viewport layout adjustment", () => {
+    expect(css).toMatch(/@media\s*\(max-width:/);
+  });
+
+  it("does not rely on page-level overflow-x: hidden as the primary fix", () => {
+    expect(css).not.toMatch(/body\s*\{[\s\S]*?overflow-x:\s*hidden/);
+  });
+});
+
+describe("S20.2 landing page — contrast and motion (AC 1, 3)", () => {
+  it("uses muted text at sufficient opacity for WCAG AA body copy", () => {
+    const mutedMatches = css.match(/--text-muted:\s*rgba\([^)]+\)/g);
+    expect(mutedMatches, "CSS must define --text-muted tokens").not.toBeNull();
+    for (const token of mutedMatches!) {
+      expect(token).toMatch(/0\.(?:7[2-9]|[89]\d)/);
+    }
+  });
+
+  it("respects prefers-reduced-motion", () => {
+    expect(css).toMatch(/prefers-reduced-motion:\s*reduce/);
+  });
+
+  it("keeps decorative wiki-mock search hidden from assistive technology", () => {
+    const search = html.match(
+      /class="[^"]*wiki-mock-search[^"]*"[^>]*aria-hidden="true"/,
+    );
+    expect(search, "wiki mock search is decorative").not.toBeNull();
+  });
+});

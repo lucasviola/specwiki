@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-16
-**Current position:** **E20 S20.1 v2 landing page complete** — review patches applied and approved; committed
-**Test count:** 402 passing
+**Current position:** **E20 S20.2 responsive/a11y landing page complete** — ready for review
+**Test count:** 415 passing
 
 ## Deliverables
 
@@ -152,6 +152,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
   - [x] S19.5 — Collapsible category navigation _(review)_
 - [ ] **E20 — Landing Page & Launch Surface** — narrative page, responsive/a11y hardening, hosting _(in progress)_
   - [x] S20.1 — Landing-page narrative and brand treatment (v2) _(review)_
+  - [x] S20.2 — Responsive, accessible landing-page implementation _(review)_
 
 ## HARNESS §13 Deliverables Checklist
 
@@ -261,4 +262,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-15 | E13 S13.2        | `ci: add GitHub Actions quality gate on push and PR` — ubuntu-latest + Node 20; npm ci then canonical §0.2 scripts as separate steps; six workflow contract tests; no publish/registry automation; 362 tests total                                                                                                                                                                                                           | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-15 | E13 S13.3        | `docs(marketing): publication README review, market research, and launch copy` — UX-led README rewrite (consumer install first, quick-start, [[specwiki]] wordmark); `docs/marketing/readme-review.md`, `market-research.md`, `launch-copy.md`; CLI help spot-checked; doc-only (no quality gate)                                                                                                                            | uncommitted           | N/A (doc-only)                                                                       |
 | 2026-07-16 | E20 S20.1        | `feat(site): v2 landing page with editorial dark-first brand treatment` — five-section static page (hero narrative + quick start + agent prompt, problem coverage table, how-it-works, live spec→wiki example with static wiki mock, facts strip); canonical BRAND.md tokens dark-first; v1 `href="/"` fix; 3 review patches applied (Main Page mock heading, subfolder link, repo-root note); 29 new tests; 402 tests total | 610b656               | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
+| 2026-07-16 | E20 S20.2        | `feat(site): responsive and accessible landing page hardening` — skip link + focusable main, :focus-visible outlines, coverage-table scroll wrapper, minmax(min(100%)) grids for 320px, narrow-viewport CSS, muted-text contrast bump (0.72), prefers-reduced-motion; 13 new tests; 415 tests total; no src/ changes                                                                                                         | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | _template_ | _E?_ S?_         | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                                              |

@@ -9,7 +9,7 @@
   --surface: #1d2026;
   --surface-raised: #24272e;
   --border: #2e323a;
-  --text-muted: rgba(234, 236, 240, 0.62);
+  --text-muted: rgba(234, 236, 240, 0.72);
   --cta-text: #16181c;
 }
 
@@ -22,7 +22,7 @@
     --surface: #f6f7f9;
     --surface-raised: #eef0f3;
     --border: #d9dce2;
-    --text-muted: rgba(32, 33, 34, 0.62);
+    --text-muted: rgba(32, 33, 34, 0.72);
     --cta-text: #ffffff;
   }
 }
@@ -33,12 +33,44 @@
 
 body {
   margin: 0;
+  max-width: 100%;
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
     sans-serif;
   color: var(--color-base);
   background: var(--background-color-base);
   line-height: 1.65;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.55rem 0.9rem;
+  background: var(--color-primary);
+  color: var(--cta-text);
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 4px;
+  transform: translateY(calc(-100% - 1rem));
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--color-base);
+  outline-offset: 2px;
+}
+
+a:focus-visible,
+.cta:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+main:focus {
+  outline: none;
 }
 
 code,
@@ -178,7 +210,7 @@ main {
 
 .narrative {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
   gap: 2rem;
   margin-bottom: 3rem;
 }
@@ -196,7 +228,7 @@ main {
 
 .hero-panels {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
   gap: 1.5rem;
   align-items: start;
 }
@@ -207,6 +239,7 @@ main {
 
 .cta {
   display: inline-block;
+  min-height: 2.75rem;
   padding: 0.8rem 1.6rem;
   background: var(--color-primary);
   color: var(--cta-text);
@@ -291,11 +324,21 @@ main {
 
 /* ---------- 02 coverage table ---------- */
 
+.coverage-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: 1.5rem;
+}
+
 .coverage-table {
   width: 100%;
-  margin-top: 1.5rem;
+  min-width: 20rem;
   border-collapse: collapse;
   font-size: 0.9rem;
+}
+
+.coverage-table td code {
+  word-break: break-word;
 }
 
 .coverage-table th,
@@ -324,7 +367,7 @@ main {
 
 .steps {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
   gap: 2rem;
   margin-top: 2rem;
 }
@@ -392,9 +435,10 @@ main {
 
 .wiki-mock-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.75rem;
   padding: 0.65rem 1rem;
   background: var(--surface-raised);
   border-bottom: 1px solid var(--border);
@@ -413,7 +457,9 @@ main {
 }
 
 .wiki-mock-search {
-  flex: 0 1 14rem;
+  flex: 1 1 8rem;
+  min-width: 0;
+  max-width: 14rem;
   padding: 0.3rem 0.7rem;
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -476,7 +522,7 @@ main {
 
 .facts {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
   gap: 2rem;
   margin-top: 2rem;
   align-items: start;
@@ -513,6 +559,44 @@ main {
   margin: 0 0.6em;
 }
 
+@media (max-width: 479px) {
+  main {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .site-header {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .specwiki-logo {
+    margin: 0.75em 0.5em;
+    font-size: 0.95rem;
+  }
+
+  .header-link {
+    margin-right: 0.5em;
+  }
+
+  .hero,
+  .section {
+    padding-top: 3rem;
+  }
+
+  .section {
+    margin-top: 3rem;
+  }
+
+  .hero h1 {
+    margin-bottom: 2rem;
+  }
+
+  .wiki-mock-search {
+    display: none;
+  }
+}
+
 @media (min-width: 48rem) {
   .example {
     grid-template-columns: 1fr 1fr;
@@ -520,5 +604,16 @@ main {
 
   .example-command {
     grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

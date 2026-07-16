@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="assets/landing.css" />
   </head>
   <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <header class="site-header">
       <a href="index.html" class="specwiki-logo" aria-label="specwiki home">
         <span class="specwiki-logo-bracket" aria-hidden="true">[[</span
@@ -25,7 +26,7 @@
       </nav>
     </header>
 
-    <main>
+    <main id="main-content" tabindex="-1">
       <!-- 01 · Hero -->
       <section class="hero" aria-labelledby="hero-title">
         <p class="kicker">
@@ -117,75 +118,77 @@ then summarize the generated wiki index for me.</code></pre>
             categorized, searchable wiki. Out of the box it finds:
           </p>
         </div>
-        <table class="coverage-table">
-          <caption class="visually-hidden">
-            Spec sources specwiki discovers by default, and the file patterns
-            for each
-          </caption>
-          <thead>
-            <tr>
-              <th scope="col">Source</th>
-              <th scope="col">Patterns</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Root agent files</td>
-              <td>
-                <code>AGENTS.md</code>, <code>SPEC.md</code>,
-                <code>CLAUDE.md</code>, <code>GEMINI.md</code>
-              </td>
-            </tr>
-            <tr>
-              <td>Cursor</td>
-              <td>
-                <code>.cursor/rules/**</code>,
-                <code>.cursor/skills/**/SKILL.md</code>
-              </td>
-            </tr>
-            <tr>
-              <td>Spec frameworks</td>
-              <td>
-                <code>specs/**</code>, <code>openspec/**</code>,
-                <code>.kiro/specs/**</code>
-              </td>
-            </tr>
-            <tr>
-              <td>Docs &amp; plans</td>
-              <td>
-                <code>docs/specs/**</code>, <code>docs/plans/**</code>,
-                <code>requirements/**</code>
-              </td>
-            </tr>
-            <tr>
-              <td>GitHub Copilot</td>
-              <td><code>.github/copilot-instructions.md</code></td>
-            </tr>
-            <tr>
-              <td>Monorepo agents</td>
-              <td><code>**/AGENTS.md</code> (nested packages)</td>
-            </tr>
-            <tr>
-              <td>BMAD output</td>
-              <td><code>_bmad-output/**/*.md</code></td>
-            </tr>
-            <tr>
-              <td>Agent skills</td>
-              <td><code>.agents/skills/**/SKILL.md</code></td>
-            </tr>
-            <tr>
-              <td>README files</td>
-              <td><code>**/README.md</code> (standalone wiki pages)</td>
-            </tr>
-            <tr>
-              <td>All markdown</td>
-              <td>
-                <code>**/*.{md,mdc}</code> (any <code>.md</code> /
-                <code>.mdc</code> in the project)
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="coverage-table-wrap">
+          <table class="coverage-table">
+            <caption class="visually-hidden">
+              Spec sources specwiki discovers by default, and the file patterns
+              for each
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Source</th>
+                <th scope="col">Patterns</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Root agent files</td>
+                <td>
+                  <code>AGENTS.md</code>, <code>SPEC.md</code>,
+                  <code>CLAUDE.md</code>, <code>GEMINI.md</code>
+                </td>
+              </tr>
+              <tr>
+                <td>Cursor</td>
+                <td>
+                  <code>.cursor/rules/**</code>,
+                  <code>.cursor/skills/**/SKILL.md</code>
+                </td>
+              </tr>
+              <tr>
+                <td>Spec frameworks</td>
+                <td>
+                  <code>specs/**</code>, <code>openspec/**</code>,
+                  <code>.kiro/specs/**</code>
+                </td>
+              </tr>
+              <tr>
+                <td>Docs &amp; plans</td>
+                <td>
+                  <code>docs/specs/**</code>, <code>docs/plans/**</code>,
+                  <code>requirements/**</code>
+                </td>
+              </tr>
+              <tr>
+                <td>GitHub Copilot</td>
+                <td><code>.github/copilot-instructions.md</code></td>
+              </tr>
+              <tr>
+                <td>Monorepo agents</td>
+                <td><code>**/AGENTS.md</code> (nested packages)</td>
+              </tr>
+              <tr>
+                <td>BMAD output</td>
+                <td><code>_bmad-output/**/*.md</code></td>
+              </tr>
+              <tr>
+                <td>Agent skills</td>
+                <td><code>.agents/skills/**/SKILL.md</code></td>
+              </tr>
+              <tr>
+                <td>README files</td>
+                <td><code>**/README.md</code> (standalone wiki pages)</td>
+              </tr>
+              <tr>
+                <td>All markdown</td>
+                <td>
+                  <code>**/*.{md,mdc}</code> (any <code>.md</code> /
+                  <code>.mdc</code> in the project)
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <!-- 03 · How it works -->
