@@ -1030,6 +1030,106 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 
 ---
 
+### E21 — NPM Security Hardening & Publish Safety
+
+**Vertical slice:** Close security gaps identified in the 2026-07-16 pre-publish security analysis so npm consumers are not exposed to path escape, undocumented trust boundaries, or weak maintainer release hygiene.
+
+**Audience:** npm installers, maintainers cutting releases, security researchers.
+
+**Dependency:** Complete **before E13 S13.4** first public `npm publish` (or owner explicitly waives open stories). Complements **E13 S13.1** (`verify-package`, `prepublishOnly`).
+
+**Context:** [`epic-21-npm-security-hardening.md`](../../implementation-artifacts/epic-21-npm-security-hardening.md)
+
+| Story | Summary                                         | Finding / source                 | Status  |
+| ----- | ----------------------------------------------- | -------------------------------- | ------- |
+| S21.1 | Generate output confined to project root        | SEC-1                            | done    |
+| S21.2 | README security section for npm users           | SEC-3, SEC-4, SEC-6              | done    |
+| S21.3 | SECURITY.md vulnerability reporting policy      | Publish gate                     | backlog |
+| S21.4 | Trust warning when loading `specwiki.config.js` | SEC-2                            | backlog |
+| S21.5 | Release-time dependency audit gate              | SEC-5                            | backlog |
+| S21.6 | Maintainer npm publish security checklist       | Analysis recs 3–4, SEC-6         | backlog |
+| S21.7 | Opt-in HTML sanitization (`--sanitize-html`)    | SEC-3 mitigation; POST-MVP Bet 6 | backlog |
+
+#### S21.1 — Generate output confined to project root ✅ done
+
+**As** an npm user, **I want** `generate --output` confined to `--project`, **so that** wiki files cannot be written outside my repo.
+
+**Demo path:** `specwiki generate --output ../outside` — exits non-zero; `output.error` + `cli.error`.
+
+**Functional:**
+
+- [x] Shared `resolveOutputWithinProject` in `src/core/paths.ts`
+- [x] Symlink escape rejected via `realpath`
+- [x] Parity with `specwiki open` output guards
+
+**Quality measures:**
+
+- [x] `tests/commands/generate.test.ts`, `tests/cli.test.ts`, `tests/core/paths.test.ts`
+- [x] Commit `a52ff64`
+
+#### S21.2 — README security section ✅ done
+
+**As** a prospective user, **I want** README security guidance, **so that** I understand trusted-project and npm-surface risks before running specwiki.
+
+**Functional:**
+
+- [x] `## Security` — trusted projects, path safety, npm package surface
+- [x] Documents `specwiki.config.js` RCE and markdown/HTML XSS model
+- [x] Documents `--output` confinement for `generate` and `open`
+
+#### S21.3 — SECURITY.md vulnerability reporting
+
+**As** a researcher, **I want** `SECURITY.md`, **so that** I can report vulnerabilities privately.
+
+**Functional:**
+
+- [ ] `SECURITY.md` at repo root with supported versions and private reporting channel
+- [ ] README links to `SECURITY.md`
+- [ ] Scope statement (CLI vs user spec content)
+
+#### S21.4 — Config.js trust warning
+
+**As** a developer on a cloned repo, **I want** a warning when `.js` config loads, **so that** I know arbitrary code is executing.
+
+**Functional:**
+
+- [ ] One stderr warning per invocation when `specwiki.config.js` is used
+- [ ] No warning for JSON config; `--json` stdout stays clean
+- [ ] `config.warn` structured event without config body
+
+#### S21.5 — Release dependency audit gate
+
+**As** a maintainer, **I want** `npm audit` in the release gate, **so that** high/critical CVEs block publish.
+
+**Functional:**
+
+- [ ] Audit step in prepublish or `release:check`
+- [ ] Fail on high/critical; document exception process
+
+#### S21.6 — Maintainer publish security checklist
+
+**As** a maintainer, **I want** a releasing checklist, **so that** every publish uses verify-package, dry-run, and 2FA.
+
+**Functional:**
+
+- [ ] `docs/RELEASING.md` (or equivalent) with numbered pre-publish steps
+- [ ] Documents `verify-package`, `prepublishOnly`, `publish:package --dry-run`, npm 2FA
+- [ ] References `check-secrets`, tarball allowlist, no install hooks
+
+#### S21.7 — Opt-in HTML sanitization (deferred)
+
+**As** a user with contributor specs, **I want** `--sanitize-html`, **so that** untrusted markdown cannot inject scripts in HTML output.
+
+**Functional:**
+
+- [ ] Opt-in flag on `generate`; default unchanged (AD-6)
+- [ ] Tests for script injection stripped in HTML body
+- [ ] Not required for v1.0.0 unless owner prioritizes
+
+**E21 gate:** S21.1–S21.2 done; S21.3–S21.6 complete before first npm publish; S21.7 optional post-v1.
+
+---
+
 ## Traceability Summary
 
 ### MVP epics (E1–E7) — **closed** (2026-07-12)
@@ -1046,18 +1146,19 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 
 ### POST-MVP epics (E8–E20) — **backlog**
 
-| Epic                | Stories     | FR binding                                            | Status  |
-| ------------------- | ----------- | ----------------------------------------------------- | ------- |
-| E8 Custom discovery | S8.1–S8.4   | FR-005, FR-006, FR-035                                | backlog |
-| E9 Agent I/O        | S9.1–S9.2   | FR-017, FR-023                                        | backlog |
-| E10 Team CI         | S10.1       | FR-024                                                | backlog |
-| E11 Live loop       | S11.1–S11.2 | FR-025, FR-026                                        | backlog |
-| E12 Semantic        | S12.1–S12.3 | FR-010                                                | backlog |
-| E13 Distribution    | S13.1–S13.4 | FR-027, FR-028; go-to-market (S13.3); release (S13.4) | backlog |
-| E14 Ecosystem       | S14.1–S14.3 | FR-018, FR-029                                        | backlog |
-| E15 IDE             | S15.1       | —                                                     | backlog |
-| E16 Wiki HTML skin  | S16.1–S16.4 | FR-032–FR-034                                         | backlog |
-| E20 specwiki.ai     | S20.1–S20.3 | New public web surface; depends on E13 S13.1          | backlog |
+| Epic                | Stories     | FR binding                                            | Status      |
+| ------------------- | ----------- | ----------------------------------------------------- | ----------- |
+| E8 Custom discovery | S8.1–S8.4   | FR-005, FR-006, FR-035                                | backlog     |
+| E9 Agent I/O        | S9.1–S9.2   | FR-017, FR-023                                        | backlog     |
+| E10 Team CI         | S10.1       | FR-024                                                | backlog     |
+| E11 Live loop       | S11.1–S11.2 | FR-025, FR-026                                        | backlog     |
+| E12 Semantic        | S12.1–S12.3 | FR-010                                                | backlog     |
+| E13 Distribution    | S13.1–S13.4 | FR-027, FR-028; go-to-market (S13.3); release (S13.4) | backlog     |
+| E14 Ecosystem       | S14.1–S14.3 | FR-018, FR-029                                        | backlog     |
+| E15 IDE             | S15.1       | —                                                     | backlog     |
+| E16 Wiki HTML skin  | S16.1–S16.4 | FR-032–FR-034                                         | backlog     |
+| E20 specwiki.ai     | S20.1–S20.3 | New public web surface; depends on E13 S13.1          | backlog     |
+| E21 NPM security    | S21.1–S21.7 | Pre-publish hardening; gate before E13 S13.4          | in-progress |
 
 ---
 
@@ -1077,7 +1178,7 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 1. **E1** — S1.1 (`IMPLEMENTATION.md`) → S1.3 (`Logger.ts`) → S1.2 verify
 2. **E2 → E3 → E4** — Core journeys; logging in same story as feature
 3. **E5 → E6 → E7** — Trustworthy output, CLI, sign-off
-4. **POST-MVP:** E8 → E15; **E16** (wiki HTML skin) recommended after E4, before or parallel with E8 S8.3; **E20** follows E13 S13.1, once the package is published to npm, a deployment provider is selected, and its CTA destination is confirmed.
+4. **POST-MVP:** E8 → E15; **E16** (wiki HTML skin) recommended after E4; **E21** (npm security) before **E13 S13.4** first publish; **E20** follows E13 S13.1 once the package is published to npm.
 
 ---
 
