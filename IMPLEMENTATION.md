@@ -2,7 +2,7 @@
 
 **Last updated:** 2026-07-16
 **Current position:** **E20 S20.3 specwiki.ai hosting workflow complete** — ready for review
-**Test count:** 432 passing
+**Test count:** 442 passing
 
 ## Deliverables
 
@@ -177,16 +177,16 @@ Verified 2026-07-12 as part of E7 S7.2. Automated guards in `tests/harness/deliv
 
 ### Code quality
 
-| Item                                      | Status | Evidence                                            |
-| ----------------------------------------- | ------ | --------------------------------------------------- |
-| All §0.2 quality gate commands pass       | ✓      | S7.2 gate run (see build log row)                   |
-| §0.2.5 automated code review per task     | ✓      | Story files under `Senior Developer Review (AI)`    |
-| §0.2.6 QA analysis with manual validation | ✓      | Story files under `QA Manual Validation`            |
-| Coverage ≥ 90% repo-wide                  | ✓      | vitest thresholds + coverage run                    |
-| Comments follow §0.6                      | ✓      | Minimal, non-obvious only                           |
-| Code cleanliness follows §0.7             | ✓      | Focused modules; no scope creep                     |
-| Structured logging follows §0.8           | ✓      | Logger in all pipeline modules; audit below         |
-| Path/HTML safety follows §0.9             | ✓      | `escapeHtml`, `assertPathConfined`; traversal tests |
+| Item                                      | Status | Evidence                                                                                  |
+| ----------------------------------------- | ------ | ----------------------------------------------------------------------------------------- |
+| All §0.2 quality gate commands pass       | ✓      | S7.2 gate run (see build log row)                                                         |
+| §0.2.5 automated code review per task     | ✓      | Story files under `Senior Developer Review (AI)`                                          |
+| §0.2.6 QA analysis with manual validation | ✓      | Story files under `QA Manual Validation`                                                  |
+| Coverage ≥ 90% repo-wide                  | ✓      | vitest thresholds + coverage run                                                          |
+| Comments follow §0.6                      | ✓      | Minimal, non-obvious only                                                                 |
+| Code cleanliness follows §0.7             | ✓      | Focused modules; no scope creep                                                           |
+| Structured logging follows §0.8           | ✓      | Logger in all pipeline modules; audit below                                               |
+| Path/HTML safety follows §0.9             | ✓      | `escapeHtml`, `assertPathConfined`, `resolveOutputWithinProject`; README security section |
 
 ## §0.8 Logging Audit (E2–E6)
 
@@ -265,4 +265,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-16 | E20 S20.1        | `feat(site): v2 landing page with editorial dark-first brand treatment` — five-section static page (hero narrative + quick start + agent prompt, problem coverage table, how-it-works, live spec→wiki example with static wiki mock, facts strip); canonical BRAND.md tokens dark-first; v1 `href="/"` fix; 3 review patches applied (Main Page mock heading, subfolder link, repo-root note); 29 new tests; 402 tests total | 610b656               | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-16 | E20 S20.2        | `feat(site): responsive and accessible landing page hardening` — skip link + focusable main, :focus-visible outlines, coverage-table scroll wrapper, minmax(min(100%)) grids for 320px, narrow-viewport CSS, muted-text contrast bump (0.72), prefers-reduced-motion; 13 new tests; 415 tests total; no src/ changes                                                                                                         | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-16 | E20 S20.3        | `ci(site): GitHub Pages deploy workflow for specwiki.ai` — `build-landing-site.mjs` copies site/ to dist/landing-site with CNAME/.nojekyll; deploy-site.yml with split production/preview jobs and `--skip-cname` on PRs; docs/hosting/specwiki-ai.md; 17 new tests; 432 tests total; no src/ changes                                                                                                                        | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
+| 2026-07-16 | Security         | `fix(generate): confine --output to project root` — shared `resolveOutputWithinProject` with symlink checks (parity with `open`); README Security section; generate/CLI/paths regression tests; 442 tests total                                                                                                                                                                                                              | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | _template_ | _E?_ S?_         | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                                              |

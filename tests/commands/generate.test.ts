@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { randomUUID } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_SPEC_PATTERNS } from "../../src/config/patterns.js";
@@ -46,35 +47,37 @@ function parseStderrLines(): Record<string, unknown>[] {
     .map((line) => JSON.parse(line) as Record<string, unknown>);
 }
 
+function ignoredFixtureOutput(projectRoot: string, label = "run"): string {
+  const outputDir = path.join(".specwiki", `${label}-${randomUUID()}`);
+  tempDirs.push(path.join(projectRoot, outputDir));
+  return outputDir;
+}
+
 describe("generateWiki", () => {
   it("writes an llms.txt manifest only when explicitly enabled", async () => {
-    const defaultOutput = await fs.mkdtemp(
-      path.join(os.tmpdir(), "specwiki-llms-default-"),
-    );
-    const enabledOutput = await fs.mkdtemp(
-      path.join(os.tmpdir(), "specwiki-llms-enabled-"),
-    );
-    tempDirs.push(defaultOutput, enabledOutput);
+    const projectRoot = fixtureRoot;
+    const defaultOutput = ignoredFixtureOutput(projectRoot, "llms-default");
+    const enabledOutput = ignoredFixtureOutput(projectRoot, "llms-enabled");
 
     await generateWiki({
-      projectRoot: fixtureRoot,
+      projectRoot,
       outputDir: defaultOutput,
     });
     await expect(
-      fs.stat(path.join(defaultOutput, "llms.txt")),
+      fs.stat(path.join(projectRoot, defaultOutput, "llms.txt")),
     ).rejects.toMatchObject({
       code: "ENOENT",
     });
 
     await generateWiki({
-      projectRoot: fixtureRoot,
+      projectRoot,
       outputDir: enabledOutput,
       emitLlmsTxt: true,
       verbose: true,
     });
 
     await expect(
-      fs.readFile(path.join(enabledOutput, "llms.txt"), "utf-8"),
+      fs.readFile(path.join(projectRoot, enabledOutput, "llms.txt"), "utf-8"),
     ).resolves.toContain("# Spec Wiki");
     expect(parseStderrLines()).toContainEqual(
       expect.objectContaining({
@@ -85,13 +88,11 @@ describe("generateWiki", () => {
   });
 
   it("prints a stable JSON result after writing the wiki", async () => {
-    const outputDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), "specwiki-json-"),
-    );
-    tempDirs.push(outputDir);
+    const projectRoot = fixtureRoot;
+    const outputDir = ignoredFixtureOutput(projectRoot, "json");
 
     await generateWiki({
-      projectRoot: fixtureRoot,
+      projectRoot,
       outputDir,
       json: true,
     });
@@ -103,7 +104,7 @@ describe("generateWiki", () => {
     };
 
     expect(result.specCount).toBe(result.pages.length);
-    expect(result.outputDir).toBe(path.resolve(outputDir));
+    expect(result.outputDir).toBe(path.resolve(projectRoot, outputDir));
     expect(result.pages.map((page) => page.sourcePath).slice(0, 4)).toEqual([
       ".agents/skills/bmad-skill/SKILL.md",
       "_bmad-output/planning/artifact.md",
@@ -128,7 +129,9 @@ describe("generateWiki", () => {
         }),
       ]),
     );
-    expect(await fs.stat(path.join(outputDir, "index.md"))).toBeDefined();
+    expect(
+      await fs.stat(path.join(projectRoot, outputDir, "index.md")),
+    ).toBeDefined();
   });
 
   it("prints an empty JSON result without creating output for zero specs", async () => {
@@ -149,17 +152,22 @@ describe("generateWiki", () => {
   });
 
   it("writes wiki output for discovered specs", async () => {
-    const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-out-"));
-    tempDirs.push(outputDir);
+    const projectRoot = fixtureRoot;
+    const outputDir = ignoredFixtureOutput(projectRoot, "writes");
 
     await generateWiki({
-      projectRoot: fixtureRoot,
+      projectRoot,
       outputDir,
       verbose: true,
     });
 
-    const indexPath = path.join(outputDir, "index.md");
-    const htmlIndexPath = path.join(outputDir, "html", "index.html");
+    const indexPath = path.join(projectRoot, outputDir, "index.md");
+    const htmlIndexPath = path.join(
+      projectRoot,
+      outputDir,
+      "html",
+      "index.html",
+    );
 
     expect(await fs.readFile(indexPath, "utf-8")).toContain("# Spec Wiki");
     expect(await fs.readFile(htmlIndexPath, "utf-8")).toContain("<html");
@@ -190,11 +198,11 @@ describe("generateWiki", () => {
   });
 
   it("emits parse.file diagnostics on stderr when verbose is enabled", async () => {
-    const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-out-"));
-    tempDirs.push(outputDir);
+    const projectRoot = fixtureRoot;
+    const outputDir = ignoredFixtureOutput(projectRoot, "parse-verbose");
 
     await generateWiki({
-      projectRoot: fixtureRoot,
+      projectRoot,
       outputDir,
       verbose: true,
     });
@@ -214,21 +222,21 @@ describe("generateWiki", () => {
   });
 
   it("binds README content into wiki index markdown and HTML on fixture", async () => {
-    const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-out-"));
-    tempDirs.push(outputDir);
+    const projectRoot = fixtureRoot;
+    const outputDir = ignoredFixtureOutput(projectRoot, "readme-index");
 
     await generateWiki({
-      projectRoot: fixtureRoot,
+      projectRoot,
       outputDir,
       verbose: true,
     });
 
     const indexContent = await fs.readFile(
-      path.join(outputDir, "index.md"),
+      path.join(projectRoot, outputDir, "index.md"),
       "utf-8",
     );
     const htmlIndex = await fs.readFile(
-      path.join(outputDir, "html", "index.html"),
+      path.join(projectRoot, outputDir, "html", "index.html"),
       "utf-8",
     );
 
@@ -248,7 +256,10 @@ describe("generateWiki", () => {
       "This nested README drives the Other category index introduction.",
     );
     expect(
-      await fs.readFile(path.join(outputDir, "readme.md"), "utf-8"),
+      await fs.readFile(
+        path.join(projectRoot, outputDir, "readme.md"),
+        "utf-8",
+      ),
     ).toContain("Root README for extended default pattern discovery.");
 
     const lines = parseStderrLines();
@@ -268,11 +279,11 @@ describe("generateWiki", () => {
   });
 
   it("emits output.write and generate.summary on stderr when verbose is enabled", async () => {
-    const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-out-"));
-    tempDirs.push(outputDir);
+    const projectRoot = fixtureRoot;
+    const outputDir = ignoredFixtureOutput(projectRoot, "output-verbose");
 
     await generateWiki({
-      projectRoot: fixtureRoot,
+      projectRoot,
       outputDir,
       verbose: true,
     });
@@ -325,11 +336,11 @@ describe("generateWiki", () => {
   });
 
   it("emits cli.command on stderr when verbose is enabled", async () => {
-    const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-out-"));
-    tempDirs.push(outputDir);
+    const projectRoot = fixtureRoot;
+    const outputDir = ignoredFixtureOutput(projectRoot, "cli-command");
 
     await generateWiki({
-      projectRoot: fixtureRoot,
+      projectRoot,
       outputDir,
       verbose: true,
     });
@@ -341,8 +352,8 @@ describe("generateWiki", () => {
       event: "cli.command",
       level: "info",
       command: "generate",
-      projectRoot: fixtureRoot,
-      outputDir: path.resolve(fixtureRoot, outputDir),
+      projectRoot,
+      outputDir: path.resolve(projectRoot, outputDir),
       verbose: true,
       patternCount: DEFAULT_SPEC_PATTERNS.length,
     });
@@ -352,11 +363,11 @@ describe("generateWiki", () => {
   });
 
   it("does not emit cli.command when verbose is disabled", async () => {
-    const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-out-"));
-    tempDirs.push(outputDir);
+    const projectRoot = fixtureRoot;
+    const outputDir = ignoredFixtureOutput(projectRoot, "cli-quiet");
 
     await generateWiki({
-      projectRoot: fixtureRoot,
+      projectRoot,
       outputDir,
       verbose: false,
     });
@@ -366,11 +377,11 @@ describe("generateWiki", () => {
   });
 
   it("does not print verbose scan diagnostics on stdout when verbose", async () => {
-    const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-out-"));
-    tempDirs.push(outputDir);
+    const projectRoot = fixtureRoot;
+    const outputDir = ignoredFixtureOutput(projectRoot, "stdout-verbose");
 
     await generateWiki({
-      projectRoot: fixtureRoot,
+      projectRoot,
       outputDir,
       verbose: true,
     });
@@ -382,8 +393,8 @@ describe("generateWiki", () => {
   });
 
   it("emits cli.error and rethrows when writeWiki fails", async () => {
-    const outputDir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-out-"));
-    tempDirs.push(outputDir);
+    const projectRoot = fixtureRoot;
+    const outputDir = ignoredFixtureOutput(projectRoot, "write-fail");
 
     vi.spyOn(wikiModule, "writeWiki").mockRejectedValueOnce(
       new Error("disk full"),
@@ -391,7 +402,7 @@ describe("generateWiki", () => {
 
     await expect(
       generateWiki({
-        projectRoot: fixtureRoot,
+        projectRoot,
         outputDir,
         verbose: true,
       }),
@@ -409,13 +420,11 @@ describe("generateWiki", () => {
   });
 
   it("disambiguates slug collisions and emits output.slug-collision when verbose", async () => {
-    const outputDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), "specwiki-collision-out-"),
-    );
-    tempDirs.push(outputDir);
+    const projectRoot = collisionFixtureRoot;
+    const outputDir = ignoredFixtureOutput(projectRoot, "collision");
 
     await generateWiki({
-      projectRoot: collisionFixtureRoot,
+      projectRoot,
       outputDir,
       verbose: true,
     });
@@ -428,21 +437,72 @@ describe("generateWiki", () => {
     expect(collisionEvents[0]?.sourcePath).toBe("specs/foo/bar.md");
     expect(collisionEvents[0]?.originalSlug).toBe("specs-foo-bar");
 
-    const mdFiles = (await fs.readdir(outputDir)).filter((name) =>
-      name.endsWith(".md"),
-    );
+    const mdFiles = (
+      await fs.readdir(path.join(projectRoot, outputDir))
+    ).filter((name) => name.endsWith(".md"));
     const pageFiles = mdFiles.filter((name) => name !== "index.md");
     expect(pageFiles).toHaveLength(3);
     expect(new Set(pageFiles).size).toBe(3);
     expect(pageFiles).toContain("specs-foo-bar.md");
 
     const indexContent = await fs.readFile(
-      path.join(outputDir, "index.md"),
+      path.join(projectRoot, outputDir, "index.md"),
       "utf-8",
     );
     for (const fileName of pageFiles) {
       expect(indexContent).toContain(`](${fileName})`);
     }
+  });
+
+  it("rejects output directory escaping project root", async () => {
+    const projectRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-generate-escape-"),
+    );
+    tempDirs.push(projectRoot);
+
+    await expect(
+      generateWiki({ projectRoot, outputDir: "../outside" }),
+    ).rejects.toThrow(/project root/i);
+
+    const events = parseStderrLines().map((line) => line.event);
+    expect(events).toContain("output.error");
+    expect(events).toContain("cli.error");
+  });
+
+  it("rejects symlinked output directory escaping project root", async () => {
+    const projectRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-generate-symlink-"),
+    );
+    const outsideDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-generate-outside-"),
+    );
+    tempDirs.push(projectRoot, outsideDir);
+    await fs.symlink(outsideDir, path.join(projectRoot, "wiki"));
+
+    await expect(
+      generateWiki({ projectRoot, outputDir: "wiki" }),
+    ).rejects.toThrow(/project root/i);
+
+    const events = parseStderrLines().map((line) => line.event);
+    expect(events).toContain("output.error");
+    expect(events).toContain("cli.error");
+  });
+
+  it("generates into the project root when --output is .", async () => {
+    const projectRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-generate-root-output-"),
+    );
+    tempDirs.push(projectRoot);
+    await fs.writeFile(
+      path.join(projectRoot, "SPEC.md"),
+      "# Root Spec\n\nProject-root output.",
+    );
+
+    await generateWiki({ projectRoot, outputDir: "." });
+
+    await expect(
+      fs.readFile(path.join(projectRoot, "index.md"), "utf-8"),
+    ).resolves.toContain("# Spec Wiki");
   });
 });
 

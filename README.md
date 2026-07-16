@@ -102,7 +102,7 @@ npx specwiki generate
 # Scan a different project
 npx specwiki generate --project /path/to/repo
 
-# Custom output directory
+# Custom output directory (must stay inside --project)
 npx specwiki generate --output .specwiki
 
 # Verbose mode
@@ -130,7 +130,7 @@ npx specwiki open --output .specwiki
 npx specwiki open --project /path/to/repo
 ```
 
-`specwiki open` resolves `{project}/{output}/html/index.html` (same `--project` and `--output` defaults as `generate`) and launches it with your OS default browser. If the wiki has not been generated yet, it exits with a message suggesting you run `specwiki generate` first.
+`specwiki open` resolves `{project}/{output}/html/index.html` (same `--project` and `--output` defaults as `generate`) and launches it with your OS default browser. Both commands require `--output` to stay within `--project` (symlinks that escape the project are rejected). If the wiki has not been generated yet, it exits with a message suggesting you run `specwiki generate` first.
 
 ### JSON output
 
@@ -182,12 +182,39 @@ Generated HTML is **self-contained** — bundled CSS/JS, system fonts only, and 
 
 Contributor tooling: **Vitest** (tests + coverage), **ESLint**, **Prettier**, **tsx** (dev runner).
 
+## Security
+
+[[specwiki]] is a local CLI — it does not open network ports or run code on `npm install`. Treat these boundaries as part of the threat model:
+
+### Trusted projects only
+
+Run `specwiki` only on repositories you trust. The tool reads markdown from your project and writes a wiki under `--output` inside `--project`.
+
+- **`specwiki.config.js` executes arbitrary Node.js** when present. A malicious config runs with your user privileges. Prefer `specwiki.config.json` when you do not need programmatic patterns.
+- **Spec markdown is rendered as HTML** for the wiki skin. Raw HTML in `.md` / `.mdc` files is passed through to generated pages (trusted-local-content model). Opening `wiki/html/` in a browser can run scripts embedded in spec files.
+- **`specwiki open` launches a local file** in your default browser via `open` / `xdg-open` / `cmd start` — no shell interpolation of paths.
+
+### Path safety
+
+- **`--output` must stay within `--project`** for both `generate` and `open`. Symlinked output directories that resolve outside the project are rejected.
+- **Discovery patterns cannot target parent directories** (`..` and absolute paths are rejected).
+- **Wiki file writes are confined** to the resolved output directory; slug-based path traversal is blocked.
+- **Config files must live in the project root** and cannot escape via symlinks.
+
+### npm package surface
+
+- The published tarball includes only `dist/`, `README.md`, and `LICENSE` (verified by `npm run verify-package`).
+- No `postinstall` or `prepare` scripts run on consumer installs.
+- `prepublishOnly` runs the full test/lint/build quality gate before publish.
+
+Report security issues privately to the maintainer before opening a public issue.
+
 ## Development
 
 ```bash
 npm run dev list
 npm run dev generate -- --verbose
-npm run dev open -- --project tests/fixtures/sample-project --output /tmp/specwiki-qa
+npm run dev open -- --project tests/fixtures/sample-project --output wiki
 npm run build
 npm run typecheck
 npm test

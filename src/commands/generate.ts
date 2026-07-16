@@ -2,6 +2,7 @@ import chalk from "chalk";
 import path from "node:path";
 import { DEFAULT_SPEC_PATTERNS } from "../config/patterns.js";
 import { log } from "../core/Logger.js";
+import { PathEscapeError, resolveOutputWithinProject } from "../core/paths.js";
 import { discoverSpecs } from "../discover/specs.js";
 import { parseSpecFile } from "../parse/markdown.js";
 import { writeLlmsTxt } from "../output/llms.js";
@@ -123,7 +124,20 @@ export async function generateWiki(options: GenerateOptions): Promise<void> {
   });
 
   try {
-    const resolvedOutput = path.resolve(resolvedProjectRoot, outputDir);
+    let resolvedOutput: string;
+    try {
+      resolvedOutput = await resolveOutputWithinProject(
+        resolvedProjectRoot,
+        outputDir,
+      );
+    } catch (err) {
+      if (err instanceof PathEscapeError) {
+        log.error("output.error", { message: err.message });
+        propagateCliError("generate", err);
+      }
+      throw err;
+    }
+
     const relativeOutput = path.relative(resolvedProjectRoot, resolvedOutput);
     const outputIgnorePath =
       relativeOutput.length > 0 && !relativeOutput.startsWith("..")

@@ -4,6 +4,12 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
 import { log } from "../core/Logger.js";
+import {
+  assertConfinedUnder as assertConfinedUnderPath,
+  assertRealpathConfinedUnder as assertRealpathConfinedUnderPath,
+  PathEscapeError,
+  resolveOutputWithinProject,
+} from "../core/paths.js";
 import type { OpenOptions } from "../types.js";
 
 const execFileAsync = promisify(execFile);
@@ -29,28 +35,33 @@ export function resetLaunchHandlerForTests(): void {
   };
 }
 
-function assertConfinedUnder(
-  root: string,
-  target: string,
-  label: string,
-): void {
-  const resolvedRoot = path.resolve(root);
-  const resolvedTarget = path.resolve(target);
-  const relative = path.relative(resolvedRoot, resolvedTarget);
-
-  if (relative.startsWith("..") || path.isAbsolute(relative)) {
-    log.error("open.error", {
-      message: `Path escapes allowed directory: ${label}`,
-    });
-    throwOpenError(`Output directory must stay within project root`);
-  }
-}
-
 function throwOpenError(message: string): never {
   console.log(chalk.yellow(message));
   const error: OpenError = new Error(message);
   error.cliErrorLogged = true;
   throw error;
+}
+
+function handlePathEscape(label: string, err: unknown): never {
+  if (err instanceof PathEscapeError) {
+    log.error("open.error", {
+      message: `Path escapes allowed directory: ${label}`,
+    });
+    throwOpenError(err.message);
+  }
+  throw err;
+}
+
+function assertConfinedUnder(
+  root: string,
+  target: string,
+  label: string,
+): void {
+  try {
+    assertConfinedUnderPath(root, target, label);
+  } catch (err) {
+    handlePathEscape(label, err);
+  }
 }
 
 async function assertRealpathConfinedUnder(
@@ -59,22 +70,16 @@ async function assertRealpathConfinedUnder(
   label: string,
 ): Promise<void> {
   try {
-    const realRoot = await fs.realpath(root);
-    const realTarget = await fs.realpath(target);
-    const relative = path.relative(realRoot, realTarget);
-
-    if (relative.startsWith("..") || path.isAbsolute(relative)) {
-      log.error("open.error", {
-        message: `Path escapes allowed directory: ${label}`,
-      });
-      throwOpenError(`Output directory must stay within project root`);
-    }
+    await assertRealpathConfinedUnderPath(root, target, label);
   } catch (err) {
     if ((err as NodeJS.ErrnoException).code === "ENOENT") {
       return;
     }
     if (err instanceof Error && (err as OpenError).cliErrorLogged) {
       throw err;
+    }
+    if (err instanceof PathEscapeError) {
+      handlePathEscape(label, err);
     }
     const message = err instanceof Error ? err.message : String(err);
     log.error("open.error", { message });
@@ -86,18 +91,15 @@ async function resolveIndexPath(
   projectRoot: string,
   outputDir: string,
 ): Promise<string> {
-  const resolvedProjectRoot = path.resolve(projectRoot);
-  const resolvedOutput = path.resolve(resolvedProjectRoot, outputDir);
+  let resolvedOutput: string;
+  try {
+    resolvedOutput = await resolveOutputWithinProject(projectRoot, outputDir);
+  } catch (err) {
+    handlePathEscape("output directory", err);
+  }
 
-  assertConfinedUnder(resolvedProjectRoot, resolvedOutput, "output directory");
-  await assertRealpathConfinedUnder(
-    resolvedProjectRoot,
-    resolvedOutput,
-    "output directory",
-  );
-
-  const indexPath = path.join(resolvedOutput, INDEX_RELATIVE_PATH);
-  assertConfinedUnder(resolvedOutput, indexPath, INDEX_RELATIVE_PATH);
+  const indexPath = path.join(resolvedOutput!, INDEX_RELATIVE_PATH);
+  assertConfinedUnder(resolvedOutput!, indexPath, INDEX_RELATIVE_PATH);
 
   return indexPath;
 }

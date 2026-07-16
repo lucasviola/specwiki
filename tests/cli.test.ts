@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import os from "node:os";
+import { randomUUID } from "node:crypto";
 import { execFile } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -22,6 +23,10 @@ const projectRoot = path.resolve(
 );
 const cliPath = path.join(projectRoot, "src/cli.ts");
 const fixtureRoot = path.join(projectRoot, "tests/fixtures/sample-project");
+
+function ignoredFixtureOutput(label = "run"): string {
+  return path.join(".specwiki", `${label}-${randomUUID()}`);
+}
 
 describe("cli list --verbose", () => {
   it("emits structured discover logs on stderr", async () => {
@@ -105,9 +110,7 @@ describe("cli JSON output", () => {
   });
 
   it("writes the wiki then prints a generate JSON result", async () => {
-    const outputDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), "specwiki-cli-json-"),
-    );
+    const outputDir = ignoredFixtureOutput("json");
 
     try {
       const { stdout, stderr } = await execFileAsync(
@@ -135,7 +138,7 @@ describe("cli JSON output", () => {
       const stderrLines = parseJsonStderrLines(stderr);
 
       expect(result.specCount).toBe(result.pages.length);
-      expect(result.outputDir).toBe(path.resolve(outputDir));
+      expect(result.outputDir).toBe(path.resolve(fixtureRoot, outputDir));
       expect(result.pages[0]).toEqual({
         slug: expect.any(String),
         title: expect.any(String),
@@ -144,7 +147,7 @@ describe("cli JSON output", () => {
         description: expect.any(String),
       });
       expect(
-        await fs.stat(path.join(outputDir, "html", "index.html")),
+        await fs.stat(path.join(fixtureRoot, outputDir, "html", "index.html")),
       ).toBeDefined();
       expect(stderrLines).toContainEqual(
         expect.objectContaining({
@@ -155,14 +158,15 @@ describe("cli JSON output", () => {
         }),
       );
     } finally {
-      await fs.rm(outputDir, { force: true, recursive: true });
+      await fs.rm(path.join(fixtureRoot, outputDir), {
+        force: true,
+        recursive: true,
+      });
     }
   });
 
   it("writes an llms.txt manifest when generate receives --emit-llms-txt", async () => {
-    const outputDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), "specwiki-cli-llms-"),
-    );
+    const outputDir = ignoredFixtureOutput("llms");
 
     try {
       const { stderr } = await execFileAsync(
@@ -183,7 +187,7 @@ describe("cli JSON output", () => {
       );
 
       const manifest = await fs.readFile(
-        path.join(outputDir, "llms.txt"),
+        path.join(fixtureRoot, outputDir, "llms.txt"),
         "utf-8",
       );
       expect(manifest).toMatch(/^# Spec Wiki\n/);
@@ -195,7 +199,10 @@ describe("cli JSON output", () => {
         }),
       );
     } finally {
-      await fs.rm(outputDir, { force: true, recursive: true });
+      await fs.rm(path.join(fixtureRoot, outputDir), {
+        force: true,
+        recursive: true,
+      });
     }
   });
 
@@ -338,9 +345,7 @@ describe("dogfood — sample-project fixture", () => {
   ] as const;
 
   it("generates categorized markdown + HTML wiki with full verbose pipeline logs in < 60s", async () => {
-    const outputDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), "specwiki-dogfood-"),
-    );
+    const outputDir = ignoredFixtureOutput("dogfood");
 
     try {
       const startedAt = Date.now();
@@ -404,11 +409,11 @@ describe("dogfood — sample-project fixture", () => {
       );
 
       const indexContent = await fs.readFile(
-        path.join(outputDir, "index.md"),
+        path.join(fixtureRoot, outputDir, "index.md"),
         "utf-8",
       );
       const htmlIndexContent = await fs.readFile(
-        path.join(outputDir, "html", "index.html"),
+        path.join(fixtureRoot, outputDir, "html", "index.html"),
         "utf-8",
       );
 
@@ -425,16 +430,17 @@ describe("dogfood — sample-project fixture", () => {
         writeEvents.some((event) => event.relativePath === "html/index.html"),
       ).toBe(true);
     } finally {
-      await fs.rm(outputDir, { force: true, recursive: true });
+      await fs.rm(path.join(fixtureRoot, outputDir), {
+        force: true,
+        recursive: true,
+      });
     }
   });
 });
 
 describe("cli generate --no-search", () => {
   it("omits search-index.json when --no-search is passed", async () => {
-    const outputDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), "specwiki-cli-nosearch-"),
-    );
+    const outputDir = ignoredFixtureOutput("nosearch");
 
     try {
       const { stdout } = await execFileAsync(
@@ -455,25 +461,26 @@ describe("cli generate --no-search", () => {
 
       expect(stdout).toContain("Generated wiki");
       await expect(
-        fs.stat(path.join(outputDir, "html", "search-index.json")),
+        fs.stat(path.join(fixtureRoot, outputDir, "html", "search-index.json")),
       ).rejects.toMatchObject({ code: "ENOENT" });
 
       const indexHtml = await fs.readFile(
-        path.join(outputDir, "html", "index.html"),
+        path.join(fixtureRoot, outputDir, "html", "index.html"),
         "utf-8",
       );
       expect(indexHtml).not.toContain("specwiki-search-input");
     } finally {
-      await fs.rm(outputDir, { force: true, recursive: true });
+      await fs.rm(path.join(fixtureRoot, outputDir), {
+        force: true,
+        recursive: true,
+      });
     }
   });
 });
 
 describe("cli generate --verbose", () => {
   it("emits cli.command before discover.start on stderr", async () => {
-    const outputDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), "specwiki-cli-generate-"),
-    );
+    const outputDir = ignoredFixtureOutput("generate");
 
     try {
       const { stdout, stderr } = await execFileAsync(
@@ -510,7 +517,10 @@ describe("cli generate --verbose", () => {
         command: "generate",
       });
     } finally {
-      await fs.rm(outputDir, { force: true, recursive: true });
+      await fs.rm(path.join(fixtureRoot, outputDir), {
+        force: true,
+        recursive: true,
+      });
     }
   });
 });
@@ -927,9 +937,7 @@ describe("cli exit codes", () => {
   });
 
   it("exits 0 on successful generate", async () => {
-    const outputDir = await fs.mkdtemp(
-      path.join(os.tmpdir(), "specwiki-cli-exit-success-"),
-    );
+    const outputDir = ignoredFixtureOutput("exit-success");
 
     try {
       const { stderr } = await execFileAsync(
@@ -949,7 +957,10 @@ describe("cli exit codes", () => {
 
       expect(stderr).not.toContain('"event":"cli.error"');
     } finally {
-      await fs.rm(outputDir, { force: true, recursive: true });
+      await fs.rm(path.join(fixtureRoot, outputDir), {
+        force: true,
+        recursive: true,
+      });
     }
   });
 });
@@ -1228,6 +1239,36 @@ describe("cli open", () => {
 
       const lines = parseJsonStderrLines(String(execError.stderr ?? ""));
       expect(lines.some((line) => line.event === "open.error")).toBe(true);
+    }
+  });
+
+  it("exits 1 when generate output path escapes project root", async () => {
+    try {
+      await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "generate",
+          "--project",
+          fixtureRoot,
+          "--output",
+          "../outside",
+        ],
+        { cwd: projectRoot },
+      );
+      expect.fail("expected generate to exit non-zero");
+    } catch (err) {
+      const execError = err as {
+        code?: number;
+        stderr?: string;
+      };
+      expect(execError.code).toBe(1);
+
+      const lines = parseJsonStderrLines(String(execError.stderr ?? ""));
+      expect(lines.some((line) => line.event === "output.error")).toBe(true);
+      expect(lines.some((line) => line.event === "cli.error")).toBe(true);
     }
   });
 });
