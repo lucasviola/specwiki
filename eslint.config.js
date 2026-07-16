@@ -50,4 +50,15 @@ export default tseslint.config(
       "no-unused-vars": ["error", { caughtErrors: "none" }],
     },
   },
+  {
+    files: ["site/assets/landing.js"],
+    languageOptions: {
+      globals: {
+        document: "readonly",
+        navigator: "readonly",
+        window: "readonly",
+        WeakMap: "readonly",
+      },
+    },
+  },
 );

@@ -62,6 +62,72 @@ describe("S20.1 v2 landing page — hero quick start and agent prompt (AC 3)", (
     expect(text).toContain("Install specwiki in this repo");
     expect(text).toContain("summarize the generated wiki index");
   });
+
+  it("adds copy-to-clipboard buttons for quick start and agent prompt", () => {
+    expect(html).toMatch(
+      /<button[^>]+class="[^"]*copy-btn[^"]*"[^>]*data-copy-target="quick-start-npx"/,
+    );
+    expect(html).toMatch(
+      /<button[^>]+class="[^"]*copy-btn[^"]*"[^>]*data-copy-target="quick-start-global"/,
+    );
+    expect(html).toMatch(
+      /<button[^>]+class="[^"]*copy-btn[^"]*"[^>]*data-copy-target="agent-prompt-code"/,
+    );
+    expect(html).toMatch(/id="quick-start-npx"/);
+    expect(html).toMatch(/id="quick-start-global"/);
+    expect(html).toMatch(/id="agent-prompt-code"/);
+    expect(html).toMatch(
+      /<script[^>]+src="assets\/landing\.js"[^>]*><\/script>/,
+    );
+  });
+
+  it("places quick-start copy buttons next to each install comment", () => {
+    expect(html).toMatch(
+      /# Try without installing[\s\S]*?data-copy-target="quick-start-npx"/,
+    );
+    expect(html).toMatch(
+      /# Or install globally[\s\S]*?data-copy-target="quick-start-global"/,
+    );
+    expect(html).toMatch(/aria-label="Copy try without installing commands"/);
+    expect(html).toMatch(/aria-label="Copy global install command"/);
+  });
+});
+
+describe("landing page — copy-to-clipboard behaviour", () => {
+  let landingJs: string;
+
+  beforeAll(() => {
+    landingJs = fs.readFileSync(
+      path.join(projectRoot, "site/assets/landing.js"),
+      "utf8",
+    );
+  });
+
+  it("styles the copy button and copied feedback state", () => {
+    expect(css).toMatch(/\.copy-btn\s*\{/);
+    expect(css).toMatch(/\.copy-btn:focus-visible/);
+    expect(css).toMatch(/\.copy-btn\.is-copied/);
+  });
+
+  it("writes clipboard text from the target code block", () => {
+    expect(landingJs).toMatch(/navigator\.clipboard\.writeText/);
+    expect(landingJs).toMatch(/data-copy-target/);
+    expect(landingJs).toMatch(/textContent/);
+    expect(landingJs).toMatch(/is-copied/);
+  });
+
+  it("falls back to execCommand when clipboard.writeText rejects", () => {
+    expect(landingJs).toMatch(/\.catch\s*\(/);
+    expect(landingJs).toMatch(/execCommand\s*\(\s*["']copy["']\s*\)/);
+  });
+
+  it("announces copy feedback without masking the control name", () => {
+    expect(html).toMatch(
+      /id="copy-status"[^>]*aria-live="polite"|aria-live="polite"[^>]*id="copy-status"/,
+    );
+    expect(landingJs).toMatch(/setAttribute\(\s*["']aria-label["']/);
+    expect(landingJs).toMatch(/clearTimeout|clearFeedbackTimer/);
+  });
 });
 
 describe("S20.1 v2 landing page — CTA (AC 7)", () => {
@@ -222,8 +288,14 @@ describe("S20.1 v2 landing page — dark-first design tokens (AC 11–12)", () =
 
   it("page pulls no web fonts, CDN assets, or external scripts", () => {
     expect(html).not.toMatch(/https?:\/\/(fonts|cdn|unpkg|jsdelivr)/);
-    expect(html).not.toMatch(/<script[^>]+src=/i);
     expect(css).not.toMatch(/@import|@font-face/);
+    const scriptSrcs = [...html.matchAll(/<script[^>]+src="([^"]+)"/gi)].map(
+      (match) => match[1],
+    );
+    for (const src of scriptSrcs) {
+      expect(src).toMatch(/^assets\//);
+      expect(src).not.toMatch(/^https?:\/\//i);
+    }
   });
 
   it("all product claims stay supportable — no invented metrics", () => {
@@ -240,10 +312,17 @@ describe("S20.2 landing page — semantic structure and no-JS core (AC 1, 4–5)
   });
 
   it("delivers the value proposition and primary CTA without JavaScript", () => {
-    expect(html).not.toMatch(/<script/i);
+    // Progressive-enhancement copy script is allowed; core content must be
+    // present in the static HTML (not injected by JS).
     expect(html).toMatch(/<h1[\s>]/);
     expect(html).toMatch(/class="[^"]*cta[^"]*"/);
     expect(text).toContain("Make AI knowledge useful to humans.");
+    expect(html).toMatch(/id="quick-start-npx"/);
+    expect(html).toMatch(/id="quick-start-global"/);
+    expect(html).toMatch(/id="agent-prompt-code"/);
+    const scripts = html.match(/<script\b/gi) ?? [];
+    expect(scripts).toHaveLength(1);
+    expect(html).toMatch(/src="assets\/landing\.js"/);
   });
 
   it("primary nav has an accessible name", () => {
@@ -276,6 +355,7 @@ describe("S20.2 landing page — responsive overflow containment (AC 2)", () => 
 
   it("constrains terminal and file-tree overflow locally", () => {
     expect(css).toMatch(/\.terminal-body[\s\S]*?overflow-x:\s*auto/);
+    expect(css).toMatch(/\.terminal-snippet pre[\s\S]*?overflow-x:\s*auto/);
     expect(css).toMatch(/\.file-tree[\s\S]*?overflow-x:\s*auto/);
   });
 

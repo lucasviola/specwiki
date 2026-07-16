@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-16
-**Current position:** **E20 S20.3 specwiki.ai hosting workflow complete** — ready for review
-**Test count:** 442 passing
+**Current position:** **E20 landing copy-to-clipboard** — ready for review
+**Test count:** 453 passing
 
 ## Deliverables
 
@@ -154,6 +154,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
   - [x] S20.1 — Landing-page narrative and brand treatment (v2) _(review)_
   - [x] S20.2 — Responsive, accessible landing-page implementation _(review)_
   - [x] S20.3 — specwiki.ai hosting and release workflow _(review)_
+  - [x] Landing copy-to-clipboard on quick start + agent prompt _(review)_
 
 ## HARNESS §13 Deliverables Checklist
 
@@ -266,4 +267,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-16 | E20 S20.2        | `feat(site): responsive and accessible landing page hardening` — skip link + focusable main, :focus-visible outlines, coverage-table scroll wrapper, minmax(min(100%)) grids for 320px, narrow-viewport CSS, muted-text contrast bump (0.72), prefers-reduced-motion; 13 new tests; 415 tests total; no src/ changes                                                                                                         | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-16 | E20 S20.3        | `ci(site): GitHub Pages deploy workflow for specwiki.ai` — `build-landing-site.mjs` copies site/ to dist/landing-site with CNAME/.nojekyll; deploy-site.yml with split production/preview jobs and `--skip-cname` on PRs; docs/hosting/specwiki-ai.md; 17 new tests; 432 tests total; no src/ changes                                                                                                                        | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-16 | Security         | `fix(generate): confine --output to project root` — shared `resolveOutputWithinProject` with symlink checks (parity with `open`); README Security section; generate/CLI/paths regression tests; 442 tests total                                                                                                                                                                                                              | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
+| 2026-07-16 | E20 copy buttons | `feat(site): add copy-to-clipboard on landing quick start and agent prompt` — per-snippet Copy next to `# Try without installing` / `# Or install globally` plus agent-prompt Copy; clipboard API with execCommand fallback on rejection; aria-live status + aria-label feedback; timer race fix; progressive-enhancement `landing.js`; 453 tests total; no src/ changes                                                     | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | _template_ | _E?_ S?_         | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                                              |

@@ -77,20 +77,57 @@
               <span class="terminal-dot"></span>
               <span class="terminal-name">quick start</span>
             </div>
-            <pre
-              class="terminal-body"
-            ><code><span class="term-comment"># Try without installing</span>
-npx @lucasviola/specwiki generate &amp;&amp; npx @lucasviola/specwiki open
-
-<span class="term-comment"># Or install globally</span>
-npm install -g @lucasviola/specwiki</code></pre>
+            <div class="terminal-snippets">
+              <div class="terminal-snippet">
+                <div class="terminal-snippet-header">
+                  <span class="term-comment"># Try without installing</span>
+                  <button
+                    type="button"
+                    class="copy-btn"
+                    data-copy-target="quick-start-npx"
+                    aria-label="Copy try without installing commands"
+                  >
+                    Copy
+                  </button>
+                </div>
+                <pre><code id="quick-start-npx"
+                  >npx @lucasviola/specwiki generate &amp;&amp; npx @lucasviola/specwiki open</code
+                ></pre>
+              </div>
+              <div class="terminal-snippet">
+                <div class="terminal-snippet-header">
+                  <span class="term-comment"># Or install globally</span>
+                  <button
+                    type="button"
+                    class="copy-btn"
+                    data-copy-target="quick-start-global"
+                    aria-label="Copy global install command"
+                  >
+                    Copy
+                  </button>
+                </div>
+                <pre><code id="quick-start-global"
+                  >npm install -g @lucasviola/specwiki</code
+                ></pre>
+              </div>
+            </div>
           </div>
 
           <div class="agent-prompt">
-            <p class="agent-prompt-label">or paste this into your agent</p>
+            <div class="agent-prompt-header">
+              <p class="agent-prompt-label">or paste this into your agent</p>
+              <button
+                type="button"
+                class="copy-btn"
+                data-copy-target="agent-prompt-code"
+                aria-label="Copy agent prompt"
+              >
+                Copy
+              </button>
+            </div>
             <pre
               class="agent-prompt-body"
-            ><code>Install specwiki in this repo: run `npx @lucasviola/specwiki generate &amp;&amp; npx @lucasviola/specwiki open`,
+            ><code id="agent-prompt-code">Install specwiki in this repo: run `npx @lucasviola/specwiki generate &amp;&amp; npx @lucasviola/specwiki open`,
 then summarize the generated wiki index for me.</code></pre>
           </div>
         </div>
@@ -379,5 +416,7 @@ npx @lucasviola/specwiki open --project examples/agent-harness-parcel</code></pr
         >
       </p>
     </footer>
+    <div id="copy-status" class="visually-hidden" aria-live="polite"></div>
+    <script src="assets/landing.js" defer></script>
   </body>
 </html>
