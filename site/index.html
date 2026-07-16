@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>[[specwiki]] — Make AI knowledge useful to humans</title>
+    <meta
+      name="description"
+      content="specwiki discovers the AI specs scattered across your repo — agent rules, spec-driven files, generated plans — and turns them into a browsable wiki with one command."
+    />
+    <link rel="stylesheet" href="assets/landing.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a href="index.html" class="specwiki-logo" aria-label="specwiki home">
+        <span class="specwiki-logo-bracket" aria-hidden="true">[[</span
+        >specwiki<span class="specwiki-logo-bracket" aria-hidden="true"
+          >]]</span
+        >
+      </a>
+      <nav aria-label="Primary">
+        <a class="header-link" href="https://github.com/lucasviola/specwiki"
+          >GitHub</a
+        >
+      </nav>
+    </header>
+
+    <main>
+      <!-- 01 · Hero -->
+      <section class="hero" aria-labelledby="hero-title">
+        <p class="kicker">
+          <span class="kicker-num">01</span> spec-to-wiki compiler
+        </p>
+        <h1 id="hero-title">Make AI knowledge useful to humans.</h1>
+
+        <div class="narrative">
+          <article class="narrative-block">
+            <h2>Knowledge written for machines</h2>
+            <p>
+              AI-era projects accumulate knowledge fast — agent rules,
+              spec-driven development files, generated plans — scattered across
+              dot-folders and conventions built for tools, not teammates. That
+              knowledge is hard for people to find and understand.
+            </p>
+          </article>
+          <article class="narrative-block">
+            <h2>One command, a real wiki</h2>
+            <p>
+              specwiki scans your project for that knowledge and generates a
+              navigable wiki from it: categorized pages, an index, and a
+              browsable HTML view with search — no server, no lock-in, straight
+              from the files already in your repo.
+            </p>
+          </article>
+          <article class="narrative-block">
+            <h2>Understanding people can share</h2>
+            <p>
+              The result is shared, usable understanding: reviewers,
+              stakeholders, and new teammates browse the same trustworthy view
+              of what the project knows about itself — without spelunking
+              through config folders.
+            </p>
+          </article>
+        </div>
+
+        <div class="hero-panels">
+          <div class="terminal">
+            <div class="terminal-bar" aria-hidden="true">
+              <span class="terminal-dot"></span>
+              <span class="terminal-dot"></span>
+              <span class="terminal-dot"></span>
+              <span class="terminal-name">quick start</span>
+            </div>
+            <pre
+              class="terminal-body"
+            ><code><span class="term-comment"># Try without installing</span>
+npx specwiki generate &amp;&amp; npx specwiki open
+
+<span class="term-comment"># Or install globally</span>
+npm install -g specwiki</code></pre>
+          </div>
+
+          <div class="agent-prompt">
+            <p class="agent-prompt-label">or paste this into your agent</p>
+            <pre
+              class="agent-prompt-body"
+            ><code>Install specwiki in this repo: run `npx specwiki generate &amp;&amp; npx specwiki open`,
+then summarize the generated wiki index for me.</code></pre>
+          </div>
+        </div>
+
+        <p class="hero-cta">
+          <a class="cta" href="https://github.com/lucasviola/specwiki"
+            >View source on GitHub</a
+          >
+        </p>
+      </section>
+
+      <!-- 02 · The problem -->
+      <section class="section" aria-labelledby="problem-title">
+        <p class="kicker"><span class="kicker-num">02</span> the problem</p>
+        <h2 id="problem-title" class="section-title">
+          Every AI tool invents its own convention. Humans get none of it.
+        </h2>
+        <div class="section-prose">
+          <p>
+            <code>AGENTS.md</code>, <code>CLAUDE.md</code>,
+            <code>.cursor/rules/**</code>, <code>_bmad-output/**</code>,
+            <code>openspec/**</code>, <code>.kiro/specs/**</code>,
+            <code>.github/copilot-instructions.md</code> — knowledge your agents
+            read on every run, but that people never browse. It rots invisibly
+            in dot-folders; reviewers and new teammates can't find it, and
+            nobody trusts what they can't see.
+          </p>
+          <p>
+            specwiki discovers all of it with one command and synthesizes a
+            categorized, searchable wiki. Out of the box it finds:
+          </p>
+        </div>
+        <table class="coverage-table">
+          <caption class="visually-hidden">
+            Spec sources specwiki discovers by default, and the file patterns
+            for each
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Source</th>
+              <th scope="col">Patterns</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Root agent files</td>
+              <td>
+                <code>AGENTS.md</code>, <code>SPEC.md</code>,
+                <code>CLAUDE.md</code>, <code>GEMINI.md</code>
+              </td>
+            </tr>
+            <tr>
+              <td>Cursor</td>
+              <td>
+                <code>.cursor/rules/**</code>,
+                <code>.cursor/skills/**/SKILL.md</code>
+              </td>
+            </tr>
+            <tr>
+              <td>Spec frameworks</td>
+              <td>
+                <code>specs/**</code>, <code>openspec/**</code>,
+                <code>.kiro/specs/**</code>
+              </td>
+            </tr>
+            <tr>
+              <td>Docs &amp; plans</td>
+              <td>
+                <code>docs/specs/**</code>, <code>docs/plans/**</code>,
+                <code>requirements/**</code>
+              </td>
+            </tr>
+            <tr>
+              <td>GitHub Copilot</td>
+              <td><code>.github/copilot-instructions.md</code></td>
+            </tr>
+            <tr>
+              <td>Monorepo agents</td>
+              <td><code>**/AGENTS.md</code> (nested packages)</td>
+            </tr>
+            <tr>
+              <td>BMAD output</td>
+              <td><code>_bmad-output/**/*.md</code></td>
+            </tr>
+            <tr>
+              <td>Agent skills</td>
+              <td><code>.agents/skills/**/SKILL.md</code></td>
+            </tr>
+            <tr>
+              <td>README files</td>
+              <td><code>**/README.md</code> (standalone wiki pages)</td>
+            </tr>
+            <tr>
+              <td>All markdown</td>
+              <td>
+                <code>**/*.{md,mdc}</code> (any <code>.md</code> /
+                <code>.mdc</code> in the project)
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- 03 · How it works -->
+      <section class="section" aria-labelledby="how-title">
+        <p class="kicker"><span class="kicker-num">03</span> how it works</p>
+        <h2 id="how-title" class="section-title">
+          Discover, generate, open. That's the whole pipeline.
+        </h2>
+        <div class="steps">
+          <article class="step">
+            <p class="step-num">i</p>
+            <h3>Discover</h3>
+            <p>
+              A fast-glob scan of known agent and spec conventions plus all
+              project markdown — ignoring <code>node_modules</code>,
+              <code>dist</code>, <code>wiki</code>, and friends.
+            </p>
+          </article>
+          <article class="step">
+            <p class="step-num">ii</p>
+            <h3>Generate</h3>
+            <p>
+              Categorized markdown pages, an index, and a browsable HTML view
+              with client-side search, highlighted code blocks, and
+              Wikimedia-inspired design tokens.
+            </p>
+          </article>
+          <article class="step">
+            <p class="step-num">iii</p>
+            <h3>Open</h3>
+            <p>
+              One command launches the wiki in your default browser.
+              Self-contained output — bundled CSS/JS, system fonts,
+              <code>file://</code>-safe. No server, no CDN, no lock-in.
+            </p>
+          </article>
+          <article class="step">
+            <p class="step-num">iv</p>
+            <h3>Agent-friendly out, too</h3>
+            <p>
+              Machine-readable <code>--json</code> output and an opt-in
+              <code>--emit-llms-txt</code> manifest, so your tooling can consume
+              the wiki as easily as your team does.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- 04 · Live example -->
+      <section class="section" aria-labelledby="example-title">
+        <p class="kicker">
+          <span class="kicker-num">04</span> spec &rarr; wiki
+        </p>
+        <h2 id="example-title" class="section-title">
+          Three root files in. A browsable wiki out.
+        </h2>
+        <p class="section-prose">
+          <a
+            href="https://github.com/lucasviola/specwiki/tree/main/examples/agent-harness-parcel"
+            ><code>examples/agent-harness-parcel</code></a
+          >
+          is a minimal agent harness — the three root files many AI tools read
+          first. Point specwiki at it (from the specwiki repo root):
+        </p>
+
+        <div class="example">
+          <div class="example-before">
+            <p class="panel-label">before — scattered specs</p>
+            <div class="file-tree">
+              <pre><code>agent-harness-parcel/
+├── README.md   <span class="term-comment"># human onboarding</span>
+├── AGENTS.md   <span class="term-comment"># vendor-neutral agent instructions</span>
+└── CLAUDE.md   <span class="term-comment"># Claude-oriented project notes</span></code></pre>
+            </div>
+          </div>
+
+          <div class="example-command">
+            <div class="terminal">
+              <div class="terminal-bar" aria-hidden="true">
+                <span class="terminal-dot"></span>
+                <span class="terminal-dot"></span>
+                <span class="terminal-dot"></span>
+                <span class="terminal-name">one command</span>
+              </div>
+              <pre
+                class="terminal-body"
+              ><code>npx specwiki generate --project examples/agent-harness-parcel
+npx specwiki open --project examples/agent-harness-parcel</code></pre>
+            </div>
+          </div>
+
+          <div class="example-after">
+            <p class="panel-label">after — a generated wiki</p>
+            <div class="wiki-mock">
+              <div class="wiki-mock-header">
+                <span class="wiki-mock-logo" aria-hidden="true"
+                  ><span class="wiki-mock-bracket">[[</span>specwiki<span
+                    class="wiki-mock-bracket"
+                    >]]</span
+                  ></span
+                >
+                <span class="wiki-mock-search" aria-hidden="true"
+                  >Search the wiki&hellip;</span
+                >
+              </div>
+              <div class="wiki-mock-body">
+                <p class="wiki-mock-portal">Main Page</p>
+                <p class="wiki-mock-title">Parcel Path (mock)</p>
+                <p class="wiki-mock-meta">
+                  <strong>3</strong> spec files indexed.
+                </p>
+                <p class="wiki-mock-category">Project Root</p>
+                <ul class="wiki-mock-pages">
+                  <li>
+                    <span class="wiki-mock-link">Agent Instructions</span> —
+                    <code>AGENTS.md</code>
+                  </li>
+                  <li>
+                    <span class="wiki-mock-link">Claude Instructions</span> —
+                    <code>CLAUDE.md</code>
+                  </li>
+                  <li>
+                    <span class="wiki-mock-link">Readme</span> —
+                    <code>README.md</code>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="section-prose">
+          Two more demos — a BMAD research project and long-form article notes —
+          live in the
+          <a href="https://github.com/lucasviola/specwiki/tree/main/examples"
+            >examples folder on GitHub</a
+          >.
+        </p>
+      </section>
+
+      <!-- 05 · Facts -->
+      <section class="section" aria-labelledby="facts-title">
+        <p class="kicker"><span class="kicker-num">05</span> the fine print</p>
+        <h2 id="facts-title" class="section-title">Plain files. No magic.</h2>
+        <div class="facts">
+          <div class="fact-output">
+            <p class="panel-label">what generate writes</p>
+            <div class="file-tree">
+              <pre><code>wiki/
+├── index.md      <span class="term-comment"># categorized link index</span>
+├── {slug}.md     <span class="term-comment"># one page per spec</span>
+├── llms.txt      <span class="term-comment"># optional AI manifest</span>
+└── html/         <span class="term-comment"># browsable, file://-safe tree</span></code></pre>
+            </div>
+          </div>
+          <ul class="fact-list">
+            <li>
+              <strong>Node.js 20+</strong> — a CLI on the runtime you already
+              have
+            </li>
+            <li><strong>TypeScript</strong> — strict, tested, deterministic</li>
+            <li>
+              <strong>Zero-config by default</strong> — sensible patterns out of
+              the box
+            </li>
+            <li><strong>MIT licensed</strong> — read it, fork it, ship it</li>
+          </ul>
+        </div>
+        <p class="hero-cta">
+          <a class="cta" href="https://github.com/lucasviola/specwiki"
+            >Get specwiki on GitHub</a
+          >
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        <a href="https://github.com/lucasviola/specwiki">GitHub</a>
+        <span class="footer-sep" aria-hidden="true">·</span>
+        <a href="https://github.com/lucasviola/specwiki/blob/main/LICENSE"
+          >MIT License</a
+        >
+      </p>
+    </footer>
+  </body>
+</html>

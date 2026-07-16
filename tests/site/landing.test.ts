@@ -1,0 +1,234 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { beforeAll, describe, expect, it } from "vitest";
+
+const projectRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../..",
+);
+
+let html: string;
+let css: string;
+// Prettier wraps HTML text across lines — normalize whitespace before
+// asserting verbatim narrative copy.
+let text: string;
+
+beforeAll(() => {
+  html = fs.readFileSync(path.join(projectRoot, "site/index.html"), "utf8");
+  css = fs.readFileSync(
+    path.join(projectRoot, "site/assets/landing.css"),
+    "utf8",
+  );
+  text = html
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&gt;/g, ">")
+    .replace(/&lt;/g, "<")
+    .replace(/\s+/g, " ");
+});
+
+describe("S20.1 v2 landing page — hero narrative (AC 1–2)", () => {
+  it("hero h1 states the exact value proposition", () => {
+    const h1 = /<h1[^>]*>([\s\S]*?)<\/h1>/.exec(html);
+    expect(h1, "page must contain an <h1>").not.toBeNull();
+    expect(
+      h1![1]
+        .replace(/<[^>]+>/g, "")
+        .replace(/\s+/g, " ")
+        .trim(),
+    ).toBe("Make AI knowledge useful to humans.");
+  });
+
+  it("has exactly one h1", () => {
+    expect(html.match(/<h1[\s>]/g)).toHaveLength(1);
+  });
+
+  it("keeps the three v1 narrative headings verbatim", () => {
+    expect(text).toContain("Knowledge written for machines");
+    expect(text).toContain("One command, a real wiki");
+    expect(text).toContain("Understanding people can share");
+  });
+
+  it("keeps the three v1 narrative bodies verbatim", () => {
+    expect(text).toContain(
+      "AI-era projects accumulate knowledge fast — agent rules, spec-driven development files, generated plans — scattered across dot-folders and conventions built for tools, not teammates. That knowledge is hard for people to find and understand.",
+    );
+    expect(text).toContain(
+      "specwiki scans your project for that knowledge and generates a navigable wiki from it: categorized pages, an index, and a browsable HTML view with search — no server, no lock-in, straight from the files already in your repo.",
+    );
+    expect(text).toContain(
+      "The result is shared, usable understanding: reviewers, stakeholders, and new teammates browse the same trustworthy view of what the project knows about itself — without spelunking through config folders.",
+    );
+  });
+});
+
+describe("S20.1 v2 landing page — hero quick start and agent prompt (AC 3)", () => {
+  it("shows the npx quick-start command in a terminal block", () => {
+    expect(text).toContain("npx specwiki generate && npx specwiki open");
+    expect(html).toMatch(/class="[^"]*terminal[^"]*"/);
+  });
+
+  it("shows the global install command", () => {
+    expect(text).toContain("npm install -g specwiki");
+  });
+
+  it("provides a copy-pasteable agent install prompt", () => {
+    expect(text).toMatch(/paste this into your agent/i);
+    expect(text).toContain("Install specwiki in this repo");
+    expect(text).toContain("summarize the generated wiki index");
+  });
+});
+
+describe("S20.1 v2 landing page — CTA (AC 7)", () => {
+  it("primary CTA links to the confirmed GitHub repository", () => {
+    expect(html).toMatch(
+      /<a[^>]+href="https:\/\/github\.com\/lucasviola\/specwiki"[^>]*>/,
+    );
+  });
+
+  it("does not link to an npm package page before publication", () => {
+    expect(html).not.toMatch(/npmjs\.com/);
+  });
+});
+
+describe("S20.1 v2 landing page — problem section (AC 4)", () => {
+  it("names the scattered tool conventions", () => {
+    expect(text).toContain("AGENTS.md");
+    expect(text).toContain("CLAUDE.md");
+    expect(text).toContain(".cursor/rules/");
+    expect(text).toContain("_bmad-output/");
+  });
+
+  it("includes the README what-it-finds coverage", () => {
+    expect(text).toContain("openspec/");
+    expect(text).toContain(".kiro/specs/");
+    expect(text).toContain(".github/copilot-instructions.md");
+  });
+});
+
+describe("S20.1 v2 landing page — how it works (AC 5)", () => {
+  it("presents the discover → generate → open mechanism", () => {
+    expect(text).toMatch(/discover/i);
+    expect(text).toMatch(/generate/i);
+    expect(text).toMatch(/\bopen\b/i);
+  });
+
+  it("states the self-contained, no-server facts", () => {
+    expect(text).toMatch(/self-contained/i);
+    expect(text).toMatch(/no server/i);
+    expect(text).toContain("file://");
+  });
+});
+
+describe("S20.1 v2 landing page — live example (AC 6)", () => {
+  it("shows the real generate/open commands for the example project", () => {
+    expect(text).toContain(
+      "npx specwiki generate --project examples/agent-harness-parcel",
+    );
+    expect(text).toContain(
+      "npx specwiki open --project examples/agent-harness-parcel",
+    );
+  });
+
+  it("lists the three input files of the agent harness example", () => {
+    expect(text).toContain("README.md");
+    expect(text).toContain("AGENTS.md");
+    expect(text).toContain("CLAUDE.md");
+  });
+
+  it("renders a static wiki-mock panel, not an iframe or embed", () => {
+    expect(html).toMatch(/class="[^"]*wiki-mock[^"]*"/);
+    expect(html).not.toMatch(/<iframe/i);
+  });
+
+  it("wiki mock mirrors the real generated index (Main Page portal heading)", () => {
+    const mockBody = /<div class="wiki-mock-body">[\s\S]*?<\/div>/.exec(html);
+    expect(mockBody, "wiki mock must have a body panel").not.toBeNull();
+    expect(mockBody![0]).toContain("Main Page");
+    expect(mockBody![0]).toContain("Parcel Path (mock)");
+  });
+
+  it("names the example directory link to its actual subfolder", () => {
+    expect(html).toMatch(
+      /href="https:\/\/github\.com\/lucasviola\/specwiki\/tree\/main\/examples\/agent-harness-parcel"/,
+    );
+  });
+
+  it("states the repo-root prerequisite for the example commands", () => {
+    expect(text).toMatch(/from the specwiki repo root/i);
+  });
+
+  it("links to the examples folder on GitHub", () => {
+    expect(html).toMatch(
+      /href="https:\/\/github\.com\/lucasviola\/specwiki\/tree\/main\/examples"/,
+    );
+  });
+});
+
+describe("S20.1 v2 landing page — brand treatment (AC 8–9)", () => {
+  it("header renders the canonical lowercase [[specwiki]] wordmark", () => {
+    const header = /<header[\s\S]*?<\/header>/.exec(html);
+    expect(header, "page must contain a <header>").not.toBeNull();
+    expect(header![0]).toContain("[[");
+    expect(header![0]).toContain("specwiki");
+    expect(header![0]).toContain("]]");
+  });
+
+  it("wordmark home link uses index.html, not a root-absolute path", () => {
+    const logo = /<a[^>]*class="[^"]*specwiki-logo[^"]*"[^>]*>/.exec(html);
+    expect(logo, "wordmark must be a .specwiki-logo link").not.toBeNull();
+    expect(logo![0]).toContain('href="index.html"');
+    expect(logo![0]).not.toContain('href="/"');
+  });
+
+  it("never uses 'Spec Wiki' title case in product chrome", () => {
+    expect(html).not.toMatch(/Spec\s+Wiki/);
+  });
+
+  it("logo has an accessible name and decorative brackets are hidden from AT", () => {
+    const logo = /<a[^>]*class="[^"]*specwiki-logo[^"]*"[^>]*>/.exec(html);
+    expect(logo![0]).toMatch(/aria-label="[^"]*specwiki[^"]*"/);
+    const brackets = html.match(
+      /<span[^>]*class="[^"]*specwiki-logo-bracket[^"]*"[^>]*>/g,
+    );
+    expect(brackets, "brackets must be spans").not.toBeNull();
+    for (const bracket of brackets!) {
+      expect(bracket).toContain('aria-hidden="true"');
+    }
+  });
+
+  it("wordmark uses the documented monospace stack at weight 700 with clear space", () => {
+    expect(css).toMatch(/\.specwiki-logo[\s\S]*?ui-monospace/);
+    expect(css).toMatch(/\.specwiki-logo[\s\S]*?font-weight:\s*700/);
+    expect(css).toMatch(/\.specwiki-logo[\s\S]*?(margin|padding):\s*1em/);
+  });
+});
+
+describe("S20.1 v2 landing page — dark-first design tokens (AC 11–12)", () => {
+  it(":root defaults to the canonical dark token set", () => {
+    const root = /:root\s*\{([\s\S]*?)\}/.exec(css);
+    expect(root, "CSS must define :root tokens").not.toBeNull();
+    expect(root![1]).toContain("#eaecf0");
+    expect(root![1]).toContain("#6b8fe8");
+    expect(root![1]).toContain("#16181c");
+  });
+
+  it("light tokens back a prefers-color-scheme: light override", () => {
+    expect(css).toMatch(/prefers-color-scheme:\s*light/);
+    expect(css).toContain("#202122");
+    expect(css).toContain("#3366cc");
+    expect(css).toContain("#ffffff");
+  });
+
+  it("page pulls no web fonts, CDN assets, or external scripts", () => {
+    expect(html).not.toMatch(/https?:\/\/(fonts|cdn|unpkg|jsdelivr)/);
+    expect(html).not.toMatch(/<script[^>]+src=/i);
+    expect(css).not.toMatch(/@import|@font-face/);
+  });
+
+  it("all product claims stay supportable — no invented metrics", () => {
+    expect(text).not.toMatch(/\d+ (stars|users|downloads)/i);
+    expect(text).not.toMatch(/testimonial/i);
+  });
+});

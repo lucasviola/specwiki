@@ -1,0 +1,524 @@
+/* Brand tokens from docs/brand/BRAND.md — canonical values only.
+   Dark-first: :root carries the dark set; light backs a media override. */
+:root {
+  --color-base: #eaecf0;
+  --color-primary: #6b8fe8;
+  --background-color-base: #16181c;
+
+  /* Derived neutrals — same families as the canonical tokens */
+  --surface: #1d2026;
+  --surface-raised: #24272e;
+  --border: #2e323a;
+  --text-muted: rgba(234, 236, 240, 0.62);
+  --cta-text: #16181c;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-base: #202122;
+    --color-primary: #3366cc;
+    --background-color-base: #ffffff;
+
+    --surface: #f6f7f9;
+    --surface-raised: #eef0f3;
+    --border: #d9dce2;
+    --text-muted: rgba(32, 33, 34, 0.62);
+    --cta-text: #ffffff;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+  color: var(--color-base);
+  background: var(--background-color-base);
+  line-height: 1.65;
+}
+
+code,
+pre {
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    monospace;
+}
+
+code {
+  font-size: 0.9em;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.1em 0.35em;
+}
+
+pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+a {
+  color: var(--color-primary);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- header ---------- */
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Wordmark per BRAND.md: monospace, bold, lowercase, 1em clear space */
+.specwiki-logo {
+  display: inline-block;
+  margin: 1em;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    monospace;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  color: var(--color-base);
+  text-decoration: none;
+}
+
+.specwiki-logo-bracket {
+  color: var(--color-primary);
+}
+
+.header-link {
+  margin-right: 1em;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.header-link:hover {
+  color: var(--color-primary);
+}
+
+/* ---------- layout ---------- */
+
+main {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 0 1.5rem 5rem;
+}
+
+.section {
+  padding: 4.5rem 0 0;
+  border-top: 1px solid var(--border);
+  margin-top: 4.5rem;
+}
+
+/* Numbered kickers — editorial section labels */
+.kicker {
+  margin: 0 0 0.75rem;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.kicker-num {
+  color: var(--color-primary);
+  margin-right: 0.75em;
+}
+
+.section-title {
+  font-size: 1.75rem;
+  line-height: 1.25;
+  margin: 0 0 1.25rem;
+  max-width: 34rem;
+}
+
+.section-prose {
+  max-width: 42rem;
+}
+
+.section-prose p {
+  margin: 0 0 1rem;
+}
+
+/* ---------- 01 hero ---------- */
+
+.hero {
+  padding: 4.5rem 0 0;
+}
+
+.hero h1 {
+  font-size: clamp(2.25rem, 6vw, 3.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin: 0 0 2.5rem;
+  max-width: 16em;
+}
+
+.narrative {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.narrative-block h2 {
+  font-size: 1.05rem;
+  margin: 0 0 0.5rem;
+  color: var(--color-primary);
+}
+
+.narrative-block p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.hero-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.hero-cta {
+  margin: 2.5rem 0 0;
+}
+
+.cta {
+  display: inline-block;
+  padding: 0.8rem 1.6rem;
+  background: var(--color-primary);
+  color: var(--cta-text);
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+/* ---------- terminal blocks ---------- */
+
+.terminal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.9rem;
+  background: var(--surface-raised);
+  border-bottom: 1px solid var(--border);
+}
+
+.terminal-dot {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: var(--border);
+}
+
+.terminal-name {
+  margin-left: 0.5rem;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    monospace;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.terminal-body {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  overflow-x: auto;
+}
+
+.term-comment {
+  color: var(--text-muted);
+}
+
+/* ---------- agent prompt ---------- */
+
+.agent-prompt {
+  border: 1px dashed var(--color-primary);
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  background: var(--surface);
+}
+
+.agent-prompt-label {
+  margin: 0 0 0.5rem;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.agent-prompt-body {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ---------- 02 coverage table ---------- */
+
+.coverage-table {
+  width: 100%;
+  margin-top: 1.5rem;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.coverage-table th,
+.coverage-table td {
+  text-align: left;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--border);
+}
+
+.coverage-table th {
+  background: var(--surface-raised);
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.coverage-table tbody tr:nth-child(odd) {
+  background: var(--surface);
+}
+
+/* ---------- 03 steps ---------- */
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.step-num {
+  margin: 0 0 0.4rem;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    monospace;
+  font-size: 1.1rem;
+  color: var(--color-primary);
+}
+
+.step h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.step p {
+  margin: 0;
+  font-size: 0.925rem;
+  color: var(--text-muted);
+}
+
+/* ---------- 04 example ---------- */
+
+.example {
+  display: grid;
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.panel-label {
+  margin: 0 0 0.6rem;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.file-tree {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+}
+
+.file-tree pre {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.7;
+}
+
+/* static wiki-mock panel — reads as the generated wiki, stays pure HTML/CSS */
+.wiki-mock {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.wiki-mock-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 1rem;
+  background: var(--surface-raised);
+  border-bottom: 1px solid var(--border);
+}
+
+.wiki-mock-logo {
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    monospace;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.wiki-mock-bracket {
+  color: var(--color-primary);
+}
+
+.wiki-mock-search {
+  flex: 0 1 14rem;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--background-color-base);
+}
+
+.wiki-mock-body {
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.wiki-mock-portal {
+  margin: 0 0 0.6rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.wiki-mock-title {
+  margin: 0 0 0.25rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.wiki-mock-meta {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.wiki-mock-category {
+  margin: 0 0 0.4rem;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.wiki-mock-pages {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.9rem;
+}
+
+.wiki-mock-pages li {
+  margin-bottom: 0.3rem;
+}
+
+.wiki-mock-link {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+/* ---------- 05 facts ---------- */
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+  align-items: start;
+}
+
+.fact-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fact-list li {
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.fact-list strong {
+  color: var(--color-base);
+}
+
+/* ---------- footer ---------- */
+
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.footer-sep {
+  margin: 0 0.6em;
+}
+
+@media (min-width: 48rem) {
+  .example {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .example-command {
+    grid-column: 1 / -1;
+  }
+}
