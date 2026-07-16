@@ -762,6 +762,30 @@ Each story: functional enrichment ACs; `parse.enrich` / `output.enrich` (verbose
 
 **Quality measures:** Owner review of README and launch copy; editorial pass for accuracy against current CLI commands; no HARNESS §0.2 gate required unless README edits break documented command examples (run spot-check: `npx specwiki --help` matches README).
 
+#### S13.4 — Version 1.0.0 release and maintainer docs
+
+**As** an open-source maintainer or trusted contributor,  
+**I want** a single-source version bump to 1.0.0, maintainer release scripts, and documented publishing steps,  
+**so that** anyone with release permissions can safely cut a semver release and publish to npm without tribal knowledge.
+
+**INVEST:** I✓ N✓ V✓ E✓ S✓ T✓  
+**Depends on:** S13.1 (prepublish gate, `verify-package`); S13.2 (green CI on `main` before publish); S13.3 (README/marketing ready).  
+**Demo path:** `npm run release:check` passes; `specwiki --version` prints `1.0.0`; `docs/RELEASING.md` and `docs/CONTRIBUTING.md` document the full contributor and maintainer paths.
+
+**Functional:**
+
+- [ ] Single version source: `package.json` authority; CLI reads version at runtime (no hardcoded semver in `src/cli.ts`)
+- [ ] Bump to `1.0.0` in manifest, lockfile, and README badge
+- [ ] Maintainer scripts: `release:check`, `release:version` (or equivalent) via `scripts/release-version.mjs`
+- [ ] `CHANGELOG.md` with `[1.0.0]` first-release notes
+- [ ] `docs/RELEASING.md` (maintainers) and `docs/CONTRIBUTING.md` (all contributors)
+- [ ] Contract tests for version consistency; no live registry calls
+- [ ] Story prepares publish; `npm publish` requires explicit owner instruction at review
+
+**Logging & diagnostics:** Release scripts emit deterministic step/status messages only; never log npm tokens or credentials.
+
+**Quality measures:** Full §0.2 gate; `verify-package`; version contract tests.
+
 ---
 
 ### E14 — Ecosystem Export & Intelligence
@@ -1022,18 +1046,18 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 
 ### POST-MVP epics (E8–E20) — **backlog**
 
-| Epic                | Stories     | FR binding                                   | Status  |
-| ------------------- | ----------- | -------------------------------------------- | ------- |
-| E8 Custom discovery | S8.1–S8.4   | FR-005, FR-006, FR-035                       | backlog |
-| E9 Agent I/O        | S9.1–S9.2   | FR-017, FR-023                               | backlog |
-| E10 Team CI         | S10.1       | FR-024                                       | backlog |
-| E11 Live loop       | S11.1–S11.2 | FR-025, FR-026                               | backlog |
-| E12 Semantic        | S12.1–S12.3 | FR-010                                       | backlog |
-| E13 Distribution    | S13.1–S13.3 | FR-027, FR-028; go-to-market (S13.3)         | backlog |
-| E14 Ecosystem       | S14.1–S14.3 | FR-018, FR-029                               | backlog |
-| E15 IDE             | S15.1       | —                                            | backlog |
-| E16 Wiki HTML skin  | S16.1–S16.4 | FR-032–FR-034                                | backlog |
-| E20 specwiki.ai     | S20.1–S20.3 | New public web surface; depends on E13 S13.1 | backlog |
+| Epic                | Stories     | FR binding                                            | Status  |
+| ------------------- | ----------- | ----------------------------------------------------- | ------- |
+| E8 Custom discovery | S8.1–S8.4   | FR-005, FR-006, FR-035                                | backlog |
+| E9 Agent I/O        | S9.1–S9.2   | FR-017, FR-023                                        | backlog |
+| E10 Team CI         | S10.1       | FR-024                                                | backlog |
+| E11 Live loop       | S11.1–S11.2 | FR-025, FR-026                                        | backlog |
+| E12 Semantic        | S12.1–S12.3 | FR-010                                                | backlog |
+| E13 Distribution    | S13.1–S13.4 | FR-027, FR-028; go-to-market (S13.3); release (S13.4) | backlog |
+| E14 Ecosystem       | S14.1–S14.3 | FR-018, FR-029                                        | backlog |
+| E15 IDE             | S15.1       | —                                                     | backlog |
+| E16 Wiki HTML skin  | S16.1–S16.4 | FR-032–FR-034                                         | backlog |
+| E20 specwiki.ai     | S20.1–S20.3 | New public web surface; depends on E13 S13.1          | backlog |
 
 ---
 

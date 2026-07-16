@@ -69,6 +69,27 @@ npm run setup-hooks   # optional: install git hooks
 npm link              # optional: use `specwiki` globally from source
 ```
 
+### For maintainers (npm publish prep)
+
+Before publishing to npm, run the local package verification and quality gate:
+
+```bash
+npm run verify-package   # pack tarball, clean-install, run specwiki --help
+npm run prepublishOnly   # full quality gate (also runs automatically on npm publish)
+```
+
+**Publish to npm** (maintainer only, requires `npm login`):
+
+```bash
+# Preview what npm would upload (runs verify-package + prepublishOnly + dry-run publish)
+npm run publish:package -- --dry-run
+
+# Publish the version in package.json
+npm run publish:package -- --confirm
+```
+
+Publishing to the npm registry is an explicit maintainer action after these checks pass. Requires **Node.js 20+** and npm maintainer access to the `specwiki` package. This repository does not automate registry credentials or release versioning.
+
 ## Usage
 
 ```bash

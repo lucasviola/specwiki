@@ -49,4 +49,11 @@ describe("npm publish contract", () => {
     expect(scripts.prepare).toBeUndefined();
     expect(scripts["setup-hooks"]).toBe("git config core.hooksPath .githooks");
   });
+
+  it("protects npm publish with the prepublish quality gate", () => {
+    const { scripts } = readPackageJson();
+
+    expect(scripts.prepublishOnly).toBe("node scripts/prepublish-check.mjs");
+    expect(scripts["verify-package"]).toBe("node scripts/verify-package.mjs");
+  });
 });

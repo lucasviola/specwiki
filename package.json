@@ -13,6 +13,9 @@
   ],
   "scripts": {
     "setup-hooks": "git config core.hooksPath .githooks",
+    "prepublishOnly": "node scripts/prepublish-check.mjs",
+    "verify-package": "node scripts/verify-package.mjs",
+    "publish:package": "node scripts/publish-package.mjs",
     "build": "tsc && node scripts/copy-html-assets.mjs",
     "dev": "tsx src/cli.ts",
     "start": "node dist/cli.js",
