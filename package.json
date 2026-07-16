@@ -1,6 +1,6 @@
 {
   "name": "specwiki",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Transform AI specs into structured wiki-like documentation",
   "type": "module",
   "bin": {

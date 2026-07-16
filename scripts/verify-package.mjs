@@ -68,15 +68,36 @@ export function listTarballEntries(tarballPath) {
 }
 
 /**
+ * npm publish --dry-run sets npm_config_dry_run, which makes nested npm pack/install
+ * simulate instead of writing files. Strip dry-run config for real subprocess work.
+ *
+ * @param {NodeJS.ProcessEnv} [overrides]
+ */
+export function npmSubprocessEnv(overrides = {}) {
+  const env = { ...process.env, ...overrides };
+  delete env.npm_config_dry_run;
+  delete env.npm_config_dryRun;
+  return env;
+}
+
+/**
  * @param {string} command
  * @param {string[]} args
  * @param {import("node:child_process").SpawnSyncOptions} [options]
  */
 function run(command, args, options = {}) {
+  const env =
+    command === "npm"
+      ? npmSubprocessEnv(
+          options.env && typeof options.env === "object" ? options.env : {},
+        )
+      : options.env;
+
   const result = spawnSync(command, args, {
     stdio: "inherit",
     shell: process.platform === "win32",
     ...options,
+    ...(env ? { env } : {}),
   });
 
   if (result.status !== 0) {
@@ -126,17 +147,18 @@ export function runVerifyPackage(options = {}) {
     const entries = listTarballEntries(tarballPath);
     validateTarballEntries(entries);
 
-    execSync("npm init -y", { cwd: installDir, stdio: "pipe" });
+    execSync("npm init -y", {
+      cwd: installDir,
+      stdio: "pipe",
+      env: npmSubprocessEnv(),
+    });
     run("npm", ["install", tarballPath], { cwd: installDir, stdio: "pipe" });
 
     const help = spawnSync("npx", ["--no-install", "specwiki", "--help"], {
       cwd: installDir,
       encoding: "utf8",
       shell: process.platform === "win32",
-      env: {
-        ...process.env,
-        npm_config_yes: "false",
-      },
+      env: npmSubprocessEnv({ npm_config_yes: "false" }),
     });
 
     if (help.status !== 0) {

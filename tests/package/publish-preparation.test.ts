@@ -11,6 +11,7 @@ import {
 import {
   FORBIDDEN_TAR_PREFIXES,
   REQUIRED_TAR_ENTRIES,
+  npmSubprocessEnv,
   validateTarballEntries,
 } from "../../scripts/verify-package.mjs";
 
@@ -152,12 +153,42 @@ describe("verify package", () => {
     expect(FORBIDDEN_TAR_PREFIXES).toContain("package/tests/");
   });
 
+  it("strips npm publish dry-run config from nested npm subprocess env", () => {
+    const env = npmSubprocessEnv({
+      npm_config_dry_run: "true",
+      npm_config_dryRun: "true",
+      npm_config_loglevel: "error",
+    });
+
+    expect(env.npm_config_dry_run).toBeUndefined();
+    expect(env.npm_config_dryRun).toBeUndefined();
+    expect(env.npm_config_loglevel).toBe("error");
+  });
+
   it("packs, installs, and runs specwiki --help from a clean temporary prefix", () => {
     const result = spawnSync("node", [verifyScript], {
       cwd: projectRoot,
       encoding: "utf8",
       env: {
         ...process.env,
+        npm_config_loglevel: "error",
+      },
+    });
+
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain(
+      "verify-package: tarball validated and CLI --help succeeded",
+    );
+    expect(result.stderr).not.toMatch(/npm ERR!/);
+  }, 180_000);
+
+  it("packs and installs when npm publish --dry-run config is inherited", () => {
+    const result = spawnSync("node", [verifyScript], {
+      cwd: projectRoot,
+      encoding: "utf8",
+      env: {
+        ...process.env,
+        npm_config_dry_run: "true",
         npm_config_loglevel: "error",
       },
     });
