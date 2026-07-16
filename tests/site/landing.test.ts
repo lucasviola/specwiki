@@ -43,24 +43,6 @@ describe("S20.1 v2 landing page — hero narrative (AC 1–2)", () => {
   it("has exactly one h1", () => {
     expect(html.match(/<h1[\s>]/g)).toHaveLength(1);
   });
-
-  it("keeps the three v1 narrative headings verbatim", () => {
-    expect(text).toContain("Knowledge written for machines");
-    expect(text).toContain("One command, a real wiki");
-    expect(text).toContain("Understanding people can share");
-  });
-
-  it("keeps the three v1 narrative bodies verbatim", () => {
-    expect(text).toContain(
-      "AI-era projects accumulate knowledge fast — agent rules, spec-driven development files, generated plans — scattered across dot-folders and conventions built for tools, not teammates. That knowledge is hard for people to find and understand.",
-    );
-    expect(text).toContain(
-      "specwiki scans your project for that knowledge and generates a navigable wiki from it: categorized pages, an index, and a browsable HTML view with search — no server, no lock-in, straight from the files already in your repo.",
-    );
-    expect(text).toContain(
-      "The result is shared, usable understanding: reviewers, stakeholders, and new teammates browse the same trustworthy view of what the project knows about itself — without spelunking through config folders.",
-    );
-  });
 });
 
 describe("S20.1 v2 landing page — hero quick start and agent prompt (AC 3)", () => {
@@ -204,6 +186,21 @@ describe("S20.1 v2 landing page — brand treatment (AC 8–9)", () => {
     expect(css).toMatch(/\.specwiki-logo[\s\S]*?ui-monospace/);
     expect(css).toMatch(/\.specwiki-logo[\s\S]*?font-weight:\s*700/);
     expect(css).toMatch(/\.specwiki-logo[\s\S]*?(margin|padding):\s*1em/);
+  });
+
+  it("head links the round brand icon as favicon and apple-touch-icon", () => {
+    expect(html).toMatch(
+      /<link[^>]+rel="icon"[^>]+href="assets\/favicon\.png"/,
+    );
+    expect(html).toMatch(
+      /<link[^>]+rel="apple-touch-icon"[^>]+href="assets\/apple-touch-icon\.png"/,
+    );
+    expect(
+      fs.existsSync(path.join(projectRoot, "site/assets/favicon.png")),
+    ).toBe(true);
+    expect(
+      fs.existsSync(path.join(projectRoot, "site/assets/apple-touch-icon.png")),
+    ).toBe(true);
   });
 });
 

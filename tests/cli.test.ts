@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import fsSync from "node:fs";
 import os from "node:os";
 import { randomUUID } from "node:crypto";
 import { execFile } from "node:child_process";
@@ -27,6 +28,25 @@ const fixtureRoot = path.join(projectRoot, "tests/fixtures/sample-project");
 function ignoredFixtureOutput(label = "run"): string {
   return path.join(".specwiki", `${label}-${randomUUID()}`);
 }
+
+function readRootPackageVersion(): string {
+  const pkg = JSON.parse(
+    fsSync.readFileSync(path.join(projectRoot, "package.json"), "utf8"),
+  ) as { version: string };
+  return pkg.version;
+}
+
+describe("cli --version", () => {
+  it("prints the version from package.json", async () => {
+    const { stdout } = await execFileAsync(
+      process.execPath,
+      ["--import", "tsx/esm", cliPath, "--version"],
+      { cwd: projectRoot },
+    );
+
+    expect(stdout.trim()).toBe(readRootPackageVersion());
+  });
+});
 
 describe("cli list --verbose", () => {
   it("emits structured discover logs on stderr", async () => {

@@ -16,6 +16,7 @@ import { isOpenErrorLogged, openWiki } from "./commands/open.js";
 import { parsePatternList } from "./config/patterns.js";
 import { ConfigError, resolveEffectivePatterns } from "./config/loader.js";
 import { log } from "./core/Logger.js";
+import { readPackageVersion } from "./version.js";
 
 const USAGE_ERROR_CODES = new Set([
   "commander.unknownOption",
@@ -130,7 +131,7 @@ program.exitOverride();
 program
   .name("specwiki")
   .description("Transform AI specs into structured wiki-like documentation")
-  .version("0.1.0");
+  .version(readPackageVersion());
 
 program
   .command("generate")
