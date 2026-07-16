@@ -6,7 +6,7 @@ Harden **specwiki** for safe publication to npm so end users who `npm install -g
 
 **Audience:** npm consumers (Personas A–C), maintainers cutting releases, and contributors reviewing security-sensitive CLI paths.
 
-**Dependency:** Complements **E13 — Distribution & Publish**. Complete **E21** (or explicitly accept residual risk) before **S13.4 — Version 1.0.0 release** and the first `npm publish`.
+**Dependency:** Complements **E13 — Distribution & Publish**. Complete **E21** (or explicitly accept residual risk) before **E22 S22.6 — Version 1.0.0 first public release** and the first `npm publish`.
 
 **Threat model summary:** specwiki is a local CLI with no network service and no install-time scripts. Residual risk is (1) malicious **project content** when users run the CLI on untrusted repos, (2) **dependency supply chain**, and (3) **maintainer publish hygiene**.
 
@@ -72,7 +72,7 @@ Harden **specwiki** for safe publication to npm so end users who `npm install -g
 ## Cross-epic dependencies
 
 - **E13 S13.1** — npm publish prep (`verify-package`, `prepublishOnly`) — in progress; S21.6 extends maintainer docs.
-- **E13 S13.4** — first semver release — blocked until S21.3, S21.5, S21.6 are done or waived by owner.
+- **E22 S22.6** — first semver release — blocked until S21.3, S21.5, S21.6 are done or waived by owner (supersedes E13 S13.4).
 - **E16 S16.3** — trusted-local HTML body model (AD-6) — S21.7 is the escape hatch for untrusted sources.
 - **POST-MVP-ROADMAP Bet 6** — body HTML sanitization — maps to S21.7.
 

@@ -4,7 +4,9 @@ baseline_commit: 7ee60fb
 
 # Story 13.4: Version 1.0.0 release and maintainer docs
 
-Status: ready-for-dev
+Status: superseded
+
+> **Superseded by E22 (2026-07-16).** Use [`epic-22-semver-and-release-process.md`](epic-22-semver-and-release-process.md) and stories S22.1–S22.7 instead. Do not implement this file.
 
 ## Story
 

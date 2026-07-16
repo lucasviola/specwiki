@@ -762,7 +762,9 @@ Each story: functional enrichment ACs; `parse.enrich` / `output.enrich` (verbose
 
 **Quality measures:** Owner review of README and launch copy; editorial pass for accuracy against current CLI commands; no HARNESS §0.2 gate required unless README edits break documented command examples (run spot-check: `npx specwiki --help` matches README).
 
-#### S13.4 — Version 1.0.0 release and maintainer docs
+#### S13.4 — Version 1.0.0 release and maintainer docs ⚠️ superseded by E22
+
+> **Superseded (2026-07-16):** Decomposed into **E22 S22.1–S22.7**. Do not implement this story; use [`epic-22-semver-and-release-process.md`](../../implementation-artifacts/epic-22-semver-and-release-process.md) instead.
 
 **As** an open-source maintainer or trusted contributor,  
 **I want** a single-source version bump to 1.0.0, maintainer release scripts, and documented publishing steps,  
@@ -1036,7 +1038,7 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 
 **Audience:** npm installers, maintainers cutting releases, security researchers.
 
-**Dependency:** Complete **before E13 S13.4** first public `npm publish` (or owner explicitly waives open stories). Complements **E13 S13.1** (`verify-package`, `prepublishOnly`).
+**Dependency:** Complete **before E22 S22.6** first public `npm publish` (or owner explicitly waives open stories). Complements **E13 S13.1** (`verify-package`, `prepublishOnly`).
 
 **Context:** [`epic-21-npm-security-hardening.md`](../../implementation-artifacts/epic-21-npm-security-hardening.md)
 
@@ -1146,19 +1148,114 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 
 ### POST-MVP epics (E8–E20) — **backlog**
 
-| Epic                | Stories     | FR binding                                            | Status      |
-| ------------------- | ----------- | ----------------------------------------------------- | ----------- |
-| E8 Custom discovery | S8.1–S8.4   | FR-005, FR-006, FR-035                                | backlog     |
-| E9 Agent I/O        | S9.1–S9.2   | FR-017, FR-023                                        | backlog     |
-| E10 Team CI         | S10.1       | FR-024                                                | backlog     |
-| E11 Live loop       | S11.1–S11.2 | FR-025, FR-026                                        | backlog     |
-| E12 Semantic        | S12.1–S12.3 | FR-010                                                | backlog     |
-| E13 Distribution    | S13.1–S13.4 | FR-027, FR-028; go-to-market (S13.3); release (S13.4) | backlog     |
-| E14 Ecosystem       | S14.1–S14.3 | FR-018, FR-029                                        | backlog     |
-| E15 IDE             | S15.1       | —                                                     | backlog     |
-| E16 Wiki HTML skin  | S16.1–S16.4 | FR-032–FR-034                                         | backlog     |
-| E20 specwiki.ai     | S20.1–S20.3 | New public web surface; depends on E13 S13.1          | backlog     |
-| E21 NPM security    | S21.1–S21.7 | Pre-publish hardening; gate before E13 S13.4          | in-progress |
+| Epic                 | Stories     | FR binding                                            | Status        |
+| -------------------- | ----------- | ----------------------------------------------------- | ------------- |
+| E8 Custom discovery  | S8.1–S8.4   | FR-005, FR-006, FR-035                                | backlog       |
+| E9 Agent I/O         | S9.1–S9.2   | FR-017, FR-023                                        | backlog       |
+| E10 Team CI          | S10.1       | FR-024                                                | backlog       |
+| E11 Live loop        | S11.1–S11.2 | FR-025, FR-026                                        | backlog       |
+| E12 Semantic         | S12.1–S12.3 | FR-010                                                | backlog       |
+| E13 Distribution     | S13.1–S13.4 | FR-027, FR-028; go-to-market (S13.3); release (S13.4) | backlog       |
+| E14 Ecosystem        | S14.1–S14.3 | FR-018, FR-029                                        | backlog       |
+| E15 IDE              | S15.1       | —                                                     | backlog       |
+| E16 Wiki HTML skin   | S16.1–S16.4 | FR-032–FR-034                                         | backlog       |
+| E20 specwiki.ai      | S20.1–S20.3 | New public web surface; depends on E13 S13.1          | backlog       |
+| E21 NPM security     | S21.1–S21.7 | Pre-publish hardening; gate before E22 S22.6          | in-progress   |
+| E22 SemVer & release | S22.1–S22.7 | FR-027 release process; supersedes E13 S13.4          | ready-for-dev |
+
+---
+
+### E22 — SemVer & Release Process
+
+**Vertical slice:** Repeatable semver bump, verify, tag, publish, and post-publish checks for `@lucasviola/specwiki` on npm.
+
+**Audience:** npm maintainers and trusted contributors.
+
+**Supersedes:** E13 S13.4 (monolithic release story decomposed here).
+
+**Dependency:** E13 S13.1 (publish contract), E13 S13.2 (CI), E21 (security gate before S22.6).
+
+**Context:** [`epic-22-semver-and-release-process.md`](../../implementation-artifacts/epic-22-semver-and-release-process.md)
+
+| Story | Summary                                     | Depends          | Status        |
+| ----- | ------------------------------------------- | ---------------- | ------------- |
+| S22.1 | Single-source CLI version                   | S13.1            | ready-for-dev |
+| S22.2 | Release version bump script                 | S22.1            | ready-for-dev |
+| S22.3 | `release:check` orchestration               | S13.1, S22.2     | ready-for-dev |
+| S22.4 | CHANGELOG and SemVer policy                 | —                | ready-for-dev |
+| S22.5 | Maintainer and contributor docs             | S22.3, S22.4     | ready-for-dev |
+| S22.6 | Version 1.0.0 first public release          | S22.1–S22.5, E21 | ready-for-dev |
+| S22.7 | GitHub tag-triggered npm publish (optional) | S22.6            | backlog       |
+
+#### S22.1 — Single-source CLI version
+
+**As** an npm user, **I want** `--version` to match `package.json`, **so that** published and dev builds never drift.
+
+**Demo path:** `node dist/cli.js --version` equals manifest semver.
+
+**Functional:**
+
+- [ ] `src/version.ts` reads `package.json` at runtime
+- [ ] No hardcoded semver in `src/cli.ts`
+- [ ] Contract tests for CLI and unit paths
+
+#### S22.2 — Release version bump script
+
+**As** a maintainer, **I want** `npm run release:version`, **so that** manifest, lockfile, and README badge stay in sync.
+
+**Functional:**
+
+- [ ] `scripts/release-version.mjs` with `--patch|--minor|--major|--set`
+- [ ] README badge sync; drift detection
+- [ ] Never publishes or reads npm tokens
+
+#### S22.3 — Release check orchestration
+
+**As** a maintainer, **I want** `npm run release:check`, **so that** I can verify a release without publishing.
+
+**Functional:**
+
+- [ ] Composes `prepublish-check` + `verify-package`
+- [ ] Optional audit step when S21.5 lands
+
+#### S22.4 — CHANGELOG and SemVer policy
+
+**As** a user, **I want** a changelog and semver rules, **so that** I know what changed and how versions are chosen.
+
+**Functional:**
+
+- [ ] `CHANGELOG.md` with `[Unreleased]` and `[1.0.0]`
+- [ ] `docs/SEMVER.md` with PATCH/MINOR/MAJOR rules
+
+#### S22.5 — Maintainer and contributor documentation
+
+**As** a contributor or maintainer, **I want** CONTRIBUTING and RELEASING docs, **so that** roles and release steps are explicit.
+
+**Functional:**
+
+- [ ] `docs/CONTRIBUTING.md` — setup, gate, PR norms, no publish rights
+- [ ] `docs/RELEASING.md` — bump → check → tag → publish → verify
+- [ ] README links; integrates S21.6 checklist when available
+
+#### S22.6 — Version 1.0.0 first public release
+
+**As** the owner, **I want** to ship 1.0.0 to npm, **so that** `npx @lucasviola/specwiki` works from the registry.
+
+**Functional:**
+
+- [ ] All version strings at 1.0.0; `release:check` green
+- [ ] Owner executes tag + publish; post-publish verification recorded
+- [ ] README npm badge after publish
+
+#### S22.7 — GitHub tag-triggered npm publish (optional)
+
+**As** a maintainer, **I want** CI publish on tag push, **so that** releases are reproducible without laptop publish.
+
+**Functional:**
+
+- [ ] `.github/workflows/release.yml` on `v*` tags
+- [ ] `NPM_TOKEN` secret; provenance; tag/version validation
+- [ ] Deferred until S22.6 manual release succeeds
 
 ---
 
@@ -1178,7 +1275,7 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 1. **E1** — S1.1 (`IMPLEMENTATION.md`) → S1.3 (`Logger.ts`) → S1.2 verify
 2. **E2 → E3 → E4** — Core journeys; logging in same story as feature
 3. **E5 → E6 → E7** — Trustworthy output, CLI, sign-off
-4. **POST-MVP:** E8 → E15; **E16** (wiki HTML skin) recommended after E4; **E21** (npm security) before **E13 S13.4** first publish; **E20** follows E13 S13.1 once the package is published to npm.
+4. **POST-MVP:** E8 → E15; **E16** (wiki HTML skin) recommended after E4; **E21** (npm security) before **E22 S22.6** first publish; **E22** (semver & release) S22.1–S22.6 for 1.0.0; **E20** follows E13 S13.1 once the package is published to npm.
 
 ---
 
