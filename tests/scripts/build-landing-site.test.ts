@@ -49,25 +49,25 @@ describe("build-landing-site", () => {
     );
   });
 
-  it("writes a CNAME for the specwiki.ai custom domain", () => {
+  it("omits CNAME by default so GitHub Pages serves at lucasviola.github.io/specwiki", () => {
     runBuildScript(tempOutputDir);
 
-    const cname = fs.readFileSync(path.join(tempOutputDir, "CNAME"), "utf8");
-    expect(cname.trim()).toBe("specwiki.ai");
+    expect(fs.existsSync(path.join(tempOutputDir, "CNAME"))).toBe(false);
+    expect(fs.existsSync(path.join(tempOutputDir, "index.html"))).toBe(true);
   });
 
-  it("omits CNAME when --skip-cname is passed (PR preview builds)", () => {
+  it("writes a CNAME when --with-cname is passed (after specwiki.ai is owned)", () => {
     execFileSync(
       "node",
-      [scriptPath, `--output=${tempOutputDir}`, "--skip-cname"],
+      [scriptPath, `--output=${tempOutputDir}`, "--with-cname"],
       {
         cwd: projectRoot,
         stdio: "pipe",
       },
     );
 
-    expect(fs.existsSync(path.join(tempOutputDir, "CNAME"))).toBe(false);
-    expect(fs.existsSync(path.join(tempOutputDir, "index.html"))).toBe(true);
+    const cname = fs.readFileSync(path.join(tempOutputDir, "CNAME"), "utf8");
+    expect(cname.trim()).toBe("specwiki.ai");
   });
 
   it("writes .nojekyll so GitHub Pages skips Jekyll processing", () => {

@@ -76,13 +76,20 @@ describe("S20.3 deploy-site workflow", () => {
     );
   });
 
-  it("deploys PR previews separately without writing CNAME", () => {
+  it("deploys PR previews separately from production", () => {
     const workflow = readWorkflow();
 
     expect(workflow).toMatch(
       /deploy-preview:[\s\S]*?if:\s*github\.event_name == 'pull_request'/,
     );
-    expect(workflow).toMatch(/--skip-cname/);
+  });
+
+  it("builds without CNAME until specwiki.ai is owned", () => {
+    const workflow = readWorkflow();
+
+    expect(workflow).toMatch(/npm run build:site/);
+    expect(workflow).not.toMatch(/--with-cname/);
+    expect(workflow).not.toMatch(/--skip-cname/);
   });
 
   it("uploads the reproducible landing-site artifact path", () => {
@@ -109,11 +116,11 @@ describe("S20.3 hosting documentation", () => {
     expect(doc).not.toMatch(/secrets?\s*[:=]/i);
   });
 
-  it("documents GitHub Pages as the selected provider", () => {
+  it("documents the default GitHub Pages URL before custom domain setup", () => {
     const doc = fs.readFileSync(hostingDocPath, "utf8");
 
-    expect(doc).toMatch(/GitHub Pages/i);
-    expect(doc).toMatch(/deploy-site\.yml/);
+    expect(doc).toMatch(/lucasviola\.github\.io\/specwiki/);
+    expect(doc).toMatch(/--with-cname/);
   });
 });
 

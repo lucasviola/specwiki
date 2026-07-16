@@ -19,7 +19,7 @@ function parseOutputDir(argv) {
 }
 
 function shouldWriteCname(argv) {
-  return !argv.includes("--skip-cname");
+  return argv.includes("--with-cname");
 }
 
 async function copyEntry(srcPath, destPath, entry) {

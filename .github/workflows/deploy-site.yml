@@ -36,12 +36,7 @@ jobs:
         run: npm test -- tests/site/landing.test.ts
 
       - name: Build landing site
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            npm run build:site -- --skip-cname
-          else
-            npm run build:site
-          fi
+        run: npm run build:site
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
