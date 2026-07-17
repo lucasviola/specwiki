@@ -1,11 +1,42 @@
-import { describe, expect, it } from "vitest";
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   buildCategoryNavSubgroups,
   categoryPathPrefix,
   humanizeSegment,
   loadNavGroupingContext,
 } from "../../../src/output/html/nav-grouping.js";
+import {
+  catalogPath,
+  parseCsvLine,
+  parseSkillCustomizeToml,
+} from "../../../src/output/html/nav-grouping-catalog.js";
+import { log } from "../../../src/core/Logger.js";
 import type { WikiPage } from "../../../src/types.js";
+
+const SAMPLE_PROJECT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../../fixtures/sample-project",
+);
+
+const tempDirs: string[] = [];
+
+async function makeTempProject(): Promise<string> {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "specwiki-nav23-"));
+  tempDirs.push(dir);
+  return dir;
+}
+
+afterEach(async () => {
+  await Promise.all(
+    tempDirs
+      .splice(0)
+      .map((dir) => fs.rm(dir, { recursive: true, force: true })),
+  );
+});
 
 function wikiPage(overrides: Partial<WikiPage> = {}): WikiPage {
   return {
@@ -40,9 +71,271 @@ describe("nav-grouping", () => {
   });
 
   describe("loadNavGroupingContext", () => {
-    it("returns a stub context for S23.1", async () => {
-      const ctx = await loadNavGroupingContext("/tmp/project");
+    it("loads CSV + TOML catalog from sample-project fixture", async () => {
+      const ctx = await loadNavGroupingContext(SAMPLE_PROJECT);
+      expect(ctx.loaded).toBe(true);
+      expect(ctx.skillsById.get("bmad-agent-pm")?.isAgent).toBe(true);
+      expect(ctx.skillsById.get("bmad-agent-pm")?.agentName).toBe("John");
+      expect(ctx.skillsById.get("bmad-create-story")?.displayName).toBe(
+        "Create Story",
+      );
+      expect(ctx.skillsById.get("bmad-brainstorming")?.phase).toBe(
+        "1-analysis",
+      );
+      expect(ctx.skillsById.get("bmad-help")?.module).toBe("Core");
+      expect(ctx.skillsById.get("bmad-legacy-skill")?.description).toMatch(
+        /DEPRECATED/i,
+      );
+    });
+
+    it("returns loaded false when bmad-help.csv is missing", async () => {
+      const root = await makeTempProject();
+      await fs.mkdir(path.join(root, ".agents", "skills", "solo"), {
+        recursive: true,
+      });
+      await fs.writeFile(
+        path.join(root, ".agents", "skills", "solo", "customize.toml"),
+        '[agent]\nname = "Ada"\ntitle = "Analyst"\n',
+      );
+
+      const ctx = await loadNavGroupingContext(root);
       expect(ctx.loaded).toBe(false);
+      expect(ctx.skillsById.size).toBe(0);
+    });
+
+    it("skips malformed CSV rows and TOML files without throwing", async () => {
+      const root = await makeTempProject();
+      await fs.mkdir(path.join(root, "_bmad", "_config"), { recursive: true });
+      await fs.mkdir(path.join(root, ".agents", "skills", "good-skill"), {
+        recursive: true,
+      });
+      await fs.mkdir(path.join(root, ".agents", "skills", "bad-toml"), {
+        recursive: true,
+      });
+      await fs.mkdir(path.join(root, ".agents", "skills", "csv-agent"), {
+        recursive: true,
+      });
+      await fs.writeFile(
+        path.join(root, "_bmad", "_config", "bmad-help.csv"),
+        [
+          "module,skill,display-name,menu-code,description,action,args,phase,preceded-by,followed-by,required,output-location,outputs",
+          'BMad Method,good-skill,Good Skill,GS,"Has, comma",,,1-analysis,,,false,,',
+          'BMad Method,quoted,Quote Skill,QS,"He said ""hi""",,,2-planning,,,false,,',
+          "not-enough-columns",
+          "BMad Method,_meta,,,,,,,,,false,,",
+          "BMad Method,csv-agent,CSV Agent,CA,,,,3-solutioning,,,false,,",
+          "",
+        ].join("\n"),
+      );
+      await fs.writeFile(
+        path.join(root, ".agents", "skills", "good-skill", "customize.toml"),
+        "[workflow]\n",
+      );
+      await fs.writeFile(
+        path.join(root, ".agents", "skills", "bad-toml", "customize.toml"),
+        "[[[not valid toml",
+      );
+      await fs.writeFile(
+        path.join(root, ".agents", "skills", "csv-agent", "customize.toml"),
+        "[agent]\r\nname = 'Alex'\r\ntitle = 'Architect'\r\nicon = '🏗️'\r\n[workflow]\r\n",
+      );
+
+      const ctx = await loadNavGroupingContext(root);
+      expect(ctx.loaded).toBe(true);
+      expect(ctx.skillsById.get("good-skill")?.displayName).toBe("Good Skill");
+      expect(ctx.skillsById.get("quoted")?.displayName).toBe("Quote Skill");
+      expect(ctx.skillsById.get("quoted")?.description).toBe('He said "hi"');
+      expect(ctx.skillsById.has("bad-toml")).toBe(false);
+      expect(ctx.skillsById.get("csv-agent")?.isAgent).toBe(true);
+      expect(ctx.skillsById.get("csv-agent")?.agentName).toBe("Alex");
+    });
+
+    it("loads CSV without a skills directory and ignores CSV missing skill column", async () => {
+      const root = await makeTempProject();
+      await fs.mkdir(path.join(root, "_bmad", "_config"), { recursive: true });
+      await fs.writeFile(
+        path.join(root, "_bmad", "_config", "bmad-help.csv"),
+        "module,display-name,phase\nBMad Method,Nope,1-analysis\n",
+      );
+
+      const ctx = await loadNavGroupingContext(root);
+      expect(ctx.loaded).toBe(true);
+      expect(ctx.skillsById.size).toBe(0);
+    });
+
+    it("prefers a later SDLC CSV row over an earlier anytime row for the same skill", async () => {
+      const root = await makeTempProject();
+      await fs.mkdir(path.join(root, "_bmad", "_config"), { recursive: true });
+      await fs.mkdir(path.join(root, ".agents", "skills", "flip-skill"), {
+        recursive: true,
+      });
+      await fs.writeFile(
+        path.join(root, "_bmad", "_config", "bmad-help.csv"),
+        [
+          "skill,display-name,phase,module,description",
+          "flip-skill,Flip Core,anytime,Core,",
+          "flip-skill,Flip Method,2-planning,BMad Method,",
+          ",Empty Skill,1-analysis,BMad Method,",
+        ].join("\n"),
+      );
+      await fs.writeFile(
+        path.join(root, ".agents", "skills", "flip-skill", "customize.toml"),
+        "[workflow]\n",
+      );
+      // Directory without customize.toml should be skipped quietly.
+      await fs.mkdir(path.join(root, ".agents", "skills", "no-toml"), {
+        recursive: true,
+      });
+
+      const ctx = await loadNavGroupingContext(root);
+      expect(ctx.skillsById.get("flip-skill")?.displayName).toBe("Flip Method");
+      expect(ctx.skillsById.get("flip-skill")?.phase).toBe("2-planning");
+      expect(ctx.skillsById.has("no-toml")).toBe(false);
+    });
+
+    it("keeps DEPRECATED membership when a tied later CSV row marks the skill deprecated", async () => {
+      const root = await makeTempProject();
+      await fs.mkdir(path.join(root, "_bmad", "_config"), { recursive: true });
+      await fs.writeFile(
+        path.join(root, "_bmad", "_config", "bmad-help.csv"),
+        [
+          "skill,display-name,phase,module,description",
+          "tied-skill,Active Name,4-implementation,BMad Method,Still active",
+          "tied-skill,Legacy Name,4-implementation,BMad Method,DEPRECATED — retired",
+        ].join("\n"),
+      );
+
+      const ctx = await loadNavGroupingContext(root);
+      expect(ctx.skillsById.get("tied-skill")?.displayName).toBe("Active Name");
+      expect(ctx.skillsById.get("tied-skill")?.description).toMatch(
+        /DEPRECATED/i,
+      );
+
+      const result = buildCategoryNavSubgroups(
+        [
+          wikiPage({
+            slug: "tied-a",
+            title: "Tied A",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/tied-skill/SKILL.md",
+          }),
+          wikiPage({
+            slug: "tied-b",
+            title: "Tied B",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/tied-skill/README.md",
+          }),
+        ],
+        {
+          categoryKey: "agent-skills",
+          indexBuild: true,
+          context: ctx,
+        },
+      );
+
+      expect(result.subgroups.map((sg) => sg.key)).toEqual(["deprecated"]);
+    });
+
+    it("ignores bmad-help.csv when it is a symlink escaping the project root", async () => {
+      const root = await makeTempProject();
+      const outside = await fs.mkdtemp(
+        path.join(os.tmpdir(), "specwiki-nav23-outside-"),
+      );
+      tempDirs.push(outside);
+      await fs.mkdir(path.join(root, "_bmad", "_config"), { recursive: true });
+      await fs.writeFile(
+        path.join(outside, "bmad-help.csv"),
+        "skill,display-name,phase,module,description\nescape-skill,Escaped,1-analysis,BMad Method,\n",
+      );
+      await fs.symlink(
+        path.join(outside, "bmad-help.csv"),
+        path.join(root, "_bmad", "_config", "bmad-help.csv"),
+      );
+
+      const ctx = await loadNavGroupingContext(root);
+      expect(ctx.loaded).toBe(false);
+      expect(ctx.skillsById.size).toBe(0);
+    });
+
+    it("skips customize.toml when it is a symlink escaping the project root", async () => {
+      const root = await makeTempProject();
+      const outside = await fs.mkdtemp(
+        path.join(os.tmpdir(), "specwiki-nav23-toml-out-"),
+      );
+      tempDirs.push(outside);
+      await fs.mkdir(path.join(root, "_bmad", "_config"), { recursive: true });
+      await fs.mkdir(path.join(root, ".agents", "skills", "escape-agent"), {
+        recursive: true,
+      });
+      await fs.writeFile(
+        path.join(root, "_bmad", "_config", "bmad-help.csv"),
+        "skill,display-name,phase,module,description\n",
+      );
+      await fs.writeFile(
+        path.join(outside, "customize.toml"),
+        '[agent]\nname = "Eve"\ntitle = "Escaped"\nicon = "😈"\n',
+      );
+      await fs.symlink(
+        path.join(outside, "customize.toml"),
+        path.join(root, ".agents", "skills", "escape-agent", "customize.toml"),
+      );
+
+      const ctx = await loadNavGroupingContext(root);
+      expect(ctx.loaded).toBe(true);
+      expect(ctx.skillsById.has("escape-agent")).toBe(false);
+    });
+  });
+
+  describe("catalog parsers", () => {
+    it("parses quoted CSV fields and escaped quotes", () => {
+      expect(parseCsvLine('a,"b,c","d""e"')).toEqual(["a", "b,c", 'd"e']);
+    });
+
+    it("extracts agent scalars and prefers [agent] over [workflow]", () => {
+      expect(
+        parseSkillCustomizeToml(
+          '[workflow]\n[agent]\nname = "A"\ntitle = "B"\nicon = "C"\n',
+        ),
+      ).toEqual({
+        isAgent: true,
+        agentName: "A",
+        agentTitle: "B",
+        agentIcon: "C",
+      });
+      expect(parseSkillCustomizeToml("[workflow]\n")).toEqual({
+        isAgent: false,
+      });
+      expect(parseSkillCustomizeToml('name = "x"\n')).toEqual({
+        isAgent: false,
+      });
+    });
+
+    it("rejects catalog paths that escape the project root", () => {
+      expect(() => catalogPath("/tmp/project", "..", "etc")).toThrow(
+        /escapes project root/,
+      );
+      expect(
+        catalogPath("/tmp/project", "_bmad", "_config", "bmad-help.csv"),
+      ).toBe(path.resolve("/tmp/project", "_bmad", "_config", "bmad-help.csv"));
+    });
+
+    it("returns empty context when catalog loading throws unexpectedly", async () => {
+      const root = await makeTempProject();
+      await fs.mkdir(path.join(root, "_bmad", "_config"), { recursive: true });
+      await fs.writeFile(
+        path.join(root, "_bmad", "_config", "bmad-help.csv"),
+        "skill,display-name,phase,module,description\nx,X,1-analysis,BMad Method,\n",
+      );
+
+      const spy = vi.spyOn(log, "info").mockImplementation(() => {
+        throw new Error("boom");
+      });
+      try {
+        const ctx = await loadNavGroupingContext(root);
+        expect(ctx.loaded).toBe(false);
+      } finally {
+        spy.mockRestore();
+      }
     });
   });
 
@@ -601,6 +894,405 @@ describe("nav-grouping", () => {
 
       expect(result.hasSubgroups).toBe(false);
       expect(result.pages[0].slug).toBe("doc");
+    });
+  });
+
+  describe("BMad catalog hybrid Agent Skills grouping", () => {
+    function agentSkillPages(): WikiPage[] {
+      return [
+        wikiPage({
+          slug: "agent-pm",
+          title: "PM Wiki Title",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/bmad-agent-pm/SKILL.md",
+        }),
+        wikiPage({
+          slug: "brainstorm",
+          title: "Brainstorm Wiki",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/bmad-brainstorming/SKILL.md",
+        }),
+        wikiPage({
+          slug: "create-story",
+          title: "Create Story Wiki",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/bmad-create-story/SKILL.md",
+        }),
+        wikiPage({
+          slug: "help",
+          title: "Help Wiki",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/bmad-help/SKILL.md",
+        }),
+        wikiPage({
+          slug: "legacy",
+          title: "Legacy Wiki",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/bmad-legacy-skill/SKILL.md",
+        }),
+        wikiPage({
+          slug: "uncat",
+          title: "Zebra Uncatalogued",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/bmad-skill/SKILL.md",
+        }),
+        wikiPage({
+          slug: "uncat-b",
+          title: "Alpha Uncatalogued",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/mystery-skill/SKILL.md",
+        }),
+      ];
+    }
+
+    it("uses hybrid order, labels, and L4 titles when catalog is loaded", async () => {
+      const ctx = await loadNavGroupingContext(SAMPLE_PROJECT);
+      // Duplicate pages so each hybrid bucket has ≥2 members (avoids singleton promotion).
+      const pages = [
+        ...agentSkillPages(),
+        wikiPage({
+          slug: "agent-pm-2",
+          title: "PM Second",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/bmad-agent-pm/README.md",
+        }),
+        wikiPage({
+          slug: "brainstorm-2",
+          title: "Brainstorm Second",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/bmad-brainstorming/README.md",
+        }),
+        wikiPage({
+          slug: "create-story-2",
+          title: "Create Story Second",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/bmad-create-story/README.md",
+        }),
+        wikiPage({
+          slug: "help-2",
+          title: "Help Second",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/bmad-help/README.md",
+        }),
+        wikiPage({
+          slug: "legacy-2",
+          title: "Legacy Second",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/bmad-legacy-skill/README.md",
+        }),
+      ];
+
+      const result = buildCategoryNavSubgroups(pages, {
+        categoryKey: "agent-skills",
+        indexBuild: true,
+        context: ctx,
+      });
+
+      expect(result.subgroups.map((sg) => sg.key)).toEqual([
+        "your-team",
+        "analysis",
+        "implementation",
+        "core-utilities",
+        "deprecated",
+        "uncatalogued",
+      ]);
+      expect(result.subgroups.map((sg) => sg.label)).toEqual([
+        "Your team",
+        "Analysis",
+        "Implementation",
+        "Core utilities",
+        "Deprecated",
+        "Uncatalogued",
+      ]);
+
+      const yourTeam = result.subgroups.find((sg) => sg.key === "your-team")!;
+      expect(
+        yourTeam.pages.every((p) => p.title === "📋 John — Product Manager"),
+      ).toBe(true);
+
+      const analysis = result.subgroups.find((sg) => sg.key === "analysis")!;
+      expect(
+        analysis.pages.every((p) => p.title === "Brainstorm Project"),
+      ).toBe(true);
+
+      const impl = result.subgroups.find((sg) => sg.key === "implementation")!;
+      expect(impl.pages.every((p) => p.title === "Create Story")).toBe(true);
+
+      const core = result.subgroups.find((sg) => sg.key === "core-utilities")!;
+      expect(core.pages.every((p) => p.title === "BMad Help")).toBe(true);
+
+      const deprecated = result.subgroups.find(
+        (sg) => sg.key === "deprecated",
+      )!;
+      expect(deprecated.pages.map((p) => p.slug).sort()).toEqual([
+        "legacy",
+        "legacy-2",
+      ]);
+
+      const uncat = result.subgroups.find((sg) => sg.key === "uncatalogued")!;
+      expect(uncat.pages.map((p) => p.title)).toEqual([
+        "Alpha Uncatalogued",
+        "Zebra Uncatalogued",
+      ]);
+    });
+
+    it("falls back to L0 path grouping when catalog is not loaded", () => {
+      const pages = [
+        wikiPage({
+          slug: "a",
+          title: "A",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/team-a/skill-a/SKILL.md",
+        }),
+        wikiPage({
+          slug: "b",
+          title: "B",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/team-a/skill-b/SKILL.md",
+        }),
+        wikiPage({
+          slug: "c",
+          title: "C",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/team-b/skill-c/SKILL.md",
+        }),
+      ];
+
+      const result = buildCategoryNavSubgroups(pages, {
+        categoryKey: "agent-skills",
+        indexBuild: true,
+        context: { loaded: false, skillsById: new Map() },
+      });
+
+      expect(result.subgroups.map((sg) => sg.label)).toEqual(["Team A"]);
+      expect(result.pages.map((p) => p.slug)).toEqual(["c"]);
+    });
+
+    it("ignores catalog context for non-agent-skills categories", async () => {
+      const ctx = await loadNavGroupingContext(SAMPLE_PROJECT);
+      const pages = [
+        wikiPage({
+          slug: "skill-a",
+          title: "Skill A",
+          category: "cursor-skills",
+          sourcePath: ".cursor/skills/team-a/skill-a/SKILL.md",
+        }),
+        wikiPage({
+          slug: "skill-b",
+          title: "Skill B",
+          category: "cursor-skills",
+          sourcePath: ".cursor/skills/team-a/skill-b/SKILL.md",
+        }),
+      ];
+
+      const result = buildCategoryNavSubgroups(pages, {
+        categoryKey: "cursor-skills",
+        indexBuild: true,
+        context: ctx,
+      });
+
+      expect(result.subgroups[0].label).toBe("Team A");
+      expect(result.subgroups.map((sg) => sg.key)).not.toContain("your-team");
+    });
+
+    it("promotes singleton hybrid subgroups", async () => {
+      const ctx = await loadNavGroupingContext(SAMPLE_PROJECT);
+      const pages = [
+        wikiPage({
+          slug: "agent-pm",
+          title: "PM",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/bmad-agent-pm/SKILL.md",
+        }),
+        wikiPage({
+          slug: "brainstorm",
+          title: "Brainstorm",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/bmad-brainstorming/SKILL.md",
+        }),
+      ];
+
+      const result = buildCategoryNavSubgroups(pages, {
+        categoryKey: "agent-skills",
+        indexBuild: true,
+        context: ctx,
+      });
+
+      expect(result.hasSubgroups).toBe(false);
+      expect(result.pages).toHaveLength(2);
+      expect(result.pages.map((p) => p.title)).toEqual(
+        expect.arrayContaining([
+          "📋 John — Product Manager",
+          "Brainstorm Project",
+        ]),
+      );
+    });
+
+    it("places paths outside .agents/skills into Uncatalogued under hybrid mode", () => {
+      const result = buildCategoryNavSubgroups(
+        [
+          wikiPage({
+            slug: "odd-a",
+            title: "Odd A",
+            category: "agent-skills",
+            sourcePath: "elsewhere/odd-a.md",
+          }),
+          wikiPage({
+            slug: "odd-b",
+            title: "Odd B",
+            category: "agent-skills",
+            sourcePath: "elsewhere/odd-b.md",
+          }),
+        ],
+        {
+          categoryKey: "agent-skills",
+          indexBuild: true,
+          context: { loaded: true, skillsById: new Map() },
+        },
+      );
+
+      expect(result.subgroups.map((sg) => sg.key)).toEqual(["uncatalogued"]);
+      expect(result.subgroups[0].pages.map((p) => p.slug)).toEqual([
+        "odd-a",
+        "odd-b",
+      ]);
+    });
+
+    it("maps planning, solutioning, and unrecognized CSV rows to hybrid buckets", () => {
+      const skillsById = new Map([
+        [
+          "plan-skill",
+          {
+            skillId: "plan-skill",
+            isAgent: false,
+            inCsv: true,
+            phase: "2-planning",
+            displayName: "Plan It",
+            module: "BMad Method",
+          },
+        ],
+        [
+          "solution-skill",
+          {
+            skillId: "solution-skill",
+            isAgent: false,
+            inCsv: true,
+            phase: "3-solutioning",
+            displayName: "Solve It",
+            module: "BMad Method",
+          },
+        ],
+        [
+          "weird-skill",
+          {
+            skillId: "weird-skill",
+            isAgent: false,
+            inCsv: true,
+            phase: "9-unknown",
+            displayName: "Weird",
+            module: "BMad Method",
+          },
+        ],
+      ]);
+
+      const result = buildCategoryNavSubgroups(
+        [
+          wikiPage({
+            slug: "plan",
+            title: "Plan Wiki",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/plan-skill/SKILL.md",
+          }),
+          wikiPage({
+            slug: "plan-2",
+            title: "Plan Wiki 2",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/plan-skill/README.md",
+          }),
+          wikiPage({
+            slug: "sol",
+            title: "Sol Wiki",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/solution-skill/SKILL.md",
+          }),
+          wikiPage({
+            slug: "sol-2",
+            title: "Sol Wiki 2",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/solution-skill/README.md",
+          }),
+          wikiPage({
+            slug: "weird",
+            title: "Weird Wiki",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/weird-skill/SKILL.md",
+          }),
+          wikiPage({
+            slug: "weird-2",
+            title: "Weird Wiki 2",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/weird-skill/README.md",
+          }),
+        ],
+        {
+          categoryKey: "agent-skills",
+          indexBuild: true,
+          context: { loaded: true, skillsById },
+        },
+      );
+
+      expect(result.subgroups.map((sg) => sg.key)).toEqual([
+        "planning",
+        "solutioning",
+        "core-utilities",
+      ]);
+      expect(result.subgroups[0].pages[0].title).toBe("Plan It");
+      expect(result.subgroups[1].pages[0].title).toBe("Solve It");
+      expect(result.subgroups[2].pages[0].title).toBe("Weird");
+    });
+
+    it("omits agent icon when missing without breaking name—title format", async () => {
+      const root = await makeTempProject();
+      await fs.mkdir(path.join(root, "_bmad", "_config"), { recursive: true });
+      await fs.mkdir(path.join(root, ".agents", "skills", "bmad-agent-ux"), {
+        recursive: true,
+      });
+      await fs.writeFile(
+        path.join(root, "_bmad", "_config", "bmad-help.csv"),
+        [
+          "module,skill,display-name,menu-code,description,action,args,phase,preceded-by,followed-by,required,output-location,outputs",
+          "BMad Method,_meta,,,,,,,,,false,,",
+        ].join("\n"),
+      );
+      await fs.writeFile(
+        path.join(root, ".agents", "skills", "bmad-agent-ux", "customize.toml"),
+        '[agent]\nname = "Sally"\ntitle = "UX Designer"\n',
+      );
+
+      const ctx = await loadNavGroupingContext(root);
+      const result = buildCategoryNavSubgroups(
+        [
+          wikiPage({
+            slug: "ux",
+            title: "UX Wiki",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/bmad-agent-ux/SKILL.md",
+          }),
+          wikiPage({
+            slug: "ux-2",
+            title: "UX Wiki 2",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/bmad-agent-ux/extra.md",
+          }),
+        ],
+        {
+          categoryKey: "agent-skills",
+          indexBuild: true,
+          context: ctx,
+        },
+      );
+
+      expect(result.subgroups[0].pages[0].title).toBe("Sally — UX Designer");
     });
   });
 });

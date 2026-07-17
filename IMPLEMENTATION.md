@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
-**Last updated:** 2026-07-16
-**Current position:** **E20 landing copy-to-clipboard** — ready for review
-**Test count:** 453 passing
+**Last updated:** 2026-07-17
+**Current position:** **E23 S23.2 BMad catalog enrichment** — ready for review
+**Test count:** 504 passing
 
 ## Deliverables
 
@@ -155,6 +155,9 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
   - [x] S20.2 — Responsive, accessible landing-page implementation _(review)_
   - [x] S20.3 — specwiki.ai hosting and release workflow _(review)_
   - [x] Landing copy-to-clipboard on quick start + agent prompt _(review)_
+- [ ] **E23 — Navigation Drawer Hierarchy** — path grouping, BMad catalog, nested disclosure, portal/search parity _(in progress)_
+  - [x] S23.1 — Nav grouping module + path-segment baseline _(review)_
+  - [x] S23.2 — BMad catalog enrichment (CSV/TOML hybrid Agent Skills) _(review)_
 
 ## HARNESS §13 Deliverables Checklist
 
@@ -269,4 +272,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-16 | Security         | `fix(generate): confine --output to project root` — shared `resolveOutputWithinProject` with symlink checks (parity with `open`); README Security section; generate/CLI/paths regression tests; 442 tests total                                                                                                                                                                                                              | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-16 | E20 copy buttons | `feat(site): add copy-to-clipboard on landing quick start and agent prompt` — per-snippet Copy next to `# Try without installing` / `# Or install globally` plus agent-prompt Copy; clipboard API with execCommand fallback on rejection; aria-live status + aria-label feedback; timer race fix; progressive-enhancement `landing.js`; 453 tests total; no src/ changes                                                     | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-17 | E23 S23.1        | `feat(output): nav grouping module with path-segment baseline` — `nav-grouping.ts` L0/L3 inference, singleton promotion, 2-level depth cap; `buildNavCategories` subgroup view model; static subgroup headings in Mustache; `projectRoot` threaded through `writeHtmlWiki`; enriched sample-project fixture; 485 tests total; `src/output/html/` 96.73% coverage                                                             | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
+| 2026-07-17 | E23 S23.2        | `feat(output): BMad catalog enrichment for Agent Skills nav` — CSV/TOML load into `NavGroupingContext`; hybrid Your team → SDLC → Core/Deprecated/Uncatalogued grouping with L4 display titles; realpath catalog confinement + DEPRECATED multi-row merge; sample-project fixtures; 504 tests; `src/output/html/` ≥90%                                                                                                       | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | _template_ | _E?_ S?_         | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                                              |

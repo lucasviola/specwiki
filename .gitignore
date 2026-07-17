@@ -10,4 +10,8 @@ coverage/
 _bmad/
 .agents/skills/bmad-*/
 
+# Exception: sample-project catalog fixtures for S23.2 nav-grouping tests
+!tests/fixtures/sample-project/_bmad/
+!tests/fixtures/sample-project/_bmad/**
+
 # Keep tracked: _bmad-output/ (planning & implementation specs), docs/ (project knowledge)

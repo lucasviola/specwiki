@@ -106,10 +106,10 @@ describe("generateWiki", () => {
     expect(result.specCount).toBe(result.pages.length);
     expect(result.outputDir).toBe(path.resolve(projectRoot, outputDir));
     expect(result.pages.map((page) => page.sourcePath).slice(0, 4)).toEqual([
-      ".agents/skills/bmad-skill/SKILL.md",
-      "_bmad-output/implementation-artifacts/23-1-nav-grouping-module-path-baseline.md",
-      "_bmad-output/implementation-artifacts/23-2-bmad-catalog-enrichment.md",
-      "_bmad-output/planning-artifacts/discovery/prd-a.md",
+      ".agents/skills/bmad-agent-pm/SKILL.md",
+      ".agents/skills/bmad-brainstorming/SKILL.md",
+      ".agents/skills/bmad-create-story/SKILL.md",
+      ".agents/skills/bmad-help/SKILL.md",
     ]);
     expect(Object.keys(result.pages[0] ?? {})).toEqual([
       "slug",
@@ -554,6 +554,11 @@ describe("listSpecs", () => {
         {
           "name": "agent-skills",
           "relativePaths": [
+            ".agents/skills/bmad-agent-pm/SKILL.md",
+            ".agents/skills/bmad-brainstorming/SKILL.md",
+            ".agents/skills/bmad-create-story/SKILL.md",
+            ".agents/skills/bmad-help/SKILL.md",
+            ".agents/skills/bmad-legacy-skill/SKILL.md",
             ".agents/skills/bmad-skill/SKILL.md",
           ],
         },
