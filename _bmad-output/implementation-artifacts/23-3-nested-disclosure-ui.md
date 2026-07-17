@@ -167,14 +167,16 @@ Cursor Grok 4.5
 
 - 2026-07-17: Story created from epic S23.3 + 23-IMP-2 owner confirmation; status in-progress.
 - 2026-07-17: Nested disclosure UI implemented; status → review; §0.2.5/§0.2.6 recorded.
+- 2026-07-17: Applied review patch — escape `data-subgroup` via `{{key}}` in both nav-subgroup partials; tests assert `&#x2F;`.
 
 ## Senior Developer Review (AI)
 
 - **Date:** 2026-07-17
-- **Outcome:** Changes Requested (1 Patch)
+- **Outcome:** Approve (escape patch applied; re-review clean)
 - **Reviewer model:** claude-sonnet-5-thinking-high (Bugbot)
 - **QA model:** claude-sonnet-5-thinking-high (generalPurpose)
 
 ### Action Items
 
-- [ ] [Patch][Med] Escape `data-subgroup` key — use Mustache `{{key}}` (or sanitize) instead of `{{{key}}}` in both nav-subgroup partials; update renderer tests for escaped `/` (`&#x2F;`). Aligns with `data-category="{{key}}"`.
+- [x] [Patch][Med] Escape `data-subgroup` key — use Mustache `{{key}}` (or sanitize) instead of `{{{key}}}` in both nav-subgroup partials; update renderer tests for escaped `/` (`&#x2F;`). Aligns with `data-category="{{key}}"`.
+  - Re-review (2026-07-17): Bugbot found no bugs on the escape patch diff.
