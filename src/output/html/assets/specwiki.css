@@ -501,6 +501,35 @@ body.specwiki {
   margin-top: 0.25rem;
 }
 
+.category-nav-subgroup-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.category-nav-subgroup-group > summary::-webkit-details-marker {
+  display: none;
+}
+
+.category-nav-subgroup-group > summary::marker {
+  content: "";
+}
+
+.category-nav-subgroup-group > summary::before {
+  content: "›";
+  color: var(--color-base--subtle);
+  font-size: 0.875rem;
+  line-height: 1;
+  transform: rotate(0deg);
+  transition: transform 160ms ease-out;
+}
+
+.category-nav-subgroup-group[open] > summary::before {
+  transform: rotate(90deg);
+}
+
 .category-nav-subgroup-label {
   display: block;
   font-size: 0.6875rem;
@@ -509,6 +538,12 @@ body.specwiki {
   margin: 0 0 0.1875rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.category-nav-subgroup-summary .category-nav-subgroup-label {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
 }
 
 .category-nav-subgroup-pages {
@@ -946,7 +981,8 @@ body.specwiki {
 
 @media (prefers-reduced-motion: reduce) {
   .specwiki-nav-drawer,
-  .category-nav-group > summary::before {
+  .category-nav-group > summary::before,
+  .category-nav-subgroup-group > summary::before {
     transition: none;
   }
 }

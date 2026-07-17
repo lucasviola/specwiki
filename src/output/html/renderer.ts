@@ -71,20 +71,39 @@ export class HtmlRenderer {
   private readonly layoutTemplate: string;
   private readonly indexTemplate: string;
   private readonly articleTemplate: string;
+  private readonly partials: Record<string, string>;
 
-  private constructor(layout: string, index: string, article: string) {
+  private constructor(
+    layout: string,
+    index: string,
+    article: string,
+    partials: Record<string, string>,
+  ) {
     this.layoutTemplate = layout;
     this.indexTemplate = index;
     this.articleTemplate = article;
+    this.partials = partials;
   }
 
   static async create(): Promise<HtmlRenderer> {
-    const [layout, index, article] = await Promise.all([
-      fs.readFile(path.join(TEMPLATES_DIR, "layout.mustache"), "utf-8"),
-      fs.readFile(path.join(TEMPLATES_DIR, "index.mustache"), "utf-8"),
-      fs.readFile(path.join(TEMPLATES_DIR, "article.mustache"), "utf-8"),
-    ]);
-    return new HtmlRenderer(layout, index, article);
+    const [layout, index, article, navSubgroup, navSubgroupNested] =
+      await Promise.all([
+        fs.readFile(path.join(TEMPLATES_DIR, "layout.mustache"), "utf-8"),
+        fs.readFile(path.join(TEMPLATES_DIR, "index.mustache"), "utf-8"),
+        fs.readFile(path.join(TEMPLATES_DIR, "article.mustache"), "utf-8"),
+        fs.readFile(
+          path.join(TEMPLATES_DIR, "partials", "nav-subgroup.mustache"),
+          "utf-8",
+        ),
+        fs.readFile(
+          path.join(TEMPLATES_DIR, "partials", "nav-subgroup-nested.mustache"),
+          "utf-8",
+        ),
+      ]);
+    return new HtmlRenderer(layout, index, article, {
+      "nav-subgroup": navSubgroup,
+      "nav-subgroup-nested": navSubgroupNested,
+    });
   }
 
   renderIndex(
@@ -120,14 +139,18 @@ export class HtmlRenderer {
     const pageCount = pages.length;
     const allPages = buildAllPagesList(pages);
     const hasRootIntro = Boolean(indexMeta.rootIntro);
-    const body = Mustache.render(this.indexTemplate, {
-      categories,
-      pageCount,
-      pageCountLabel: pageCount === 1 ? "spec file" : "spec files",
-      allPages,
-      hasRootIntro,
-      rootIntroHtml: hasRootIntro ? renderMarkdown(indexMeta.rootIntro!) : "",
-    });
+    const body = Mustache.render(
+      this.indexTemplate,
+      {
+        categories,
+        pageCount,
+        pageCountLabel: pageCount === 1 ? "spec file" : "spec files",
+        allPages,
+        hasRootIntro,
+        rootIntroHtml: hasRootIntro ? renderMarkdown(indexMeta.rootIntro!) : "",
+      },
+      this.partials,
+    );
     return Mustache.render(this.layoutTemplate, {
       pageTitle: "Spec Wiki",
       body,
@@ -155,18 +178,22 @@ export class HtmlRenderer {
     const tocEntries = buildTocEntries(page.sections);
     const breadcrumbs = buildBreadcrumbs(page, categoryLabel, allPages);
 
-    const body = Mustache.render(this.articleTemplate, {
-      categories,
-      breadcrumbs,
-      title: page.title,
-      categoryLabel,
-      sourcePath: page.sourcePath,
-      description: page.description,
-      hasDescription: Boolean(page.description),
-      content: contentHtml,
-      tocEntries,
-      hasToc: tocEntries.length > 0,
-    });
+    const body = Mustache.render(
+      this.articleTemplate,
+      {
+        categories,
+        breadcrumbs,
+        title: page.title,
+        categoryLabel,
+        sourcePath: page.sourcePath,
+        description: page.description,
+        hasDescription: Boolean(page.description),
+        content: contentHtml,
+        tocEntries,
+        hasToc: tocEntries.length > 0,
+      },
+      this.partials,
+    );
 
     return Mustache.render(this.layoutTemplate, {
       pageTitle: page.title,
