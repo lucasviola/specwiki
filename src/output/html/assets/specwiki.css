@@ -751,7 +751,6 @@ body.specwiki {
 
 @media (min-width: 1200px) {
   .specwiki-article-body .mw-parser-output {
-    display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 70ch) minmax(0, 1fr);
   }
 
