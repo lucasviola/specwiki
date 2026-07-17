@@ -16,6 +16,33 @@ describe("copy-html-assets", () => {
     );
 
     expect(source).toContain('copyDir("assets", "assets")');
+    expect(source).toContain("withFileTypes: true");
+    expect(source).toContain("entry.isDirectory()");
     expect(source).not.toContain("highlight.js/styles/github.min.css");
+  });
+
+  it("copies nested Mustache partials into dist after build script runs", async () => {
+    const { execFileSync } = await import("node:child_process");
+    execFileSync("node", ["scripts/copy-html-assets.mjs"], {
+      cwd: projectRoot,
+      stdio: "pipe",
+    });
+
+    expect(
+      fs.existsSync(
+        path.join(
+          projectRoot,
+          "dist/output/html/templates/partials/nav-subgroup.mustache",
+        ),
+      ),
+    ).toBe(true);
+    expect(
+      fs.existsSync(
+        path.join(
+          projectRoot,
+          "dist/output/html/templates/partials/nav-subgroup-nested.mustache",
+        ),
+      ),
+    ).toBe(true);
   });
 });

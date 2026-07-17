@@ -410,6 +410,12 @@ describe("HtmlRenderer", () => {
     expect(css).toMatch(
       /\.category-nav-subgroup-pages\s*>\s*li\s*>\s*a\s*\{[^}]*color:\s*var\(--color-base\)/,
     );
+    expect(css).toContain(".category-nav-subgroup-group");
+    expect(css).toContain(".category-nav-subgroup-summary");
+    expect(css).toMatch(/\.category-nav-subgroup-group\s*>\s*summary::before/);
+    expect(css).toMatch(
+      /\.category-nav-subgroup-group\[open\]\s*>\s*summary::before/,
+    );
   });
 
   it("reads highlight theme CSS from bundled assets or node_modules", async () => {
@@ -543,7 +549,7 @@ describe("buildNavCategories subgroups", () => {
     expect(categories[0].label).toBe("custom-category");
   });
 
-  it("renders static subgroup headings in nav without nested details", () => {
+  it("renders nested collapsible subgroup details closed on index", () => {
     const pages = [
       samplePage({
         slug: "skill-a",
@@ -557,17 +563,86 @@ describe("buildNavCategories subgroups", () => {
         category: "cursor-skills",
         sourcePath: ".cursor/skills/team-a/skill-b/SKILL.md",
       }),
+      samplePage({
+        slug: "skill-c",
+        title: "Skill C",
+        category: "cursor-skills",
+        sourcePath: ".cursor/skills/team-b/skill-c/SKILL.md",
+      }),
+      samplePage({
+        slug: "skill-d",
+        title: "Skill D",
+        category: "cursor-skills",
+        sourcePath: ".cursor/skills/team-b/skill-d/SKILL.md",
+      }),
     ];
 
     const html = renderer.renderIndex(pages, emptyIndexMeta(), {
       navGroupingContext: { loaded: false },
     });
 
+    expect(html).toContain(
+      '<details class="category-nav-subgroup-group" data-subgroup="team-a"',
+    );
+    expect(html).toContain(
+      '<details class="category-nav-subgroup-group" data-subgroup="team-b"',
+    );
+    expect(html).not.toMatch(/data-subgroup="team-a"[^>]*\sopen/);
+    expect(html).not.toMatch(/data-subgroup="team-b"[^>]*\sopen/);
+    expect(html).toContain('<summary class="category-nav-subgroup-summary">');
     expect(html).toContain('class="category-nav-subgroup-label"');
     expect(html).toContain("Team A");
-    expect(html).not.toMatch(/category-nav-subgroup[\s\S]*?<details/);
+    expect(html).toContain(
+      '<span class="category-nav-count" aria-label="2 pages">2</span>',
+    );
     expect(html).toContain('href="skill-a.html"');
     expect(html).toContain('href="skill-b.html"');
+  });
+
+  it("opens the active subgroup chain on article views", () => {
+    const pages = [
+      samplePage({
+        slug: "story-19",
+        title: "Story 19",
+        category: "bmad-output",
+        sourcePath:
+          "_bmad-output/implementation-artifacts/19-5-collapsible-category-navigation.md",
+      }),
+      samplePage({
+        slug: "story-19b",
+        title: "Story 19b",
+        category: "bmad-output",
+        sourcePath: "_bmad-output/implementation-artifacts/19-6-other-story.md",
+      }),
+      samplePage({
+        slug: "story-23",
+        title: "Story 23",
+        category: "bmad-output",
+        sourcePath:
+          "_bmad-output/implementation-artifacts/23-1-nav-grouping-module-path-baseline.md",
+      }),
+      samplePage({
+        slug: "story-23b",
+        title: "Story 23b",
+        category: "bmad-output",
+        sourcePath:
+          "_bmad-output/implementation-artifacts/23-2-bmad-catalog-enrichment.md",
+      }),
+    ];
+
+    const html = renderer.renderArticle(pages[0], pages, "<p>Body</p>", {
+      navGroupingContext: { loaded: false },
+    });
+
+    expect(html).toMatch(/data-subgroup="implementation-stories"[^>]*\sopen/);
+    expect(html).toMatch(
+      /data-subgroup="implementation-stories\/epic-19"[^>]*\sopen/,
+    );
+    expect(html).not.toMatch(
+      /data-subgroup="implementation-stories\/epic-23"[^>]*\sopen/,
+    );
+    expect(html).toContain("category-nav-subgroup-nested");
+    expect(html).toContain('href="story-19.html"');
   });
 
   it("exposes hybrid Agent Skills subgroup labels when catalog context is loaded", () => {

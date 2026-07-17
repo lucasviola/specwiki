@@ -22,24 +22,7 @@
           <li><a href="{{href}}">{{title}}</a></li>
           {{/pages}}
           {{#subgroups}}
-          <li class="category-nav-subgroup">
-            <span class="category-nav-subgroup-label">{{label}}</span>
-            <ul class="category-nav-subgroup-pages">
-              {{#pages}}
-              <li><a href="{{href}}">{{title}}</a></li>
-              {{/pages}}
-              {{#subgroups}}
-              <li class="category-nav-subgroup category-nav-subgroup-nested">
-                <span class="category-nav-subgroup-label">{{label}}</span>
-                <ul class="category-nav-subgroup-pages">
-                  {{#pages}}
-                  <li><a href="{{href}}">{{title}}</a></li>
-                  {{/pages}}
-                </ul>
-              </li>
-              {{/subgroups}}
-            </ul>
-          </li>
+          {{> nav-subgroup}}
           {{/subgroups}}
         </ul>
       </details>
@@ -52,24 +35,7 @@
           <li><a href="{{href}}">{{title}}</a></li>
           {{/pages}}
           {{#subgroups}}
-          <li class="category-nav-subgroup">
-            <span class="category-nav-subgroup-label">{{label}}</span>
-            <ul class="category-nav-subgroup-pages">
-              {{#pages}}
-              <li><a href="{{href}}">{{title}}</a></li>
-              {{/pages}}
-              {{#subgroups}}
-              <li class="category-nav-subgroup category-nav-subgroup-nested">
-                <span class="category-nav-subgroup-label">{{label}}</span>
-                <ul class="category-nav-subgroup-pages">
-                  {{#pages}}
-                  <li><a href="{{href}}">{{title}}</a></li>
-                  {{/pages}}
-                </ul>
-              </li>
-              {{/subgroups}}
-            </ul>
-          </li>
+          {{> nav-subgroup}}
           {{/subgroups}}
         </ul>
       </div>

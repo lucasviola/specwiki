@@ -11,8 +11,17 @@ async function copyDir(srcSubdir, destSubdir) {
   const destPath = path.join(distHtml, destSubdir);
   await fs.mkdir(destPath, { recursive: true });
 
-  for (const entry of await fs.readdir(srcPath)) {
-    await fs.copyFile(path.join(srcPath, entry), path.join(destPath, entry));
+  for (const entry of await fs.readdir(srcPath, { withFileTypes: true })) {
+    const from = path.join(srcPath, entry.name);
+    const to = path.join(destPath, entry.name);
+    if (entry.isDirectory()) {
+      await copyDir(
+        path.join(srcSubdir, entry.name),
+        path.join(destSubdir, entry.name),
+      );
+    } else {
+      await fs.copyFile(from, to);
+    }
   }
 }
 

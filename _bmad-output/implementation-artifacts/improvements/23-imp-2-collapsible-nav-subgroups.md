@@ -5,7 +5,7 @@
 **Source:** Owner review of S23.2 dogfood (drawer hierarchy)  
 **Epic:** E23 — Navigation Drawer Hierarchy  
 **Related:** **S23.3** (already backlog — Nested disclosure UI)  
-**Status:** logged — maps to existing story S23.3
+**Status:** implemented via S23.3 (`23-3-nested-disclosure-ui`) — review
 
 ---
 
@@ -41,11 +41,11 @@ This report is an **owner confirmation** that S23.3 is wanted from dogfood — n
 
 ## Acceptance sketch (S23.3)
 
-- [ ] Nested `<details>` (or equivalent) for subgroups in article + index nav
-- [ ] CSS tokens / chevrons / optional page-count badges for subgroups
-- [ ] Active route expands the correct subgroup chain; other subgroups stay closed
-- [ ] Works in desktop sidebar and mobile drawer (same `.category-nav` tree)
-- [ ] No new runtime deps; Mustache-escaped labels; renderer/CSS tests green
+- [x] Nested `<details>` (or equivalent) for subgroups in article + index nav
+- [x] CSS tokens / chevrons / optional page-count badges for subgroups
+- [x] Active route expands the correct subgroup chain; other subgroups stay closed
+- [x] Works in desktop sidebar and mobile drawer (same `.category-nav` tree)
+- [x] No new runtime deps; Mustache-escaped labels; renderer/CSS tests green
 
 ## Non-goals
 
