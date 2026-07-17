@@ -169,6 +169,7 @@ export async function generateWiki(options: GenerateOptions): Promise<void> {
     const written = await writeWiki(resolvedOutput, wiki);
     const htmlWritten = await writeHtmlWiki(resolvedOutput, wiki, {
       noSearch: options.noSearch,
+      projectRoot: resolvedProjectRoot,
     });
     if (options.emitLlmsTxt) {
       await writeLlmsTxt(resolvedOutput, wiki.pages);

@@ -491,6 +491,54 @@ body.specwiki {
   text-decoration: underline;
 }
 
+/* Subgroup labels are structural (not links): muted section chrome.
+   Leaf page links keep --color-base so parents and children read apart. */
+.category-nav-subgroup {
+  margin-top: 0.5rem;
+}
+
+.category-nav-subgroup:first-child {
+  margin-top: 0.25rem;
+}
+
+.category-nav-subgroup-label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-base--subtle);
+  margin: 0 0 0.1875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.category-nav-subgroup-pages {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 0.625rem;
+  border-left: 1px solid var(--border-color-divider);
+}
+
+.category-nav-subgroup-pages > li > a {
+  color: var(--color-base);
+}
+
+.category-nav-subgroup-nested {
+  margin-top: 0.375rem;
+}
+
+.category-nav-subgroup-nested .category-nav-subgroup-label {
+  font-weight: var(--font-weight-bold);
+  font-size: 0.6875rem;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--color-base--subtle);
+}
+
+.category-nav-subgroup-nested .category-nav-subgroup-pages {
+  border-left-color: var(--border-color-divider);
+  padding-left: 0.5rem;
+}
+
 .specwiki-center {
   padding: var(--padding-horizontal-base);
   min-width: 0;

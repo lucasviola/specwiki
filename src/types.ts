@@ -97,6 +97,7 @@ export interface InitOptions {
 
 export interface WriteHtmlWikiOptions {
   noSearch?: boolean;
+  projectRoot?: string;
 }
 
 export interface DiscoverOptions {

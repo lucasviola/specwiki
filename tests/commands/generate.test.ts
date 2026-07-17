@@ -107,9 +107,9 @@ describe("generateWiki", () => {
     expect(result.outputDir).toBe(path.resolve(projectRoot, outputDir));
     expect(result.pages.map((page) => page.sourcePath).slice(0, 4)).toEqual([
       ".agents/skills/bmad-skill/SKILL.md",
-      "_bmad-output/planning/artifact.md",
-      ".cursor/rules/example.mdc",
-      ".cursor/skills/my-skill/SKILL.md",
+      "_bmad-output/implementation-artifacts/23-1-nav-grouping-module-path-baseline.md",
+      "_bmad-output/implementation-artifacts/23-2-bmad-catalog-enrichment.md",
+      "_bmad-output/planning-artifacts/discovery/prd-a.md",
     ]);
     expect(Object.keys(result.pages[0] ?? {})).toEqual([
       "slug",
@@ -276,6 +276,25 @@ describe("generateWiki", () => {
         readmeIndexCount: 2,
       }),
     );
+  });
+
+  it("groups BMAD Output and Cursor Skills in HTML nav subgroups", async () => {
+    const projectRoot = fixtureRoot;
+    const outputDir = ignoredFixtureOutput(projectRoot, "nav-subgroups");
+
+    await generateWiki({
+      projectRoot,
+      outputDir,
+    });
+
+    const htmlIndex = await fs.readFile(
+      path.join(projectRoot, outputDir, "html", "index.html"),
+      "utf-8",
+    );
+
+    expect(htmlIndex).toContain('class="category-nav-subgroup-label"');
+    expect(htmlIndex).toContain("Implementation Stories");
+    expect(htmlIndex).toContain("Team A");
   });
 
   it("emits output.write and generate.summary on stderr when verbose is enabled", async () => {
@@ -541,6 +560,10 @@ describe("listSpecs", () => {
         {
           "name": "bmad-output",
           "relativePaths": [
+            "_bmad-output/implementation-artifacts/23-1-nav-grouping-module-path-baseline.md",
+            "_bmad-output/implementation-artifacts/23-2-bmad-catalog-enrichment.md",
+            "_bmad-output/planning-artifacts/discovery/prd-a.md",
+            "_bmad-output/planning-artifacts/discovery/prd-b.md",
             "_bmad-output/planning/artifact.md",
           ],
         },
@@ -554,6 +577,8 @@ describe("listSpecs", () => {
           "name": "cursor-skills",
           "relativePaths": [
             ".cursor/skills/my-skill/SKILL.md",
+            ".cursor/skills/team-a/skill-one/SKILL.md",
+            ".cursor/skills/team-a/skill-two/SKILL.md",
           ],
         },
         {

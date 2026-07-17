@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { log } from "../../../src/core/Logger.js";
 import {
   HtmlRenderer,
+  buildNavCategories,
   getHtmlRenderer,
   resetHtmlRendererCache,
 } from "../../../src/output/html/renderer.js";
@@ -403,6 +404,12 @@ describe("HtmlRenderer", () => {
     expect(css).toContain(".category-nav");
     expect(css).toContain(".infobox");
     expect(css).toContain(".toc");
+    expect(css).toMatch(
+      /\.category-nav-subgroup-label\s*\{[^}]*color:\s*var\(--color-base--subtle\)/,
+    );
+    expect(css).toMatch(
+      /\.category-nav-subgroup-pages\s*>\s*li\s*>\s*a\s*\{[^}]*color:\s*var\(--color-base\)/,
+    );
   });
 
   it("reads highlight theme CSS from bundled assets or node_modules", async () => {
@@ -434,6 +441,133 @@ describe("HtmlRenderer", () => {
 
     await expect(HtmlRenderer.bundleCss()).rejects.toThrow("missing css");
     readSpy.mockRestore();
+  });
+});
+
+describe("buildNavCategories subgroups", () => {
+  let renderer: HtmlRenderer;
+
+  beforeEach(async () => {
+    resetHtmlRendererCache();
+    renderer = await HtmlRenderer.create();
+  });
+
+  afterEach(() => {
+    resetHtmlRendererCache();
+  });
+
+  it("exposes subgroup fields for nested cursor-skills paths", () => {
+    const pages: WikiPage[] = [
+      samplePage({
+        slug: "skill-a",
+        title: "Skill A",
+        category: "cursor-skills",
+        sourcePath: ".cursor/skills/team-a/skill-a/SKILL.md",
+      }),
+      samplePage({
+        slug: "skill-b",
+        title: "Skill B",
+        category: "cursor-skills",
+        sourcePath: ".cursor/skills/team-a/skill-b/SKILL.md",
+      }),
+    ];
+
+    const categories = buildNavCategories(pages, undefined, undefined, {
+      navGroupingContext: { loaded: false },
+    });
+    const cursorSkills = categories.find((c) => c.key === "cursor-skills");
+
+    expect(cursorSkills?.hasSubgroups).toBe(true);
+    expect(cursorSkills?.subgroups?.[0].label).toBe("Team A");
+    expect(cursorSkills?.subgroups?.[0].pages).toHaveLength(2);
+  });
+
+  it("preserves flat pages for categories without nested segments", () => {
+    const pages = [
+      samplePage({ slug: "a", sourcePath: "FIRST.md" }),
+      samplePage({ slug: "b", sourcePath: "SECOND.md" }),
+    ];
+
+    const categories = buildNavCategories(pages, undefined, undefined, {
+      navGroupingContext: { loaded: false },
+    });
+    const root = categories.find((c) => c.key === "root");
+
+    expect(root?.hasSubgroups).toBeUndefined();
+    expect(root?.pages).toHaveLength(2);
+    expect(root?.collapsible).toBe(true);
+  });
+
+  it("keeps S19.5 category disclosure flags with subgroups present", () => {
+    const active = samplePage({
+      slug: "skill-a",
+      title: "Skill A",
+      category: "cursor-skills",
+      sourcePath: ".cursor/skills/team-a/skill-a/SKILL.md",
+    });
+    const pages = [
+      active,
+      samplePage({
+        slug: "skill-b",
+        title: "Skill B",
+        category: "cursor-skills",
+        sourcePath: ".cursor/skills/team-a/skill-b/SKILL.md",
+      }),
+    ];
+
+    const categories = buildNavCategories(pages, "cursor-skills", active, {
+      navGroupingContext: { loaded: false },
+    });
+    const cursorSkills = categories.find((c) => c.key === "cursor-skills");
+
+    expect(cursorSkills?.open).toBe(true);
+    expect(cursorSkills?.active).toBe(true);
+    expect(cursorSkills?.collapsible).toBe(true);
+    expect(cursorSkills?.subgroups?.[0].open).toBe(true);
+  });
+
+  it("uses raw category key as label for unknown categories", () => {
+    const pages = [
+      samplePage({
+        slug: "custom",
+        title: "Custom",
+        category: "custom-category",
+        sourcePath: "custom-category/doc.md",
+      }),
+    ];
+
+    const categories = buildNavCategories(pages, undefined, undefined, {
+      navGroupingContext: { loaded: false },
+    });
+
+    expect(categories[0].label).toBe("custom-category");
+  });
+
+  it("renders static subgroup headings in nav without nested details", () => {
+    const pages = [
+      samplePage({
+        slug: "skill-a",
+        title: "Skill A",
+        category: "cursor-skills",
+        sourcePath: ".cursor/skills/team-a/skill-a/SKILL.md",
+      }),
+      samplePage({
+        slug: "skill-b",
+        title: "Skill B",
+        category: "cursor-skills",
+        sourcePath: ".cursor/skills/team-a/skill-b/SKILL.md",
+      }),
+    ];
+
+    const html = renderer.renderIndex(pages, emptyIndexMeta(), {
+      navGroupingContext: { loaded: false },
+    });
+
+    expect(html).toContain('class="category-nav-subgroup-label"');
+    expect(html).toContain("Team A");
+    expect(html).not.toMatch(/category-nav-subgroup[\s\S]*?<details/);
+    expect(html).toContain('href="skill-a.html"');
+    expect(html).toContain('href="skill-b.html"');
   });
 });
 
