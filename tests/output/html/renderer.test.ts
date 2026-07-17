@@ -636,10 +636,10 @@ describe("buildNavCategories subgroups", () => {
 
     expect(html).toMatch(/data-subgroup="implementation-stories"[^>]*\sopen/);
     expect(html).toMatch(
-      /data-subgroup="implementation-stories\/epic-19"[^>]*\sopen/,
+      /data-subgroup="implementation-stories&#x2F;epic-19"[^>]*\sopen/,
     );
     expect(html).not.toMatch(
-      /data-subgroup="implementation-stories\/epic-23"[^>]*\sopen/,
+      /data-subgroup="implementation-stories&#x2F;epic-23"[^>]*\sopen/,
     );
     expect(html).toContain("category-nav-subgroup-nested");
     expect(html).toContain('href="story-19.html"');
