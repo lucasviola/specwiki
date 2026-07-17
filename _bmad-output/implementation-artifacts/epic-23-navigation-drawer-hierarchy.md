@@ -191,3 +191,12 @@ Add a **human-readable second level of grouping** inside every navigation drawer
 
 - **Phase C polish** (description subtitles on nav links, menu-code badges) — defer to follow-up story or E12 if desired
 - **Unified Skills category** (merge Agent + Cursor) — explicitly out of scope per owner decision
+
+## Owner review improvements (2026-07-17)
+
+Logged after S23.2 dogfood — reports under [`improvements/`](./improvements/):
+
+| ID                                                                    | Summary                                                                                                                | Disposition                                                       |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| [23-IMP-1](./improvements/23-imp-1-agent-skills-phase-group-dedup.md) | Agent Skills phase groups show duplicate identical titles; want BMAD Output–like hierarchy / one clear entry per skill | **S23.6** (`23-6-agent-skills-phase-group-dedup`) — review        |
+| [23-IMP-2](./improvements/23-imp-2-collapsible-nav-subgroups.md)      | Collapse/expand subgroups in the drawer                                                                                | **Maps to existing S23.3** (`23-3-nested-disclosure-ui`, backlog) |
