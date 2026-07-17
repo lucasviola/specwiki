@@ -21,6 +21,26 @@
           {{#pages}}
           <li><a href="{{href}}">{{title}}</a></li>
           {{/pages}}
+          {{#subgroups}}
+          <li class="category-nav-subgroup">
+            <span class="category-nav-subgroup-label">{{label}}</span>
+            <ul class="category-nav-subgroup-pages">
+              {{#pages}}
+              <li><a href="{{href}}">{{title}}</a></li>
+              {{/pages}}
+              {{#subgroups}}
+              <li class="category-nav-subgroup category-nav-subgroup-nested">
+                <span class="category-nav-subgroup-label">{{label}}</span>
+                <ul class="category-nav-subgroup-pages">
+                  {{#pages}}
+                  <li><a href="{{href}}">{{title}}</a></li>
+                  {{/pages}}
+                </ul>
+              </li>
+              {{/subgroups}}
+            </ul>
+          </li>
+          {{/subgroups}}
         </ul>
       </details>
       {{/collapsible}}
@@ -31,6 +51,26 @@
           {{#pages}}
           <li><a href="{{href}}">{{title}}</a></li>
           {{/pages}}
+          {{#subgroups}}
+          <li class="category-nav-subgroup">
+            <span class="category-nav-subgroup-label">{{label}}</span>
+            <ul class="category-nav-subgroup-pages">
+              {{#pages}}
+              <li><a href="{{href}}">{{title}}</a></li>
+              {{/pages}}
+              {{#subgroups}}
+              <li class="category-nav-subgroup category-nav-subgroup-nested">
+                <span class="category-nav-subgroup-label">{{label}}</span>
+                <ul class="category-nav-subgroup-pages">
+                  {{#pages}}
+                  <li><a href="{{href}}">{{title}}</a></li>
+                  {{/pages}}
+                </ul>
+              </li>
+              {{/subgroups}}
+            </ul>
+          </li>
+          {{/subgroups}}
         </ul>
       </div>
       {{/collapsible}}

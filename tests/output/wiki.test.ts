@@ -735,6 +735,43 @@ describe("writeHtmlWiki", () => {
     expect(indexHtml).toContain("Custom Spec Title");
   });
 
+  it("threads projectRoot into nav grouping during HTML generation", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-nav-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([
+      sampleSpec({
+        file: {
+          path: "/tmp/.cursor/skills/team-a/skill-a/SKILL.md",
+          relativePath: ".cursor/skills/team-a/skill-a/SKILL.md",
+          category: "cursor-skills",
+          title: "Skill A",
+        },
+        title: "Skill A",
+      }),
+      sampleSpec({
+        file: {
+          path: "/tmp/.cursor/skills/team-a/skill-b/SKILL.md",
+          relativePath: ".cursor/skills/team-a/skill-b/SKILL.md",
+          category: "cursor-skills",
+          title: "Skill B",
+        },
+        title: "Skill B",
+      }),
+    ]);
+
+    await writeHtmlWiki(outputDir, wiki, { projectRoot: "/tmp/project" });
+
+    const indexHtml = await fs.readFile(
+      path.join(outputDir, "html", "index.html"),
+      "utf-8",
+    );
+    expect(indexHtml).toContain('class="category-nav-subgroup-label"');
+    expect(indexHtml).toContain("Team A");
+  });
+
   it("writes html/assets/specwiki.css with bundled stylesheet", async () => {
     const outputDir = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-html-"),

@@ -7,6 +7,7 @@ import { log } from "../core/Logger.js";
 import { CATEGORY_LABELS } from "../config/patterns.js";
 import { renderMarkdown } from "../parse/markdown.js";
 import { getHtmlRenderer, HtmlRenderer } from "./html/renderer.js";
+import { loadNavGroupingContext } from "./html/nav-grouping.js";
 import {
   buildSearchIndex,
   serializeSearchIndexForInlineScript,
@@ -427,10 +428,23 @@ export async function writeHtmlWiki(
     ? { includeSearch: true, searchIndexJson }
     : { includeSearch: false };
 
+  const navGroupingContext = options.projectRoot
+    ? await loadNavGroupingContext(options.projectRoot)
+    : undefined;
+
+  const htmlRenderOptions = {
+    ...renderOptions,
+    navGroupingContext,
+  };
+
   let indexHtml: string;
   try {
     log.info("output.render", { kind: "index", slug: "index" });
-    indexHtml = renderer.renderIndex(wiki.pages, wiki.indexMeta, renderOptions);
+    indexHtml = renderer.renderIndex(
+      wiki.pages,
+      wiki.indexMeta,
+      htmlRenderOptions,
+    );
   } catch (err) {
     log.error("output.error", {
       relativePath: "html/index.html",
@@ -461,7 +475,7 @@ export async function writeHtmlWiki(
         page,
         wiki.pages,
         renderMarkdown(page.content),
-        renderOptions,
+        htmlRenderOptions,
       );
     } catch (err) {
       log.error("output.error", {

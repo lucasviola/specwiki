@@ -139,7 +139,7 @@ describe("discoverSpecs", () => {
     const specs = await discoverSpecs({ projectRoot: fixtureRoot });
 
     expect(specs.length).toBeGreaterThanOrEqual(5);
-    expect(specs.length).toBe(17);
+    expect(specs.length).toBe(23);
   });
 
   it("discovers and categorizes spec files in a project tree", async () => {

@@ -7,6 +7,11 @@ import { CATEGORY_LABELS } from "../../config/patterns.js";
 import { renderMarkdown } from "../../parse/markdown.js";
 import type { SpecSection, WikiIndexMeta, WikiPage } from "../../types.js";
 import { isReadmeFile } from "../readme-index.js";
+import {
+  buildCategoryNavSubgroups,
+  type NavGroupingContext,
+  type NavSubgroup,
+} from "./nav-grouping.js";
 
 const moduleDir = path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
@@ -32,6 +37,8 @@ interface NavCategory {
   collapsible: boolean;
   open: boolean;
   active: boolean;
+  hasSubgroups?: boolean;
+  subgroups?: NavSubgroup[];
   hasIntro?: boolean;
   introHtml?: string;
 }
@@ -51,6 +58,7 @@ interface BreadcrumbSegment {
 export interface HtmlRenderOptions {
   includeSearch?: boolean;
   searchIndexJson?: string;
+  navGroupingContext?: NavGroupingContext;
 }
 
 interface AllPagesEntry {
@@ -84,12 +92,27 @@ export class HtmlRenderer {
     indexMeta: WikiIndexMeta,
     renderOptions: HtmlRenderOptions = {},
   ): string {
-    const categories = buildNavCategories(pages)
+    const categories = buildNavCategories(
+      pages,
+      undefined,
+      undefined,
+      renderOptions,
+    )
       .filter((category) => categoryVisibleInIndex(pages, category.key))
       .map((category) => {
         const intro = indexMeta.categoryIntros.get(category.key);
+        const portalPages = category.hasSubgroups
+          ? pages
+              .filter(
+                (page) =>
+                  page.category === category.key &&
+                  !isReadmeFile(page.sourcePath),
+              )
+              .map((page) => toNavPage(page))
+          : category.pages;
         return {
           ...category,
+          portalPages,
           hasIntro: Boolean(intro),
           introHtml: intro ? renderMarkdown(intro.content) : "",
         };
@@ -122,7 +145,12 @@ export class HtmlRenderer {
   ): string {
     validateArticlePage(page);
 
-    const categories = buildNavCategories(allPages, page.category);
+    const categories = buildNavCategories(
+      allPages,
+      page.category,
+      page,
+      renderOptions,
+    );
     const categoryLabel = categoryLabelFor(page.category);
     const tocEntries = buildTocEntries(page.sections);
     const breadcrumbs = buildBreadcrumbs(page, categoryLabel, allPages);
@@ -198,9 +226,11 @@ function categoryVisibleInIndex(pages: WikiPage[], category: string): boolean {
   );
 }
 
-function buildNavCategories(
+export function buildNavCategories(
   pages: WikiPage[],
   activeCategory?: string,
+  activePage?: WikiPage,
+  renderOptions: HtmlRenderOptions = {},
 ): NavCategory[] {
   const byCategory = new Map<string, WikiPage[]>();
 
@@ -214,23 +244,52 @@ function buildNavCategories(
     categoryLabelFor(a).localeCompare(categoryLabelFor(b)),
   );
 
+  const context = renderOptions.navGroupingContext;
+
   return sortedKeys
     .filter((key) => categoryVisibleInIndex(pages, key))
-    .map((key) => ({
-      key,
-      label: categoryLabelFor(key),
-      anchor: categoryAnchor(key),
-      active: key === activeCategory,
-      open: key === activeCategory,
-      pageCount: (byCategory.get(key) ?? []).length,
-      collapsible: (byCategory.get(key) ?? []).length > 1,
-      pages: (byCategory.get(key) ?? []).map((page) => ({
-        title: page.title,
-        slug: page.slug,
-        href: `${page.slug}.html`,
-        sourcePath: page.sourcePath,
-      })),
-    }));
+    .map((key) => {
+      const categoryPages = byCategory.get(key) ?? [];
+      const isIndexBuild = !activePage;
+      const grouping = buildCategoryNavSubgroups(categoryPages, {
+        categoryKey: key,
+        activePageSlug: activePage?.slug,
+        activeSourcePath: activePage?.sourcePath,
+        indexBuild: isIndexBuild,
+        context,
+      });
+
+      const navPages = grouping.hasSubgroups
+        ? grouping.pages
+        : categoryPages.map((page) => toNavPage(page));
+
+      const category: NavCategory = {
+        key,
+        label: categoryLabelFor(key),
+        anchor: categoryAnchor(key),
+        active: key === activeCategory,
+        open: key === activeCategory,
+        pageCount: categoryPages.length,
+        collapsible: categoryPages.length > 1,
+        pages: navPages,
+      };
+
+      if (grouping.hasSubgroups) {
+        category.hasSubgroups = true;
+        category.subgroups = grouping.subgroups;
+      }
+
+      return category;
+    });
+}
+
+function toNavPage(page: WikiPage): NavPage {
+  return {
+    title: page.title,
+    slug: page.slug,
+    href: `${page.slug}.html`,
+    sourcePath: page.sourcePath,
+  };
 }
 
 function buildTocEntries(sections: SpecSection[]): TocEntry[] {
