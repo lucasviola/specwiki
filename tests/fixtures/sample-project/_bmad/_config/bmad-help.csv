@@ -1,0 +1,8 @@
+module,skill,display-name,menu-code,description,action,args,phase,preceded-by,followed-by,required,output-location,outputs
+BMad Method,_meta,,,,,,,,,false,https://example.com,
+BMad Method,bmad-brainstorming,Brainstorm Project,BP,Expert guided facilitation.,,,1-analysis,,,false,planning_artifacts,brainstorming session
+BMad Method,bmad-create-story,Create Story,CS,Story cycle start.,create,,4-implementation,,,true,implementation_artifacts,story
+BMad Method,bmad-create-story,Validate Story,VS,Validates story readiness.,validate,,4-implementation,,,false,implementation_artifacts,story validation report
+Core,bmad-brainstorming,Brainstorming,BSP,Use early in ideation.,,,anytime,,,false,{output_folder}/brainstorming,brainstorming session
+Core,bmad-help,BMad Help,BH,,,,anytime,,,false,,
+BMad Method,bmad-legacy-skill,Legacy Skill,LS,DEPRECATED — use create-story instead.,,,4-implementation,,,false,,

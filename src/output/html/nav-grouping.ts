@@ -1,4 +1,12 @@
 import type { WikiPage } from "../../types.js";
+import {
+  loadNavGroupingContext,
+  type AgentSkillCatalogEntry,
+  type NavGroupingContext,
+} from "./nav-grouping-catalog.js";
+
+export type { AgentSkillCatalogEntry, NavGroupingContext };
+export { loadNavGroupingContext };
 
 export interface NavPage {
   title: string;
@@ -23,11 +31,6 @@ export interface CategoryNavGroupingResult {
   hasSubgroups: boolean;
 }
 
-export interface NavGroupingContext {
-  /** Reserved for S23.2 CSV/TOML enrichment. */
-  readonly loaded: boolean;
-}
-
 export interface BuildCategoryNavSubgroupsOptions {
   categoryKey: string;
   activePageSlug?: string;
@@ -36,6 +39,19 @@ export interface BuildCategoryNavSubgroupsOptions {
   indexBuild?: boolean;
   context?: NavGroupingContext;
 }
+
+const HYBRID_GROUPS = [
+  { key: "your-team", label: "Your team" },
+  { key: "analysis", label: "Analysis" },
+  { key: "planning", label: "Planning" },
+  { key: "solutioning", label: "Solutioning" },
+  { key: "implementation", label: "Implementation" },
+  { key: "core-utilities", label: "Core utilities" },
+  { key: "deprecated", label: "Deprecated" },
+  { key: "uncatalogued", label: "Uncatalogued" },
+] as const;
+
+type HybridGroupKey = (typeof HYBRID_GROUPS)[number]["key"];
 
 const CATEGORY_PATH_PREFIXES: Record<string, string> = {
   "cursor-rules": ".cursor/rules/",
@@ -85,17 +101,19 @@ interface MutableSubgroupNode {
 
 let subgroupOrderCounter = 0;
 
-export async function loadNavGroupingContext(
-  _projectRoot: string,
-): Promise<NavGroupingContext> {
-  return { loaded: false };
-}
-
 export function buildCategoryNavSubgroups(
   pages: WikiPage[],
   options: BuildCategoryNavSubgroupsOptions,
 ): CategoryNavGroupingResult {
   subgroupOrderCounter = 0;
+
+  if (
+    options.categoryKey === "agent-skills" &&
+    options.context?.loaded === true
+  ) {
+    return buildHybridAgentSkillsGrouping(pages, options);
+  }
+
   const rootPages: NavPage[] = [];
   const rootChildren = new Map<string, MutableSubgroupNode>();
 
@@ -131,9 +149,116 @@ export function buildCategoryNavSubgroups(
   };
 }
 
-function toNavPage(page: WikiPage): NavPage {
+function buildHybridAgentSkillsGrouping(
+  pages: WikiPage[],
+  options: BuildCategoryNavSubgroupsOptions,
+): CategoryNavGroupingResult {
+  const skillsById = options.context?.skillsById ?? new Map();
+  const buckets = new Map<HybridGroupKey, NavPage[]>();
+
+  for (const page of pages) {
+    const skillId = agentSkillIdFromPath(page.sourcePath);
+    const entry = skillId ? skillsById.get(skillId) : undefined;
+    const groupKey = resolveHybridGroupKey(entry);
+    const navPage = toNavPage(page, resolveAgentSkillTitle(page, entry));
+    const list = buckets.get(groupKey) ?? [];
+    list.push(navPage);
+    buckets.set(groupKey, list);
+  }
+
+  const rootChildren = new Map<string, MutableSubgroupNode>();
+  for (const group of HYBRID_GROUPS) {
+    const groupPages = buckets.get(group.key);
+    if (!groupPages || groupPages.length === 0) {
+      continue;
+    }
+
+    groupPages.sort((a, b) =>
+      a.title.localeCompare(b.title, undefined, { sensitivity: "base" }),
+    );
+
+    rootChildren.set(group.key, {
+      key: group.key,
+      label: group.label,
+      pages: groupPages,
+      children: new Map(),
+      order: subgroupOrderCounter++,
+    });
+  }
+
+  const subgroups = finalizeSubgroups(rootChildren, options);
   return {
-    title: page.title,
+    pages: subgroups.rootPromoted,
+    subgroups: subgroups.subgroups,
+    hasSubgroups: subgroups.subgroups.length > 0,
+  };
+}
+
+function agentSkillIdFromPath(sourcePath: string): string | null {
+  const normalized = normalizePath(sourcePath);
+  const prefix = ".agents/skills/";
+  if (!normalized.startsWith(prefix)) {
+    return null;
+  }
+  const skillId = normalized.slice(prefix.length).split("/")[0];
+  return skillId || null;
+}
+
+function resolveHybridGroupKey(
+  entry: AgentSkillCatalogEntry | undefined,
+): HybridGroupKey {
+  if (entry?.isAgent) {
+    return "your-team";
+  }
+
+  if (entry?.description?.toLowerCase().includes("deprecated")) {
+    return "deprecated";
+  }
+
+  switch (entry?.phase) {
+    case "1-analysis":
+      return "analysis";
+    case "2-planning":
+      return "planning";
+    case "3-solutioning":
+      return "solutioning";
+    case "4-implementation":
+      return "implementation";
+    default:
+      break;
+  }
+
+  if (entry?.module === "Core" || entry?.phase === "anytime") {
+    return "core-utilities";
+  }
+
+  if (entry?.inCsv) {
+    return "core-utilities";
+  }
+
+  return "uncatalogued";
+}
+
+function resolveAgentSkillTitle(
+  page: WikiPage,
+  entry: AgentSkillCatalogEntry | undefined,
+): string {
+  if (entry?.isAgent && entry.agentName && entry.agentTitle) {
+    return entry.agentIcon
+      ? `${entry.agentIcon} ${entry.agentName} — ${entry.agentTitle}`
+      : `${entry.agentName} — ${entry.agentTitle}`;
+  }
+
+  if (entry?.displayName) {
+    return entry.displayName;
+  }
+
+  return page.title;
+}
+
+function toNavPage(page: WikiPage, titleOverride?: string): NavPage {
+  return {
+    title: titleOverride ?? page.title,
     slug: page.slug,
     href: `${page.slug}.html`,
     sourcePath: page.sourcePath,

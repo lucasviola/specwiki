@@ -259,10 +259,7 @@ export function buildNavCategories(
         context,
       });
 
-      const navPages = grouping.hasSubgroups
-        ? grouping.pages
-        : categoryPages.map((page) => toNavPage(page));
-
+      // Always use grouping.pages so L4 catalog titles survive singleton promotion.
       const category: NavCategory = {
         key,
         label: categoryLabelFor(key),
@@ -271,7 +268,7 @@ export function buildNavCategories(
         open: key === activeCategory,
         pageCount: categoryPages.length,
         collapsible: categoryPages.length > 1,
-        pages: navPages,
+        pages: grouping.pages,
       };
 
       if (grouping.hasSubgroups) {

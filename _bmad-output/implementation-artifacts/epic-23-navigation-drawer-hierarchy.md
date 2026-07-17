@@ -59,13 +59,13 @@ Add a **human-readable second level of grouping** inside every navigation drawer
 
 ## Stories
 
-| Story | Summary                                                    | Depends      | Status  |
-| ----- | ---------------------------------------------------------- | ------------ | ------- |
-| S23.1 | Nav grouping module + universal path-segment baseline      | E19 S19.5    | backlog |
-| S23.2 | BMad catalog enrichment (CSV + customize.toml)             | S23.1        | backlog |
-| S23.3 | Nested disclosure UI (templates + CSS + route-aware state) | S23.1        | backlog |
-| S23.4 | Index portal parity + subgroup anchors                     | S23.3        | backlog |
-| S23.5 | Search grouped by category › subgroup                      | S23.1, S19.4 | backlog |
+| Story | Summary                                                    | Depends      | Status        |
+| ----- | ---------------------------------------------------------- | ------------ | ------------- |
+| S23.1 | Nav grouping module + universal path-segment baseline      | E19 S19.5    | backlog       |
+| S23.2 | BMad catalog enrichment (CSV + customize.toml)             | S23.1        | ready-for-dev |
+| S23.3 | Nested disclosure UI (templates + CSS + route-aware state) | S23.1        | backlog       |
+| S23.4 | Index portal parity + subgroup anchors                     | S23.3        | backlog       |
+| S23.5 | Search grouped by category › subgroup                      | S23.1, S19.4 | backlog       |
 
 ---
 

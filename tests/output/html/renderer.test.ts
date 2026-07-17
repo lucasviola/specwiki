@@ -569,6 +569,98 @@ describe("buildNavCategories subgroups", () => {
     expect(html).toContain('href="skill-a.html"');
     expect(html).toContain('href="skill-b.html"');
   });
+
+  it("exposes hybrid Agent Skills subgroup labels when catalog context is loaded", () => {
+    const skillsById = new Map([
+      [
+        "bmad-agent-pm",
+        {
+          skillId: "bmad-agent-pm",
+          isAgent: true,
+          agentName: "John",
+          agentTitle: "Product Manager",
+          agentIcon: "📋",
+          inCsv: false,
+        },
+      ],
+      [
+        "bmad-brainstorming",
+        {
+          skillId: "bmad-brainstorming",
+          isAgent: false,
+          displayName: "Brainstorm Project",
+          phase: "1-analysis",
+          module: "BMad Method",
+          inCsv: true,
+        },
+      ],
+      [
+        "bmad-create-story",
+        {
+          skillId: "bmad-create-story",
+          isAgent: false,
+          displayName: "Create Story",
+          phase: "4-implementation",
+          module: "BMad Method",
+          inCsv: true,
+        },
+      ],
+    ]);
+
+    const pages = [
+      samplePage({
+        slug: "agent-pm",
+        title: "PM Wiki",
+        category: "agent-skills",
+        sourcePath: ".agents/skills/bmad-agent-pm/SKILL.md",
+      }),
+      samplePage({
+        slug: "agent-pm-2",
+        title: "PM Wiki 2",
+        category: "agent-skills",
+        sourcePath: ".agents/skills/bmad-agent-pm/README.md",
+      }),
+      samplePage({
+        slug: "brainstorm",
+        title: "Brainstorm Wiki",
+        category: "agent-skills",
+        sourcePath: ".agents/skills/bmad-brainstorming/SKILL.md",
+      }),
+      samplePage({
+        slug: "brainstorm-2",
+        title: "Brainstorm Wiki 2",
+        category: "agent-skills",
+        sourcePath: ".agents/skills/bmad-brainstorming/README.md",
+      }),
+      samplePage({
+        slug: "create-story",
+        title: "Create Story Wiki",
+        category: "agent-skills",
+        sourcePath: ".agents/skills/bmad-create-story/SKILL.md",
+      }),
+      samplePage({
+        slug: "create-story-2",
+        title: "Create Story Wiki 2",
+        category: "agent-skills",
+        sourcePath: ".agents/skills/bmad-create-story/README.md",
+      }),
+    ];
+
+    const categories = buildNavCategories(pages, undefined, undefined, {
+      navGroupingContext: { loaded: true, skillsById },
+    });
+    const agentSkills = categories.find((c) => c.key === "agent-skills");
+
+    expect(agentSkills?.hasSubgroups).toBe(true);
+    expect(agentSkills?.subgroups?.map((sg) => sg.label)).toEqual([
+      "Your team",
+      "Analysis",
+      "Implementation",
+    ]);
+    expect(agentSkills?.subgroups?.[0].pages[0].title).toBe(
+      "📋 John — Product Manager",
+    );
+  });
 });
 
 describe("HtmlRenderer asset paths", () => {
