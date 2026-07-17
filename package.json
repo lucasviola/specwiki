@@ -1,6 +1,6 @@
 {
   "name": "@lucasviola/specwiki",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Transform AI specs into structured wiki-like documentation",
   "type": "module",
   "publishConfig": {
