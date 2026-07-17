@@ -166,6 +166,7 @@ development_status:
   23-3-nested-disclosure-ui: backlog
   23-4-index-portal-parity: backlog
   23-5-search-subgroup-grouping: backlog
+  23-6-agent-skills-phase-group-dedup: review
   epic-23-retrospective: optional
 
 # MVP formally closed 2026-07-12 — all E1–E7 stories done; POST-MVP begins at E8

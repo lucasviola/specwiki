@@ -1006,25 +1006,42 @@ describe("nav-grouping", () => {
       ]);
 
       const yourTeam = result.subgroups.find((sg) => sg.key === "your-team")!;
-      expect(
-        yourTeam.pages.every((p) => p.title === "📋 John — Product Manager"),
-      ).toBe(true);
+      expect(yourTeam.pages).toHaveLength(0);
+      expect(yourTeam.subgroups).toHaveLength(1);
+      expect(yourTeam.subgroups![0].label).toBe("📋 John — Product Manager");
+      expect(yourTeam.subgroups![0].pages.map((p) => p.title).sort()).toEqual([
+        "PM Second",
+        "PM Wiki Title",
+      ]);
 
       const analysis = result.subgroups.find((sg) => sg.key === "analysis")!;
-      expect(
-        analysis.pages.every((p) => p.title === "Brainstorm Project"),
-      ).toBe(true);
+      expect(analysis.pages).toHaveLength(0);
+      expect(analysis.subgroups).toHaveLength(1);
+      expect(analysis.subgroups![0].label).toBe("Brainstorm Project");
+      expect(analysis.subgroups![0].pages.map((p) => p.title).sort()).toEqual([
+        "Brainstorm Second",
+        "Brainstorm Wiki",
+      ]);
 
       const impl = result.subgroups.find((sg) => sg.key === "implementation")!;
-      expect(impl.pages.every((p) => p.title === "Create Story")).toBe(true);
+      expect(impl.subgroups![0].label).toBe("Create Story");
+      expect(impl.subgroups![0].pages.map((p) => p.title).sort()).toEqual([
+        "Create Story Second",
+        "Create Story Wiki",
+      ]);
 
       const core = result.subgroups.find((sg) => sg.key === "core-utilities")!;
-      expect(core.pages.every((p) => p.title === "BMad Help")).toBe(true);
+      expect(core.subgroups![0].label).toBe("BMad Help");
+      expect(core.subgroups![0].pages.map((p) => p.title).sort()).toEqual([
+        "Help Second",
+        "Help Wiki",
+      ]);
 
       const deprecated = result.subgroups.find(
         (sg) => sg.key === "deprecated",
       )!;
-      expect(deprecated.pages.map((p) => p.slug).sort()).toEqual([
+      expect(deprecated.subgroups![0].label).toBe("Legacy Skill");
+      expect(deprecated.subgroups![0].pages.map((p) => p.slug).sort()).toEqual([
         "legacy",
         "legacy-2",
       ]);
@@ -1033,6 +1050,168 @@ describe("nav-grouping", () => {
       expect(uncat.pages.map((p) => p.title)).toEqual([
         "Alpha Uncatalogued",
         "Zebra Uncatalogued",
+      ]);
+    });
+
+    it("nests multi-page skills under phase without duplicate L4 titles", async () => {
+      const ctx = await loadNavGroupingContext(SAMPLE_PROJECT);
+      const pages = [
+        wikiPage({
+          slug: "brainstorm",
+          title: "Brainstorm Wiki",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/bmad-brainstorming/SKILL.md",
+        }),
+        wikiPage({
+          slug: "brainstorm-ref",
+          title: "Facilitation Notes",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/bmad-brainstorming/references/notes.md",
+        }),
+        wikiPage({
+          slug: "create-story",
+          title: "Create Story Wiki",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/bmad-create-story/SKILL.md",
+        }),
+        wikiPage({
+          slug: "create-story-checklist",
+          title: "Story Checklist",
+          category: "agent-skills",
+          sourcePath: ".agents/skills/bmad-create-story/checklist.md",
+        }),
+      ];
+
+      const result = buildCategoryNavSubgroups(pages, {
+        categoryKey: "agent-skills",
+        indexBuild: true,
+        context: ctx,
+      });
+
+      const analysis = result.subgroups.find((sg) => sg.key === "analysis")!;
+      const skillLabels = (analysis.subgroups ?? []).map((sg) => sg.label);
+      expect(skillLabels).toEqual(["Brainstorm Project"]);
+      const leafTitles = analysis.subgroups![0].pages.map((p) => p.title);
+      expect(leafTitles).toEqual(["Brainstorm Wiki", "Facilitation Notes"]);
+      expect(new Set(leafTitles).size).toBe(leafTitles.length);
+
+      const impl = result.subgroups.find((sg) => sg.key === "implementation")!;
+      expect(impl.subgroups![0].label).toBe("Create Story");
+      expect(impl.subgroups![0].pages.map((p) => p.title)).toEqual([
+        "Create Story Wiki",
+        "Story Checklist",
+      ]);
+    });
+
+    it("uses humanized skill id as L2 label for uncatalogued multi-page skills", () => {
+      const result = buildCategoryNavSubgroups(
+        [
+          wikiPage({
+            slug: "mystery-a",
+            title: "Alpha Notes",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/mystery-skill/notes-a.md",
+          }),
+          wikiPage({
+            slug: "mystery-b",
+            title: "Beta Notes",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/mystery-skill/notes-b.md",
+          }),
+          wikiPage({
+            slug: "orphan-a",
+            title: "Orphan A",
+            category: "agent-skills",
+            sourcePath: "elsewhere/orphan-a.md",
+          }),
+          wikiPage({
+            slug: "orphan-b",
+            title: "Orphan B",
+            category: "agent-skills",
+            sourcePath: "elsewhere/orphan-b.md",
+          }),
+        ],
+        {
+          categoryKey: "agent-skills",
+          indexBuild: true,
+          context: { loaded: true, skillsById: new Map() },
+        },
+      );
+
+      const uncat = result.subgroups.find((sg) => sg.key === "uncatalogued")!;
+      expect(uncat.pages.map((p) => p.title)).toEqual(["Orphan A", "Orphan B"]);
+      expect(uncat.subgroups).toHaveLength(1);
+      expect(uncat.subgroups![0].label).toBe("Mystery Skill");
+      expect(uncat.subgroups![0].pages.map((p) => p.title)).toEqual([
+        "Alpha Notes",
+        "Beta Notes",
+      ]);
+    });
+
+    it("sorts multi-page skill L2 subgroups by label case-insensitively", () => {
+      const skillsById = new Map([
+        [
+          "skill-z",
+          {
+            skillId: "skill-z",
+            isAgent: false,
+            inCsv: true,
+            phase: "1-analysis",
+            displayName: "zebra Workshop",
+            module: "BMad Method",
+          },
+        ],
+        [
+          "skill-a",
+          {
+            skillId: "skill-a",
+            isAgent: false,
+            inCsv: true,
+            phase: "1-analysis",
+            displayName: "Alpha Workshop",
+            module: "BMad Method",
+          },
+        ],
+      ]);
+
+      const result = buildCategoryNavSubgroups(
+        [
+          wikiPage({
+            slug: "z1",
+            title: "Z One",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/skill-z/SKILL.md",
+          }),
+          wikiPage({
+            slug: "z2",
+            title: "Z Two",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/skill-z/README.md",
+          }),
+          wikiPage({
+            slug: "a1",
+            title: "A One",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/skill-a/SKILL.md",
+          }),
+          wikiPage({
+            slug: "a2",
+            title: "A Two",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/skill-a/README.md",
+          }),
+        ],
+        {
+          categoryKey: "agent-skills",
+          indexBuild: true,
+          context: { loaded: true, skillsById },
+        },
+      );
+
+      const analysis = result.subgroups.find((sg) => sg.key === "analysis")!;
+      expect(analysis.subgroups!.map((sg) => sg.label)).toEqual([
+        "Alpha Workshop",
+        "zebra Workshop",
       ]);
     });
 
@@ -1246,9 +1425,12 @@ describe("nav-grouping", () => {
         "solutioning",
         "core-utilities",
       ]);
-      expect(result.subgroups[0].pages[0].title).toBe("Plan It");
-      expect(result.subgroups[1].pages[0].title).toBe("Solve It");
-      expect(result.subgroups[2].pages[0].title).toBe("Weird");
+      expect(result.subgroups[0].subgroups![0].label).toBe("Plan It");
+      expect(result.subgroups[1].subgroups![0].label).toBe("Solve It");
+      expect(result.subgroups[2].subgroups![0].label).toBe("Weird");
+      expect(
+        result.subgroups[0].subgroups![0].pages.map((p) => p.title),
+      ).toEqual(["Plan Wiki", "Plan Wiki 2"]);
     });
 
     it("omits agent icon when missing without breaking name—title format", async () => {
@@ -1292,7 +1474,96 @@ describe("nav-grouping", () => {
         },
       );
 
-      expect(result.subgroups[0].pages[0].title).toBe("Sally — UX Designer");
+      expect(result.subgroups[0].subgroups![0].label).toBe(
+        "Sally — UX Designer",
+      );
+      expect(
+        result.subgroups[0].subgroups![0].pages.map((p) => p.title),
+      ).toEqual(["UX Wiki", "UX Wiki 2"]);
+    });
+
+    it("keeps L4 titles on single-page skills without wrapping an L2 subgroup", () => {
+      const skillsById = new Map([
+        [
+          "skill-a",
+          {
+            skillId: "skill-a",
+            isAgent: false,
+            inCsv: true,
+            phase: "1-analysis",
+            displayName: "Alpha Skill",
+            module: "BMad Method",
+          },
+        ],
+        [
+          "skill-b",
+          {
+            skillId: "skill-b",
+            isAgent: false,
+            inCsv: true,
+            phase: "1-analysis",
+            displayName: "Beta Skill",
+            module: "BMad Method",
+          },
+        ],
+        [
+          "skill-c",
+          {
+            skillId: "skill-c",
+            isAgent: false,
+            inCsv: true,
+            phase: "1-analysis",
+            displayName: "Gamma Multi",
+            module: "BMad Method",
+          },
+        ],
+      ]);
+
+      const result = buildCategoryNavSubgroups(
+        [
+          wikiPage({
+            slug: "a",
+            title: "Alpha Wiki",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/skill-a/SKILL.md",
+          }),
+          wikiPage({
+            slug: "b",
+            title: "Beta Wiki",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/skill-b/SKILL.md",
+          }),
+          wikiPage({
+            slug: "c",
+            title: "Gamma Wiki",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/skill-c/SKILL.md",
+          }),
+          wikiPage({
+            slug: "c-2",
+            title: "Gamma Extra",
+            category: "agent-skills",
+            sourcePath: ".agents/skills/skill-c/README.md",
+          }),
+        ],
+        {
+          categoryKey: "agent-skills",
+          indexBuild: true,
+          context: { loaded: true, skillsById },
+        },
+      );
+
+      const analysis = result.subgroups.find((sg) => sg.key === "analysis")!;
+      expect(analysis.pages.map((p) => p.title)).toEqual([
+        "Alpha Skill",
+        "Beta Skill",
+      ]);
+      expect(analysis.subgroups).toHaveLength(1);
+      expect(analysis.subgroups![0].label).toBe("Gamma Multi");
+      expect(analysis.subgroups![0].pages.map((p) => p.title)).toEqual([
+        "Gamma Extra",
+        "Gamma Wiki",
+      ]);
     });
   });
 });

@@ -657,9 +657,12 @@ describe("buildNavCategories subgroups", () => {
       "Analysis",
       "Implementation",
     ]);
-    expect(agentSkills?.subgroups?.[0].pages[0].title).toBe(
+    expect(agentSkills?.subgroups?.[0].subgroups?.[0].label).toBe(
       "📋 John — Product Manager",
     );
+    expect(
+      agentSkills?.subgroups?.[0].subgroups?.[0].pages.map((p) => p.title),
+    ).toEqual(["PM Wiki", "PM Wiki 2"]);
   });
 });
 

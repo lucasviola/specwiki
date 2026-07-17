@@ -154,36 +154,103 @@ function buildHybridAgentSkillsGrouping(
   options: BuildCategoryNavSubgroupsOptions,
 ): CategoryNavGroupingResult {
   const skillsById = options.context?.skillsById ?? new Map();
-  const buckets = new Map<HybridGroupKey, NavPage[]>();
+  /** phase → skillId ("" for orphans) → wiki pages */
+  const buckets = new Map<HybridGroupKey, Map<string, WikiPage[]>>();
 
   for (const page of pages) {
     const skillId = agentSkillIdFromPath(page.sourcePath);
     const entry = skillId ? skillsById.get(skillId) : undefined;
     const groupKey = resolveHybridGroupKey(entry);
-    const navPage = toNavPage(page, resolveAgentSkillTitle(page, entry));
-    const list = buckets.get(groupKey) ?? [];
-    list.push(navPage);
-    buckets.set(groupKey, list);
+    const skillKey = skillId ?? "";
+    let phaseSkills = buckets.get(groupKey);
+    if (!phaseSkills) {
+      phaseSkills = new Map();
+      buckets.set(groupKey, phaseSkills);
+    }
+    const list = phaseSkills.get(skillKey) ?? [];
+    list.push(page);
+    phaseSkills.set(skillKey, list);
   }
 
   const rootChildren = new Map<string, MutableSubgroupNode>();
   for (const group of HYBRID_GROUPS) {
-    const groupPages = buckets.get(group.key);
-    if (!groupPages || groupPages.length === 0) {
+    const phaseSkills = buckets.get(group.key);
+    if (!phaseSkills || phaseSkills.size === 0) {
       continue;
     }
 
-    groupPages.sort((a, b) =>
+    const phaseNode: MutableSubgroupNode = {
+      key: group.key,
+      label: group.label,
+      pages: [],
+      children: new Map(),
+      order: subgroupOrderCounter++,
+    };
+
+    const skillEntries = [...phaseSkills.entries()].sort(
+      ([idA, pagesA], [idB, pagesB]) => {
+        const labelA = resolveHybridSkillLabel(
+          idA,
+          pagesA[0],
+          skillsById.get(idA),
+        );
+        const labelB = resolveHybridSkillLabel(
+          idB,
+          pagesB[0],
+          skillsById.get(idB),
+        );
+        return labelA.localeCompare(labelB, undefined, { sensitivity: "base" });
+      },
+    );
+
+    for (const [skillKey, skillPages] of skillEntries) {
+      const entry = skillKey ? skillsById.get(skillKey) : undefined;
+
+      // Paths outside .agents/skills/ stay as direct Uncatalogued leaves.
+      if (!skillKey) {
+        for (const page of skillPages) {
+          phaseNode.pages.push(toNavPage(page));
+        }
+        continue;
+      }
+
+      const skillLabel = resolveHybridSkillLabel(
+        skillKey,
+        skillPages[0],
+        entry,
+      );
+
+      // Single-page skills: L4 title on the phase leaf (no L2 wrapper).
+      if (skillPages.length === 1) {
+        phaseNode.pages.push(
+          toNavPage(
+            skillPages[0],
+            resolveAgentSkillTitle(skillPages[0], entry),
+          ),
+        );
+        continue;
+      }
+
+      const nestedPages = skillPages
+        .map((page) => toNavPage(page))
+        .sort((a, b) =>
+          a.title.localeCompare(b.title, undefined, { sensitivity: "base" }),
+        );
+
+      phaseNode.children.set(skillKey, {
+        key: `${group.key}/${skillKey}`,
+        label: skillLabel,
+        pages: nestedPages,
+        children: new Map(),
+        order: subgroupOrderCounter++,
+      });
+    }
+
+    phaseNode.pages.sort((a, b) =>
       a.title.localeCompare(b.title, undefined, { sensitivity: "base" }),
     );
 
-    rootChildren.set(group.key, {
-      key: group.key,
-      label: group.label,
-      pages: groupPages,
-      children: new Map(),
-      order: subgroupOrderCounter++,
-    });
+    rootChildren.set(group.key, phaseNode);
   }
 
   const subgroups = finalizeSubgroups(rootChildren, options);
@@ -192,6 +259,27 @@ function buildHybridAgentSkillsGrouping(
     subgroups: subgroups.subgroups,
     hasSubgroups: subgroups.subgroups.length > 0,
   };
+}
+
+function resolveHybridSkillLabel(
+  skillId: string,
+  page: WikiPage,
+  entry: AgentSkillCatalogEntry | undefined,
+): string {
+  if (!skillId) {
+    return page.title;
+  }
+
+  if (entry?.isAgent && entry.agentName && entry.agentTitle) {
+    return resolveAgentSkillTitle(page, entry);
+  }
+
+  if (entry?.displayName) {
+    return entry.displayName;
+  }
+
+  // Stable label for uncatalogued multi-page skills (not first-page wiki title).
+  return humanizeFolderLabel(skillId, [skillId]);
 }
 
 function agentSkillIdFromPath(sourcePath: string): string | null {
