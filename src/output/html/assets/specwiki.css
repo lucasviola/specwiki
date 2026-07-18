@@ -40,6 +40,13 @@
   --font-size-h4: 1.125rem;
   --font-size-h5: 1rem;
   --font-size-h6: 0.875rem;
+  --font-size-caption: 0.6875rem;
+  --font-size-ui-sm: 0.75rem;
+  --font-size-ui: 0.8125rem;
+  --font-size-body: 0.875rem;
+  --font-family-monospace-brand:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    monospace;
 }
 
 :root[data-theme="light"] {
@@ -124,8 +131,8 @@
 
 body.specwiki {
   margin: 0;
-  font-family: var(--font-family-base);
-  font-size: 0.875rem;
+  font-family: var(--font-family-system-sans);
+  font-size: var(--font-size-body);
   line-height: var(--line-height-base);
   color: var(--color-base);
   background-color: var(--background-color-base);
@@ -206,8 +213,8 @@ body.specwiki {
   padding: 0.4rem 0.625rem;
   color: var(--color-base--subtle);
   background-color: var(--background-color-interactive-subtle);
-  font-size: 0.75rem;
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-ui-sm);
+  font-weight: var(--font-weight-semi-bold);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -258,7 +265,7 @@ body.specwiki {
   border-radius: var(--border-radius-base, 2px);
   color: var(--color-base);
   background-color: var(--specwiki-search-badge-background);
-  font-size: 0.6875rem;
+  font-size: var(--font-size-caption);
   font-weight: var(--font-weight-normal);
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -270,7 +277,7 @@ body.specwiki {
   min-width: 0;
   overflow: hidden;
   color: var(--color-base--subtle);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-ui);
   font-weight: normal;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -302,7 +309,7 @@ body.specwiki {
   text-decoration: none;
   font-weight: var(--font-weight-bold);
   font-size: 1rem;
-  font-family: var(--font-family-monospace);
+  font-family: var(--font-family-monospace-brand);
   letter-spacing: -0.02em;
 }
 
@@ -452,7 +459,8 @@ body.specwiki {
   display: block;
   color: var(--color-primary);
   text-decoration: none;
-  font-size: 0.8125rem;
+  font-size: var(--font-size-ui);
+  font-weight: var(--font-weight-semi-bold);
   margin-bottom: 0.25rem;
 }
 
@@ -472,7 +480,7 @@ body.specwiki {
   border-radius: var(--border-radius-base, 2px);
   color: var(--color-base--subtle);
   background-color: var(--background-color-interactive-subtle);
-  font-size: 0.6875rem;
+  font-size: var(--font-size-caption);
   font-weight: var(--font-weight-normal);
 }
 
@@ -489,7 +497,7 @@ body.specwiki {
 .category-nav-pages a {
   color: var(--color-base);
   text-decoration: none;
-  font-size: 0.75rem;
+  font-size: var(--font-size-ui-sm);
 }
 
 .category-nav-pages a:hover {
@@ -538,8 +546,8 @@ body.specwiki {
 
 .category-nav-subgroup-label {
   display: block;
-  font-size: 0.6875rem;
-  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semi-bold);
   color: var(--color-base--subtle);
   margin: 0 0 0.1875rem;
   text-transform: uppercase;
@@ -561,6 +569,7 @@ body.specwiki {
 
 .category-nav-subgroup-pages > li > a {
   color: var(--color-base);
+  font-size: var(--font-size-ui-sm);
 }
 
 .category-nav-subgroup-nested {
@@ -568,8 +577,8 @@ body.specwiki {
 }
 
 .category-nav-subgroup-nested .category-nav-subgroup-label {
-  font-weight: var(--font-weight-bold);
-  font-size: 0.6875rem;
+  font-weight: var(--font-weight-semi-bold);
+  font-size: var(--font-size-caption);
   text-transform: none;
   letter-spacing: normal;
   color: var(--color-base--subtle);
@@ -586,7 +595,7 @@ body.specwiki {
 }
 
 .breadcrumb {
-  font-size: 0.8125rem;
+  font-size: var(--font-size-ui);
   color: var(--color-base--subtle);
   margin-bottom: var(--padding-horizontal-base);
 }
@@ -607,7 +616,7 @@ body.specwiki {
   border: 1px solid var(--border-color-base);
   background-color: var(--background-color-interactive-subtle);
   padding: var(--padding-vertical-base) var(--padding-horizontal-base);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-ui);
 }
 
 .infobox-title {
@@ -637,7 +646,7 @@ body.specwiki {
 }
 
 .infobox-table code {
-  font-size: 0.75rem;
+  font-size: var(--font-size-ui-sm);
   word-break: break-all;
 }
 
@@ -654,7 +663,7 @@ body.specwiki {
 
 .toc-heading {
   margin: 0 0 var(--padding-vertical-base);
-  font-size: 0.8125rem;
+  font-size: var(--font-size-ui);
   font-weight: var(--font-weight-bold);
 }
 
@@ -671,7 +680,7 @@ body.specwiki {
 .toc-list a {
   color: var(--color-primary);
   text-decoration: none;
-  font-size: 0.75rem;
+  font-size: var(--font-size-ui-sm);
 }
 
 .toc-list a:hover {
@@ -705,7 +714,7 @@ body.specwiki {
 .specwiki-article-body .mw-parser-output h4,
 .specwiki-article-body .mw-parser-output h5,
 .specwiki-article-body .mw-parser-output h6 {
-  font-family: var(--font-family-base);
+  font-family: var(--font-family-system-sans);
   font-weight: 600;
   line-height: var(--line-height-heading);
 }
@@ -852,7 +861,7 @@ body.specwiki {
   padding: 0.15em 0.4em;
   border-radius: var(--border-radius-base);
   font-size: 0.9em;
-  font-family: var(--font-family-monospace);
+  font-family: var(--font-family-monospace-brand);
 }
 
 .mw-parser-output pre {
@@ -860,6 +869,7 @@ body.specwiki {
   padding: var(--padding-horizontal-base);
   border-radius: var(--border-radius-base);
   overflow-x: auto;
+  font-family: var(--font-family-monospace-brand);
 }
 
 .mw-parser-output pre code {

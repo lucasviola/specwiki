@@ -841,7 +841,7 @@ describe("writeHtmlWiki", () => {
       /\.specwiki-article-body \.mw-parser-output h1,\s*\.specwiki-article-body \.mw-parser-output h2\s*\{[^}]*font-family:\s*var\(--font-family-heading-main\)/s,
     );
     expect(css).toMatch(
-      /\.specwiki-article-body \.mw-parser-output h3,\s*\.specwiki-article-body \.mw-parser-output h4,\s*\.specwiki-article-body \.mw-parser-output h5,\s*\.specwiki-article-body \.mw-parser-output h6\s*\{[^}]*font-family:\s*var\(--font-family-base\)/s,
+      /\.specwiki-article-body \.mw-parser-output h3,\s*\.specwiki-article-body \.mw-parser-output h4,\s*\.specwiki-article-body \.mw-parser-output h5,\s*\.specwiki-article-body \.mw-parser-output h6\s*\{[^}]*font-family:\s*var\(--font-family-system-sans\)/s,
     );
     expect(css).toMatch(
       /\.specwiki-article-body \.mw-parser-output h1,\s*\.specwiki-article-body \.mw-parser-output h2\s*\{[^}]*font-weight:\s*400/s,
@@ -875,6 +875,105 @@ describe("writeHtmlWiki", () => {
     );
     // Portal/category intros use mw-parser-output but must not inherit article heading scale
     expect(css).not.toMatch(/^\.mw-parser-output h1\s*\{[^}]*font-size:/m);
+  });
+
+  it("writes chrome type tokens with system sans body and BRAND monospace", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-chrome-type-tokens-"),
+    );
+    tempDirs.push(outputDir);
+
+    await writeHtmlWiki(outputDir, buildWiki([sampleSpec()]));
+
+    const css = await fs.readFile(
+      path.join(outputDir, "html", "assets", "specwiki.css"),
+      "utf-8",
+    );
+
+    const chromeTokens: Record<string, string> = {
+      "--font-size-caption": "0.6875rem",
+      "--font-size-ui-sm": "0.75rem",
+      "--font-size-ui": "0.8125rem",
+      "--font-size-body": "0.875rem",
+    };
+    for (const [token, value] of Object.entries(chromeTokens)) {
+      expect(css).toMatch(
+        new RegExp(`${token}:\\s*${value.replace(".", "\\.")}`),
+      );
+    }
+
+    expect(css).toMatch(
+      /body\.specwiki\s*\{[^}]*font-family:\s*var\(--font-family-system-sans\)/s,
+    );
+    expect(css).toMatch(
+      /body\.specwiki\s*\{[^}]*font-size:\s*var\(--font-size-body\)/s,
+    );
+
+    expect(css).toMatch(
+      /\.category-nav-heading\s*\{[^}]*font-size:\s*var\(--font-size-ui\)/s,
+    );
+    expect(css).toMatch(
+      /\.category-nav-count\s*\{[^}]*font-size:\s*var\(--font-size-caption\)/s,
+    );
+    expect(css).toMatch(
+      /\.category-nav-pages a\s*\{[^}]*font-size:\s*var\(--font-size-ui-sm\)/s,
+    );
+    expect(css).toMatch(
+      /\.category-nav-subgroup-label\s*\{[^}]*font-size:\s*var\(--font-size-caption\)/s,
+    );
+    expect(css).toMatch(
+      /\.breadcrumb\s*\{[^}]*font-size:\s*var\(--font-size-ui\)/s,
+    );
+    expect(css).toMatch(
+      /\.infobox\s*\{[^}]*font-size:\s*var\(--font-size-ui\)/s,
+    );
+    expect(css).toMatch(
+      /\.toc-heading\s*\{[^}]*font-size:\s*var\(--font-size-ui\)/s,
+    );
+    expect(css).toMatch(
+      /\.toc-list a\s*\{[^}]*font-size:\s*var\(--font-size-ui-sm\)/s,
+    );
+    expect(css).toMatch(
+      /\.specwiki-search-group-heading\s*\{[^}]*font-size:\s*var\(--font-size-ui-sm\)/s,
+    );
+    expect(css).toMatch(
+      /\.specwiki-search-category\s*\{[^}]*font-size:\s*var\(--font-size-caption\)/s,
+    );
+    expect(css).toMatch(
+      /\.specwiki-search-snippet\s*\{[^}]*font-size:\s*var\(--font-size-ui\)/s,
+    );
+
+    expect(css).toMatch(/--font-family-monospace-brand:[^;]*ui-monospace/s);
+    expect(css).toMatch(
+      /\.specwiki-logo\s*\{[^}]*font-family:\s*var\(--font-family-monospace-brand\)/s,
+    );
+    expect(css).toMatch(
+      /\.mw-parser-output code\s*\{[^}]*font-family:\s*var\(--font-family-monospace-brand\)/s,
+    );
+    expect(css).toMatch(
+      /\.mw-parser-output pre\s*\{[^}]*font-family:\s*var\(--font-family-monospace-brand\)/s,
+    );
+
+    expect(css).toMatch(
+      /\.category-nav-heading\s*\{[^}]*font-weight:\s*var\(--font-weight-semi-bold\)/s,
+    );
+    expect(css).toMatch(
+      /\.category-nav-subgroup-label\s*\{[^}]*font-weight:\s*var\(--font-weight-semi-bold\)/s,
+    );
+    expect(css).toMatch(
+      /\.category-nav-group\.category-nav-active \.category-nav-heading\s*\{[^}]*font-weight:\s*var\(--font-weight-bold\)/s,
+    );
+    expect(css).toMatch(
+      /\.toc-heading\s*\{[^}]*font-weight:\s*var\(--font-weight-bold\)/s,
+    );
+
+    // Chrome surfaces should not rely on raw rem literals for font-size
+    expect(css).not.toMatch(
+      /\.category-nav-heading\s*\{[^}]*font-size:\s*0\.8125rem/s,
+    );
+    expect(css).not.toMatch(
+      /\.category-nav-subgroup-label\s*\{[^}]*font-size:\s*0\.6875rem/s,
+    );
   });
 
   it("writes responsive layout, drawer, and overflow containment styles", async () => {
