@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SpecWiki typography mockup — current vs proposed</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --background-color-base: #ffffff;
+        --background-color-interactive-subtle: #f8f9fa;
+        --color-base: #202122;
+        --color-base--subtle: #54595d;
+        --color-primary: #3366cc;
+        --border-color-divider: #72777d;
+        --font-family-sans:
+          "Helvetica Neue", Helvetica, "Liberation Sans", Arial, sans-serif;
+        --font-family-system-sans:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter,
+          Helvetica, Arial, sans-serif;
+        --font-family-heading:
+          "Linux Libertine", Georgia, "Times", "Source Serif Pro", serif;
+        --font-family-monospace-current:
+          Menlo, Consolas, "Liberation Mono", "Fira Code", "Courier New",
+          monospace;
+        --font-family-monospace-proposed:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", monospace;
+        --line-height-base: 1.6;
+        --line-height-heading: 1.375;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--font-family-system-sans);
+        color: var(--color-base);
+        background: #eef0f3;
+      }
+
+      .mockup-banner {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 0.75rem 1.25rem;
+        background: #202122;
+        color: #eaecf0;
+        border-bottom: 1px solid #72777d;
+      }
+
+      .mockup-banner h1 {
+        margin: 0;
+        font-size: 0.9375rem;
+        font-weight: 600;
+      }
+
+      .mockup-banner p {
+        margin: 0;
+        font-size: 0.8125rem;
+        color: rgba(234, 236, 240, 0.78);
+      }
+
+      .mockup-banner .legend {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.75rem;
+      }
+
+      .mockup-banner .legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .mockup-banner .swatch {
+        width: 0.65rem;
+        height: 0.65rem;
+        border-radius: 2px;
+      }
+
+      .swatch-current {
+        background: #cf222e;
+      }
+
+      .swatch-proposed {
+        background: #1a7f37;
+      }
+
+      .panels {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: calc(100vh - 3.5rem);
+      }
+
+      @media (max-width: 960px) {
+        .panels {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .panel {
+        padding: 1rem;
+        border-right: 1px solid #d9dce2;
+      }
+
+      .panel:last-child {
+        border-right: none;
+      }
+
+      .panel-label {
+        display: inline-block;
+        margin: 0 0 0.75rem;
+        padding: 0.2rem 0.5rem;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        border-radius: 2px;
+      }
+
+      .panel-label.current {
+        background: #ffebe9;
+        color: #cf222e;
+      }
+
+      .panel-label.proposed {
+        background: #dafbe1;
+        color: #1a7f37;
+      }
+
+      .wiki-frame {
+        background: var(--background-color-base);
+        border: 1px solid var(--border-color-divider);
+        border-radius: 4px;
+        overflow: hidden;
+        min-height: 720px;
+      }
+
+      /* Shared chrome structure */
+      .wiki-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0 1rem;
+        min-height: 2.5rem;
+        border-bottom: 1px solid var(--border-color-divider);
+      }
+
+      .wiki-logo {
+        font-weight: 700;
+        font-size: 1rem;
+        letter-spacing: -0.02em;
+        text-decoration: none;
+        color: var(--color-base);
+      }
+
+      .wiki-logo-bracket {
+        color: var(--color-primary);
+      }
+
+      .wiki-search {
+        margin-left: auto;
+        width: 12rem;
+        padding: 0.375rem 0.625rem;
+        border: 1px solid var(--border-color-divider);
+        border-radius: 2px;
+        font: inherit;
+        font-size: 0.8125rem;
+      }
+
+      .wiki-layout {
+        display: grid;
+        grid-template-columns: 11rem minmax(0, 1fr) 9rem;
+        min-height: 640px;
+      }
+
+      .wiki-nav {
+        border-right: 1px solid var(--border-color-divider);
+        padding: 0.75rem;
+        background: var(--background-color-interactive-subtle);
+      }
+
+      .wiki-nav-category {
+        margin: 0 0 0.35rem;
+        font-size: 0.8125rem;
+        font-weight: 700;
+        color: var(--color-primary);
+      }
+
+      .wiki-nav-subgroup {
+        margin: 0.5rem 0 0.25rem;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--color-base--subtle);
+      }
+
+      .wiki-nav-link {
+        display: block;
+        margin: 0.15rem 0;
+        font-size: 0.75rem;
+        color: var(--color-primary);
+        text-decoration: none;
+      }
+
+      .wiki-nav-link.active {
+        font-weight: 700;
+        color: var(--color-base);
+      }
+
+      .wiki-article {
+        padding: 1rem 1.25rem 2rem;
+      }
+
+      .wiki-breadcrumb {
+        margin: 0 0 1rem;
+        font-size: 0.8125rem;
+        color: var(--color-base--subtle);
+      }
+
+      .wiki-breadcrumb a {
+        color: var(--color-primary);
+        text-decoration: none;
+      }
+
+      .wiki-toc {
+        border-left: 1px solid var(--border-color-divider);
+        padding: 0.75rem;
+        background: var(--background-color-interactive-subtle);
+      }
+
+      .wiki-toc-title {
+        margin: 0 0 0.5rem;
+        font-size: 0.8125rem;
+        font-weight: 700;
+      }
+
+      .wiki-toc a {
+        display: block;
+        margin: 0.2rem 0;
+        font-size: 0.75rem;
+        color: var(--color-primary);
+        text-decoration: none;
+      }
+
+      .wiki-toc .indent {
+        padding-left: 0.75rem;
+      }
+
+      .infobox {
+        float: right;
+        width: 10rem;
+        margin: 0 0 1rem 1rem;
+        padding: 0.75rem;
+        border: 1px solid var(--border-color-divider);
+        background: var(--background-color-interactive-subtle);
+        font-size: 0.8125rem;
+      }
+
+      .infobox-title {
+        margin: 0 0 0.5rem;
+        font-size: 1rem;
+        line-height: var(--line-height-heading);
+        text-align: center;
+      }
+
+      .article-body p {
+        margin: 0 0 0.85rem;
+      }
+
+      .article-body code {
+        padding: 0.1em 0.35em;
+        border-radius: 2px;
+        background: #f6f8fa;
+        font-size: 0.9em;
+      }
+
+      .article-body blockquote {
+        margin: 0 0 0.85rem;
+        padding-left: 1rem;
+        border-left: 3px solid var(--border-color-divider);
+        color: var(--color-base--subtle);
+      }
+
+      /* ---- CURRENT panel typography ---- */
+      .current .wiki-frame {
+        font-family: var(--font-family-sans);
+        font-size: 0.875rem;
+        line-height: var(--line-height-base);
+      }
+
+      .current .wiki-logo {
+        font-family: var(--font-family-monospace-current);
+      }
+
+      .current .article-body h1,
+      .current .article-body h2,
+      .current .article-body h3 {
+        line-height: var(--line-height-heading);
+        font-family: inherit;
+        font-weight: bold;
+      }
+
+      .current .article-body h1 {
+        font-size: 1.75em;
+        margin: 0 0 0.75rem;
+      }
+
+      .current .article-body h2 {
+        font-size: 1.5em;
+        margin: 1.25rem 0 0.5rem;
+      }
+
+      .current .article-body h3 {
+        font-size: 1.17em;
+        margin: 1rem 0 0.35rem;
+      }
+
+      .current .article-body code {
+        font-family: var(--font-family-monospace-current);
+      }
+
+      /* ---- PROPOSED panel typography ---- */
+      .proposed .wiki-frame {
+        font-family: var(--font-family-system-sans);
+        font-size: 0.875rem;
+        line-height: var(--line-height-base);
+      }
+
+      .proposed .wiki-logo {
+        font-family: var(--font-family-monospace-proposed);
+      }
+
+      .proposed .article-body h1,
+      .proposed .article-body h2 {
+        font-family: var(--font-family-heading);
+        font-weight: 400;
+        line-height: var(--line-height-heading);
+      }
+
+      .proposed .article-body h3,
+      .proposed .article-body h4,
+      .proposed .article-body h5,
+      .proposed .article-body h6 {
+        font-family: var(--font-family-system-sans);
+        font-weight: 600;
+        line-height: var(--line-height-heading);
+      }
+
+      .proposed .article-body h1 {
+        font-size: 2rem;
+        margin: 0 0 0.75rem;
+      }
+
+      .proposed .article-body h2 {
+        font-size: 1.625rem;
+        margin: 1.5rem 0 0.5rem;
+        padding-bottom: 0.15rem;
+        border-bottom: 1px solid var(--border-color-divider);
+      }
+
+      .proposed .article-body h3 {
+        font-size: 1.375rem;
+        margin: 1.25rem 0 0.35rem;
+      }
+
+      .proposed .infobox-title {
+        font-family: var(--font-family-heading);
+        font-weight: 400;
+      }
+
+      .proposed .article-body code {
+        font-family: var(--font-family-monospace-proposed);
+      }
+
+      .notes {
+        margin: 0.75rem 0 0;
+        padding: 0;
+        list-style: none;
+        font-size: 0.75rem;
+        color: var(--color-base--subtle);
+      }
+
+      .notes li {
+        margin: 0.2rem 0;
+      }
+
+      .notes li::before {
+        content: "→ ";
+        color: var(--color-primary);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="mockup-banner">
+      <div>
+        <h1>SpecWiki typography mockup</h1>
+        <p>
+          Side-by-side preview · same article content · system fonts only (file:// safe)
+        </p>
+      </div>
+      <div class="legend">
+        <span><i class="swatch swatch-current"></i> Current (shipped)</span>
+        <span><i class="swatch swatch-proposed"></i> Proposed (S24-T1 + T2)</span>
+      </div>
+    </header>
+
+    <div class="panels">
+      <section class="panel current" aria-labelledby="current-label">
+        <p class="panel-label current" id="current-label">Current</p>
+        <div class="wiki-frame">
+          <header class="wiki-header">
+            <a class="wiki-logo" href="#"
+              ><span class="wiki-logo-bracket">[[</span>specwiki<span
+                class="wiki-logo-bracket"
+                >]]</span
+              ></a
+            >
+            <input
+              class="wiki-search"
+              type="search"
+              placeholder="Search wiki…"
+              aria-label="Search"
+              disabled
+            />
+          </header>
+          <div class="wiki-layout">
+            <nav class="wiki-nav" aria-label="Categories">
+              <p class="wiki-nav-category">BMAD Output</p>
+              <p class="wiki-nav-subgroup">Implementation Stories</p>
+              <a class="wiki-nav-link" href="#">Epic 19 context</a>
+              <a class="wiki-nav-link active" href="#">S19.3 reading measure</a>
+              <a class="wiki-nav-link" href="#">S19.5 collapsible nav</a>
+              <p class="wiki-nav-subgroup">Planning Artifacts</p>
+              <a class="wiki-nav-link" href="#">Discovery PRD</a>
+            </nav>
+            <article class="wiki-article">
+              <p class="wiki-breadcrumb">
+                <a href="#">Main Page</a> › BMAD Output › Implementation Stories ›
+                <strong>S19.3 reading measure</strong>
+              </p>
+              <aside class="infobox">
+                <p class="infobox-title">Story</p>
+                <p><strong>Epic</strong> E19</p>
+                <p><strong>Status</strong> Done</p>
+              </aside>
+              <div class="article-body">
+                <h1>S19.3 — Reading measure and sticky header</h1>
+                <p>
+                  At wide desktop widths, article Markdown renders in a centered
+                  <code>70ch</code> grid track. The header stays sticky; TOC and hash
+                  targets use a shared block size for scroll offsets.
+                </p>
+                <h2>Functional requirements</h2>
+                <p>
+                  Normal direct children occupy the middle track. Top-level tables and
+                  code blocks span the full article column without breaking measure.
+                </p>
+                <h3>Grid behavior</h3>
+                <p>
+                  The three-column grid activates at 1200px to avoid conflict with the
+                  floated infobox at tablet widths.
+                </p>
+                <blockquote>
+                  Do not reintroduce per-child width/auto-margin — it fragmented article
+                  layout in earlier iterations.
+                </blockquote>
+                <h2>Acceptance criteria</h2>
+                <p>
+                  Given a generated article at 1280px, when the user scrolls to an h2
+                  anchor, then the heading clears the sticky header without overlap.
+                </p>
+              </div>
+            </article>
+            <aside class="wiki-toc" aria-label="Contents">
+              <p class="wiki-toc-title">Contents</p>
+              <a href="#">Functional requirements</a>
+              <a class="indent" href="#">Grid behavior</a>
+              <a href="#">Acceptance criteria</a>
+            </aside>
+          </div>
+        </div>
+        <ul class="notes">
+          <li>Helvetica body; browser-default heading sizes on 14px root</li>
+          <li>Headings sans-only — no serif distinction for page title</li>
+          <li>Menlo-first monospace (differs from BRAND wordmark stack)</li>
+        </ul>
+      </section>
+
+      <section class="panel proposed" aria-labelledby="proposed-label">
+        <p class="panel-label proposed" id="proposed-label">Proposed</p>
+        <div class="wiki-frame">
+          <header class="wiki-header">
+            <a class="wiki-logo" href="#"
+              ><span class="wiki-logo-bracket">[[</span>specwiki<span
+                class="wiki-logo-bracket"
+                >]]</span
+              ></a
+            >
+            <input
+              class="wiki-search"
+              type="search"
+              placeholder="Search wiki…"
+              aria-label="Search"
+              disabled
+            />
+          </header>
+          <div class="wiki-layout">
+            <nav class="wiki-nav" aria-label="Categories">
+              <p class="wiki-nav-category">BMAD Output</p>
+              <p class="wiki-nav-subgroup">Implementation Stories</p>
+              <a class="wiki-nav-link" href="#">Epic 19 context</a>
+              <a class="wiki-nav-link active" href="#">S19.3 reading measure</a>
+              <a class="wiki-nav-link" href="#">S19.5 collapsible nav</a>
+              <p class="wiki-nav-subgroup">Planning Artifacts</p>
+              <a class="wiki-nav-link" href="#">Discovery PRD</a>
+            </nav>
+            <article class="wiki-article">
+              <p class="wiki-breadcrumb">
+                <a href="#">Main Page</a> › BMAD Output › Implementation Stories ›
+                <strong>S19.3 reading measure</strong>
+              </p>
+              <aside class="infobox">
+                <p class="infobox-title">Story</p>
+                <p><strong>Epic</strong> E19</p>
+                <p><strong>Status</strong> Done</p>
+              </aside>
+              <div class="article-body">
+                <h1>S19.3 — Reading measure and sticky header</h1>
+                <p>
+                  At wide desktop widths, article Markdown renders in a centered
+                  <code>70ch</code> grid track. The header stays sticky; TOC and hash
+                  targets use a shared block size for scroll offsets.
+                </p>
+                <h2>Functional requirements</h2>
+                <p>
+                  Normal direct children occupy the middle track. Top-level tables and
+                  code blocks span the full article column without breaking measure.
+                </p>
+                <h3>Grid behavior</h3>
+                <p>
+                  The three-column grid activates at 1200px to avoid conflict with the
+                  floated infobox at tablet widths.
+                </p>
+                <blockquote>
+                  Do not reintroduce per-child width/auto-margin — it fragmented article
+                  layout in earlier iterations.
+                </blockquote>
+                <h2>Acceptance criteria</h2>
+                <p>
+                  Given a generated article at 1280px, when the user scrolls to an h2
+                  anchor, then the heading clears the sticky header without overlap.
+                </p>
+              </div>
+            </article>
+            <aside class="wiki-toc" aria-label="Contents">
+              <p class="wiki-toc-title">Contents</p>
+              <a href="#">Functional requirements</a>
+              <a class="indent" href="#">Grid behavior</a>
+              <a href="#">Acceptance criteria</a>
+            </aside>
+          </div>
+        </div>
+        <ul class="notes">
+          <li>System sans body; explicit h1 32px / h2 26px / h3 22px scale</li>
+          <li>Serif h1–h2 (Linux Libertine / Georgia); h2 section rule</li>
+          <li>ui-monospace-first stack aligned with BRAND.md</li>
+        </ul>
+      </section>
+    </div>
+  </body>
+</html>
