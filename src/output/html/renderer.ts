@@ -9,6 +9,7 @@ import type { SpecSection, WikiIndexMeta, WikiPage } from "../../types.js";
 import { isReadmeFile } from "../readme-index.js";
 import {
   buildCategoryNavSubgroups,
+  resolveActiveSubgroupTrail,
   type NavGroupingContext,
   type NavSubgroup,
 } from "./nav-grouping.js";
@@ -53,6 +54,8 @@ interface BreadcrumbSegment {
   label: string;
   href?: string;
   first: boolean;
+  /** True only on the final page-title segment. */
+  current?: boolean;
 }
 
 export interface HtmlRenderOptions {
@@ -176,7 +179,15 @@ export class HtmlRenderer {
     );
     const categoryLabel = categoryLabelFor(page.category);
     const tocEntries = buildTocEntries(page.sections);
-    const breadcrumbs = buildBreadcrumbs(page, categoryLabel, allPages);
+    const activeCategory = categories.find(
+      (category) => category.key === page.category,
+    );
+    const breadcrumbs = buildBreadcrumbs(
+      page,
+      categoryLabel,
+      allPages,
+      activeCategory?.subgroups,
+    );
 
     const body = Mustache.render(
       this.articleTemplate,
@@ -330,6 +341,7 @@ function buildBreadcrumbs(
   page: WikiPage,
   categoryLabel: string,
   allPages: WikiPage[],
+  subgroups?: NavSubgroup[],
 ): BreadcrumbSegment[] {
   const segments: BreadcrumbSegment[] = [
     { label: "Main Page", href: "index.html", first: true },
@@ -345,7 +357,17 @@ function buildBreadcrumbs(
     segments.push({ label: categoryLabel, first: false });
   }
 
-  segments.push({ label: page.title, first: false });
+  if (subgroups?.length) {
+    const trail = resolveActiveSubgroupTrail(subgroups, {
+      activePageSlug: page.slug,
+      activeSourcePath: page.sourcePath,
+    });
+    for (const segment of trail) {
+      segments.push({ label: segment.label, first: false });
+    }
+  }
+
+  segments.push({ label: page.title, first: false, current: true });
 
   return segments;
 }

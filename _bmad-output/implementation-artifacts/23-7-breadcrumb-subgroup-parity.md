@@ -4,7 +4,7 @@ baseline_commit: 34b6393a3245a3259f09e638a5afee44a23ded55
 
 # Story 23.7: Breadcrumb Subgroup Parity
 
-Status: ready-for-dev
+Status: review
 
 **Source:** [23-IMP-3](./improvements/23-imp-3-breadcrumb-subgroup-parity.md)  
 **Epic:** E23 — Navigation Drawer Hierarchy  
@@ -54,14 +54,14 @@ so that my place in the wiki matches what I see in the navbar.
 
 ## Tasks / Subtasks
 
-- [ ] Breadcrumb subgroup parity vertical slice (AC: 1–12)
-  - [ ] RED: renderer tests — nested Cursor Skills / BMAD Output crumbs; flat category unchanged; `aria-current` only on final segment
-  - [ ] RED: unit tests for ancestry helper (L1, L2, none)
-  - [ ] GREEN: export helper from `nav-grouping.ts` (e.g. `resolveActiveSubgroupTrail`) that walks finalized `NavSubgroup[]` for active slug/sourcePath and returns ordered `{ key, label }[]`
-  - [ ] GREEN: extend `buildBreadcrumbs` to insert subgroup segments after category; pass `navGroupingContext` / reuse subgroups already built for the active category (avoid a second divergent grouping pass when possible)
-  - [ ] GREEN: fix `article.mustache` breadcrumb markup for explicit `current` flag
-  - [ ] REFACTOR: no discovery/slug/Markdown changes; no S23.4 portal work; no S23.5 search changes
-  - [ ] Update `IMPLEMENTATION.md`, sprint-status, 23-IMP-3 disposition, epic table; run quality gate + §0.2.5/§0.2.6
+- [x] Breadcrumb subgroup parity vertical slice (AC: 1–12)
+  - [x] RED: renderer tests — nested Cursor Skills / BMAD Output crumbs; flat category unchanged; `aria-current` only on final segment
+  - [x] RED: unit tests for ancestry helper (L1, L2, none)
+  - [x] GREEN: export helper from `nav-grouping.ts` (e.g. `resolveActiveSubgroupTrail`) that walks finalized `NavSubgroup[]` for active slug/sourcePath and returns ordered `{ key, label }[]`
+  - [x] GREEN: extend `buildBreadcrumbs` to insert subgroup segments after category; pass `navGroupingContext` / reuse subgroups already built for the active category (avoid a second divergent grouping pass when possible)
+  - [x] GREEN: fix `article.mustache` breadcrumb markup for explicit `current` flag
+  - [x] REFACTOR: no discovery/slug/Markdown changes; no S23.4 portal work; no S23.5 search changes
+  - [x] Update `IMPLEMENTATION.md`, sprint-status, 23-IMP-3 disposition, epic table; run quality gate + §0.2.5/§0.2.6
 
 ## Dev Notes
 
@@ -177,12 +177,43 @@ Recent: nested disclosure (`6ec9910`), `data-subgroup` escape (`34b6393`), Agent
 
 ### Agent Model Used
 
+Cursor Grok 4.5
+
 ### Debug Log References
 
 ### Completion Notes List
 
+- Exported `resolveActiveSubgroupTrail` from `nav-grouping.ts`; reuses `subgroupContainsActiveInChild` match rules (slug / sourcePath).
+- `buildBreadcrumbs` inserts subgroup labels from the active category’s already-built `subgroups` VM (single grouping pass via `buildNavCategories`).
+- `BreadcrumbSegment.current` + Mustache update so only the page-title segment gets `aria-current="page"`.
+- Added renderer HTML assertions (Cursor Skills L1, BMAD Output L1→L2, flat category) and unit tests for L1 / L2 / none trail cases.
+- Docs: IMPLEMENTATION.md, sprint-status, 23-IMP-3, epic table/gate updated.
+
 ### File List
+
+- `src/output/html/nav-grouping.ts`
+- `src/output/html/renderer.ts`
+- `src/output/html/templates/article.mustache`
+- `tests/output/html/renderer.test.ts`
+- `tests/output/html/nav-grouping.test.ts`
+- `IMPLEMENTATION.md`
+- `_bmad-output/implementation-artifacts/sprint-status.yaml`
+- `_bmad-output/implementation-artifacts/23-7-breadcrumb-subgroup-parity.md`
+- `_bmad-output/implementation-artifacts/improvements/23-imp-3-breadcrumb-subgroup-parity.md`
+- `_bmad-output/implementation-artifacts/epic-23-navigation-drawer-hierarchy.md`
 
 ### Change Log
 
 - 2026-07-17: Story created from 23-IMP-3; status ready-for-dev.
+- 2026-07-18: Implemented breadcrumb subgroup parity; status review.
+
+## Senior Developer Review (AI)
+
+- **Review date:** 2026-07-18
+- **Outcome:** Approve
+- **Reviewer model:** claude-sonnet-5-thinking-high (Bugbot)
+- **Findings:** none
+
+| Severity | Location | Finding       | Triage |
+| -------- | -------- | ------------- | ------ |
+| —        | —        | No bugs found | —      |

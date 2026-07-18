@@ -59,13 +59,15 @@ Add a **human-readable second level of grouping** inside every navigation drawer
 
 ## Stories
 
-| Story | Summary                                                    | Depends      | Status        |
-| ----- | ---------------------------------------------------------- | ------------ | ------------- |
-| S23.1 | Nav grouping module + universal path-segment baseline      | E19 S19.5    | backlog       |
-| S23.2 | BMad catalog enrichment (CSV + customize.toml)             | S23.1        | ready-for-dev |
-| S23.3 | Nested disclosure UI (templates + CSS + route-aware state) | S23.1        | review        |
-| S23.4 | Index portal parity + subgroup anchors                     | S23.3        | backlog       |
-| S23.5 | Search grouped by category › subgroup                      | S23.1, S19.4 | backlog       |
+| Story | Summary                                                    | Depends      | Status  |
+| ----- | ---------------------------------------------------------- | ------------ | ------- |
+| S23.1 | Nav grouping module + universal path-segment baseline      | E19 S19.5    | review  |
+| S23.2 | BMad catalog enrichment (CSV + customize.toml)             | S23.1        | review  |
+| S23.3 | Nested disclosure UI (templates + CSS + route-aware state) | S23.1        | review  |
+| S23.4 | Index portal parity + subgroup anchors                     | S23.3        | backlog |
+| S23.5 | Search grouped by category › subgroup                      | S23.1, S19.4 | backlog |
+| S23.6 | Agent Skills phase group dedup (skill-folder L2)           | S23.2        | review  |
+| S23.7 | Breadcrumb subgroup parity                                 | S23.1        | review  |
 
 ---
 
@@ -183,6 +185,7 @@ Add a **human-readable second level of grouping** inside every navigation drawer
 - [x] S23.3 — Nested disclosure in drawer; active route expands correct subgroup
 - [ ] S23.4 — Index portal matches drawer structure
 - [ ] S23.5 — Search groups by category › subgroup
+- [x] S23.7 — Article breadcrumbs include subgroup ancestry matching drawer labels
 - [ ] Full HARNESS §0.2 quality gate on epic completion
 
 ---
@@ -196,7 +199,8 @@ Add a **human-readable second level of grouping** inside every navigation drawer
 
 Logged after S23.2 dogfood — reports under [`improvements/`](./improvements/):
 
-| ID                                                                    | Summary                                                                                                                | Disposition                                                       |
-| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| [23-IMP-1](./improvements/23-imp-1-agent-skills-phase-group-dedup.md) | Agent Skills phase groups show duplicate identical titles; want BMAD Output–like hierarchy / one clear entry per skill | **S23.6** (`23-6-agent-skills-phase-group-dedup`) — review        |
-| [23-IMP-2](./improvements/23-imp-2-collapsible-nav-subgroups.md)      | Collapse/expand subgroups in the drawer                                                                                | **Maps to existing S23.3** (`23-3-nested-disclosure-ui`, backlog) |
+| ID                                                                    | Summary                                                                                                                | Disposition                                                      |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| [23-IMP-1](./improvements/23-imp-1-agent-skills-phase-group-dedup.md) | Agent Skills phase groups show duplicate identical titles; want BMAD Output–like hierarchy / one clear entry per skill | **S23.6** (`23-6-agent-skills-phase-group-dedup`) — review       |
+| [23-IMP-2](./improvements/23-imp-2-collapsible-nav-subgroups.md)      | Collapse/expand subgroups in the drawer                                                                                | **Maps to existing S23.3** (`23-3-nested-disclosure-ui`, review) |
+| [23-IMP-3](./improvements/23-imp-3-breadcrumb-subgroup-parity.md)     | Article breadcrumbs omit drawer subgroup path                                                                          | **S23.7** (`23-7-breadcrumb-subgroup-parity`) — review           |

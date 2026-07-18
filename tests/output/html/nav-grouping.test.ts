@@ -8,6 +8,7 @@ import {
   categoryPathPrefix,
   humanizeSegment,
   loadNavGroupingContext,
+  resolveActiveSubgroupTrail,
 } from "../../../src/output/html/nav-grouping.js";
 import {
   catalogPath,
@@ -542,6 +543,115 @@ describe("nav-grouping", () => {
 
       expect(result.pages).toHaveLength(1);
       expect(result.pages[0].slug).toBe("artifact");
+    });
+  });
+
+  describe("resolveActiveSubgroupTrail", () => {
+    it("returns L1-only trail for a page under one subgroup", () => {
+      const pages = [
+        wikiPage({
+          slug: "skill-a",
+          title: "Skill A",
+          category: "cursor-skills",
+          sourcePath: ".cursor/skills/team-a/skill-a/SKILL.md",
+        }),
+        wikiPage({
+          slug: "skill-b",
+          title: "Skill B",
+          category: "cursor-skills",
+          sourcePath: ".cursor/skills/team-a/skill-b/SKILL.md",
+        }),
+      ];
+
+      const result = buildCategoryNavSubgroups(pages, {
+        categoryKey: "cursor-skills",
+        activePageSlug: "skill-a",
+        activeSourcePath: ".cursor/skills/team-a/skill-a/SKILL.md",
+      });
+
+      expect(
+        resolveActiveSubgroupTrail(result.subgroups, {
+          activePageSlug: "skill-a",
+          activeSourcePath: ".cursor/skills/team-a/skill-a/SKILL.md",
+        }),
+      ).toEqual([{ key: "team-a", label: "Team A" }]);
+    });
+
+    it("returns L1→L2 trail for nested BMAD Output stories", () => {
+      const pages = [
+        wikiPage({
+          slug: "story-19-5",
+          title: "Story 19.5",
+          sourcePath:
+            "_bmad-output/implementation-artifacts/19-5-collapsible-category-navigation.md",
+        }),
+        wikiPage({
+          slug: "story-19-1",
+          title: "Story 19.1",
+          sourcePath:
+            "_bmad-output/implementation-artifacts/19-1-dark-mode-pre-paint-theme-toggle.md",
+        }),
+        wikiPage({
+          slug: "story-23-1",
+          title: "Story 23.1",
+          sourcePath:
+            "_bmad-output/implementation-artifacts/23-1-nav-grouping-module-path-baseline.md",
+        }),
+        wikiPage({
+          slug: "story-23-2",
+          title: "Story 23.2",
+          sourcePath:
+            "_bmad-output/implementation-artifacts/23-2-bmad-catalog-enrichment.md",
+        }),
+      ];
+
+      const result = buildCategoryNavSubgroups(pages, {
+        categoryKey: "bmad-output",
+        activePageSlug: "story-19-5",
+        activeSourcePath:
+          "_bmad-output/implementation-artifacts/19-5-collapsible-category-navigation.md",
+      });
+
+      expect(
+        resolveActiveSubgroupTrail(result.subgroups, {
+          activePageSlug: "story-19-5",
+          activeSourcePath:
+            "_bmad-output/implementation-artifacts/19-5-collapsible-category-navigation.md",
+        }),
+      ).toEqual([
+        { key: "implementation-stories", label: "Implementation Stories" },
+        { key: "implementation-stories/epic-19", label: "Epic 19" },
+      ]);
+    });
+
+    it("returns empty trail when page is a direct category leaf", () => {
+      const pages = [
+        wikiPage({
+          slug: "root-a",
+          title: "Root A",
+          category: "root",
+          sourcePath: "FIRST.md",
+        }),
+        wikiPage({
+          slug: "root-b",
+          title: "Root B",
+          category: "root",
+          sourcePath: "SECOND.md",
+        }),
+      ];
+
+      const result = buildCategoryNavSubgroups(pages, {
+        categoryKey: "root",
+        activePageSlug: "root-a",
+        activeSourcePath: "FIRST.md",
+      });
+
+      expect(
+        resolveActiveSubgroupTrail(result.subgroups, {
+          activePageSlug: "root-a",
+          activeSourcePath: "FIRST.md",
+        }),
+      ).toEqual([]);
     });
   });
 

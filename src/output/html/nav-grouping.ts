@@ -672,7 +672,10 @@ function nodeOrChildrenContainActive(
 
 function subgroupContainsActiveInChild(
   subgroup: NavSubgroup,
-  options: BuildCategoryNavSubgroupsOptions,
+  options: Pick<
+    BuildCategoryNavSubgroupsOptions,
+    "activePageSlug" | "activeSourcePath"
+  >,
 ): boolean {
   if (!options.activePageSlug && !options.activeSourcePath) {
     return false;
@@ -694,6 +697,42 @@ function subgroupContainsActiveInChild(
   }
 
   return false;
+}
+
+export interface SubgroupTrailSegment {
+  key: string;
+  label: string;
+}
+
+/**
+ * Walk finalized category subgroups and return the ordered ancestor trail
+ * (outer → inner) for the active page. Does not include the page itself.
+ */
+export function resolveActiveSubgroupTrail(
+  subgroups: NavSubgroup[],
+  options: Pick<
+    BuildCategoryNavSubgroupsOptions,
+    "activePageSlug" | "activeSourcePath"
+  >,
+): SubgroupTrailSegment[] {
+  const trail: SubgroupTrailSegment[] = [];
+
+  function walk(nodes: NavSubgroup[]): boolean {
+    for (const node of nodes) {
+      if (!subgroupContainsActiveInChild(node, options)) {
+        continue;
+      }
+      trail.push({ key: node.key, label: node.label });
+      if (node.subgroups?.length) {
+        walk(node.subgroups);
+      }
+      return true;
+    }
+    return false;
+  }
+
+  walk(subgroups);
+  return trail;
 }
 
 /** Exported for unit tests — maps category keys to path strip prefixes. */

@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
-**Last updated:** 2026-07-17
-**Current position:** **E23 S23.3 Nested disclosure UI** — ready for review
-**Test count:** 510 passing
+**Last updated:** 2026-07-18
+**Current position:** **E23 S23.7 Breadcrumb subgroup parity** — ready for review
+**Test count:** 516 passing
 
 ## Deliverables
 
@@ -160,6 +160,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
   - [x] S23.2 — BMad catalog enrichment (CSV/TOML hybrid Agent Skills) _(review)_
   - [x] S23.3 — Nested disclosure UI (collapsible nav subgroups) _(review)_
   - [x] S23.6 — Agent Skills phase group dedup (skill-folder L2) _(review)_
+  - [x] S23.7 — Breadcrumb subgroup parity _(review)_
 
 ## HARNESS §13 Deliverables Checklist
 
@@ -277,4 +278,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-17 | E23 S23.2        | `feat(output): BMad catalog enrichment for Agent Skills nav` — CSV/TOML load into `NavGroupingContext`; hybrid Your team → SDLC → Core/Deprecated/Uncatalogued grouping with L4 display titles; realpath catalog confinement + DEPRECATED multi-row merge; sample-project fixtures; 504 tests; `src/output/html/` ≥90%                                                                                                       | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-17 | E23 S23.6        | `feat(output): nest multi-page Agent Skills under phase groups` — hybrid phase buckets get skill-folder L2 (CSV/agent L4 as subgroup label; wiki titles on leaves); single-page skills stay as L4 phase leaves; uncatalogued multi-page uses humanized skill id; 23-IMP-1; 508 tests; `src/output/html/` ≥90%                                                                                                                | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-17 | E23 S23.3        | `feat(output): collapsible nested nav subgroups` — Mustache partials with nested `<details>` for L1/L2 subgroups; route-aware `open`; count badges; CSS chevrons; recursive template copy in `copy-html-assets.mjs`; 23-IMP-2; `src/output/html/` ≥90%                                                                                                                                                                       | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
+| 2026-07-18 | E23 S23.7        | `feat(output): breadcrumb subgroup parity with drawer ancestry` — `resolveActiveSubgroupTrail` walks finalized `NavSubgroup[]`; `buildBreadcrumbs` inserts L1/L2 labels after category; explicit `current` flag fixes `aria-current`; 23-IMP-3; 516 tests; `src/output/html/` ≥90%                                                                                                                                           | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | _template_ | _E?_ S?_         | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                                              |

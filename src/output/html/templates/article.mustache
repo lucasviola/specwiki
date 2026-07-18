@@ -48,7 +48,7 @@
       {{#breadcrumbs}}
       {{^first}} › {{/first}}
       {{#href}}<a href="{{href}}">{{label}}</a>{{/href}}
-      {{^href}}<span aria-current="page">{{label}}</span>{{/href}}
+      {{^href}}{{#current}}<span aria-current="page">{{label}}</span>{{/current}}{{^current}}<span>{{label}}</span>{{/current}}{{/href}}
       {{/breadcrumbs}}
     </nav>
     <aside class="infobox">

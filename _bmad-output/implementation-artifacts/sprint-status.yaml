@@ -1,5 +1,5 @@
 # generated: 2026-07-12
-# last_updated: 2026-07-17
+# last_updated: 2026-07-18
 # project: specwiki
 # project_key: NOKEY
 # tracking_system: file-system
@@ -45,7 +45,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-07-12
-last_updated: 2026-07-17
+last_updated: 2026-07-18
 project: specwiki
 project_key: NOKEY
 tracking_system: file-system
@@ -167,6 +167,7 @@ development_status:
   23-4-index-portal-parity: backlog
   23-5-search-subgroup-grouping: backlog
   23-6-agent-skills-phase-group-dedup: review
+  23-7-breadcrumb-subgroup-parity: review
   epic-23-retrospective: optional
 
 # MVP formally closed 2026-07-12 — all E1–E7 stories done; POST-MVP begins at E8

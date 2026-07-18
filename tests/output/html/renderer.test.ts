@@ -359,6 +359,106 @@ describe("HtmlRenderer", () => {
     expect(html).not.toContain(`IMPLEMENTATION ${title}`);
   });
 
+  it("includes Cursor Skills subgroup labels in article breadcrumbs", () => {
+    const pages = [
+      samplePage({
+        slug: "skill-a",
+        title: "Skill A",
+        category: "cursor-skills",
+        sourcePath: ".cursor/skills/team-a/skill-a/SKILL.md",
+      }),
+      samplePage({
+        slug: "skill-b",
+        title: "Skill B",
+        category: "cursor-skills",
+        sourcePath: ".cursor/skills/team-a/skill-b/SKILL.md",
+      }),
+    ];
+
+    const html = renderer.renderArticle(pages[0], pages, "<p>Body</p>", {
+      navGroupingContext: { loaded: false },
+    });
+
+    const breadcrumb = html.match(
+      /<nav class="breadcrumb"[^>]*>[\s\S]*?<\/nav>/,
+    )?.[0];
+    expect(breadcrumb).toBeDefined();
+    expect(breadcrumb).toContain("Main Page");
+    expect(breadcrumb).toContain("Cursor Skills");
+    expect(breadcrumb).toContain("<span>Team A</span>");
+    expect(breadcrumb).toContain('<span aria-current="page">Skill A</span>');
+    expect(breadcrumb).not.toMatch(/<span aria-current="page">Team A<\/span>/);
+    expect(breadcrumb?.match(/aria-current="page"/g)).toHaveLength(1);
+  });
+
+  it("includes BMAD Output L1 and L2 subgroup labels in article breadcrumbs", () => {
+    const pages = [
+      samplePage({
+        slug: "story-19",
+        title: "Story 19",
+        category: "bmad-output",
+        sourcePath:
+          "_bmad-output/implementation-artifacts/19-5-collapsible-category-navigation.md",
+      }),
+      samplePage({
+        slug: "story-19b",
+        title: "Story 19b",
+        category: "bmad-output",
+        sourcePath: "_bmad-output/implementation-artifacts/19-6-other-story.md",
+      }),
+      samplePage({
+        slug: "story-23",
+        title: "Story 23",
+        category: "bmad-output",
+        sourcePath:
+          "_bmad-output/implementation-artifacts/23-1-nav-grouping-module-path-baseline.md",
+      }),
+      samplePage({
+        slug: "story-23b",
+        title: "Story 23b",
+        category: "bmad-output",
+        sourcePath:
+          "_bmad-output/implementation-artifacts/23-2-bmad-catalog-enrichment.md",
+      }),
+    ];
+
+    const html = renderer.renderArticle(pages[0], pages, "<p>Body</p>", {
+      navGroupingContext: { loaded: false },
+    });
+
+    const breadcrumb = html.match(
+      /<nav class="breadcrumb"[^>]*>[\s\S]*?<\/nav>/,
+    )?.[0];
+    expect(breadcrumb).toBeDefined();
+    expect(breadcrumb).toContain("BMAD Output");
+    expect(breadcrumb).toContain("<span>Implementation Stories</span>");
+    expect(breadcrumb).toContain("<span>Epic 19</span>");
+    expect(breadcrumb).toContain('<span aria-current="page">Story 19</span>');
+    expect(breadcrumb?.match(/aria-current="page"/g)).toHaveLength(1);
+  });
+
+  it("keeps flat-category breadcrumbs without subgroup segments", () => {
+    const pages = [
+      samplePage({ slug: "a", title: "First", sourcePath: "FIRST.md" }),
+      samplePage({ slug: "b", title: "Second", sourcePath: "SECOND.md" }),
+    ];
+
+    const html = renderer.renderArticle(pages[0], pages, "<p>Body</p>", {
+      navGroupingContext: { loaded: false },
+    });
+
+    const breadcrumb = html.match(
+      /<nav class="breadcrumb"[^>]*>[\s\S]*?<\/nav>/,
+    )?.[0];
+    expect(breadcrumb).toBeDefined();
+    expect(breadcrumb).toContain("Main Page");
+    expect(breadcrumb).toContain("Project Root");
+    expect(breadcrumb).toContain('<span aria-current="page">First</span>');
+    expect(breadcrumb).not.toContain("<span>Team A</span>");
+    expect(breadcrumb?.match(/ › /g)).toHaveLength(2);
+    expect(breadcrumb?.match(/aria-current="page"/g)).toHaveLength(1);
+  });
+
   it("omits TOC rail when page has no sections", () => {
     const page = samplePage({ sections: [] });
     const html = renderer.renderArticle(page, [page], "<p>Body</p>");
