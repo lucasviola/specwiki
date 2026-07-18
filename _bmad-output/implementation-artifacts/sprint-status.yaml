@@ -1,5 +1,5 @@
 # generated: 2026-07-12
-# last_updated: 2026-07-18 (E24 added)
+# last_updated: 2026-07-18 (S24.3 story created)
 # project: specwiki
 # project_key: NOKEY
 # tracking_system: file-system
@@ -172,7 +172,7 @@ development_status:
   epic-24: in-progress
   24-1-article-type-scale-and-heading-serif: review
   24-2-type-tokens-and-chrome-alignment: review
-  24-3-typography-specification-doc: backlog
+  24-3-typography-specification-doc: review
   epic-24-retrospective: optional
 
 # MVP formally closed 2026-07-12 — all E1–E7 stories done; POST-MVP begins at E8

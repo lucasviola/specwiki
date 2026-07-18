@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-07-18
+
+### Added
+
+- Wiki typography system (Epic 24): explicit article heading scale with serif h1–h2 and sans h3–h6 under a clear size hierarchy
+- Tokenized chrome font sizes for navigation, search, breadcrumbs, table of contents, and infobox surfaces
+- System sans body text at 14px Vector-style reading density; BRAND-aligned monospace stack for the wordmark and inline code
+
+### Changed
+
+- Generated HTML wiki typography is now documented in `docs/brand/BRAND.md` (type scale, chrome surface map, and intentional landing-vs-wiki divergence)
+
 ## [1.1.0] - 2026-07-18
 
 ### Added
