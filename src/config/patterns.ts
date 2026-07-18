@@ -189,6 +189,7 @@ export const CATEGORY_LABELS: Record<string, string> = {
   "docs-specs": "Documentation Specs",
   requirements: "Requirements",
   plans: "Plans",
+  adr: "Architecture Decisions",
   github: "GitHub",
   "bmad-output": "BMAD Output",
   "agent-skills": "Agent Skills",

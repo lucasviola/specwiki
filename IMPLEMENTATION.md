@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-18
-**Current position:** **E24 S24.3 Typography specification doc** — ready for review
-**Test count:** 517 passing
+**Current position:** **E25 S25.1 ADR scaffolding, template, and wiki category** — ready for review
+**Test count:** 520 passing
 
 ## Deliverables
 
@@ -285,4 +285,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-18 | E24 S24.1        | `feat(output): article heading type scale and serif h1-h2` — `:root` `--font-size-h1`–`h6` tokens; `.specwiki-article-body .mw-parser-output` heading typography (serif h1–h2, sans h3–h6, h2 divider); `.specwiki-portal h1` parity; generated-CSS regression test; portal-intro scope fix from code review; 517 tests; `src/output/html/` 97.11%                                                                           | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-18 | E24 S24.2        | `feat(output): chrome type tokens and system sans alignment` — `:root` `--font-size-caption/ui-sm/ui/body` + `--font-family-monospace-brand`; body `--font-family-system-sans`; nav/search/breadcrumb/TOC/infobox refactored to tokens; BRAND mono on logo/code/pre; chrome weight rhythm (600 labels, 700 active category + TOC); generated-CSS test; 518 tests; `src/output/html/` 97.11%                                  | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-18 | E24 S24.3        | `docs(brand): wiki typography specification in BRAND.md` — type scale token ladder, font stacks, chrome surface map, weight rhythm, landing-vs-wiki divergence, research links; §0.8 N/A (doc-only); no src/ changes                                                                                                                                                                                                         | uncommitted           | typecheck ✓ · build ✓                                                                |
+| 2026-07-18 | E25 S25.1        | `feat(adr): scaffold docs/adr with wiki category discovery` — `docs/adr/index.md` + `template.md` (MADR skeleton, status lifecycle, authoring norms); `deriveCategory` maps `docs/adr/` → `adr`; `CATEGORY_LABELS.adr` = Architecture Decisions; `CATEGORY_PATH_PREFIXES` parity; 520 tests; `src/discover/specs.ts` 100%                                                                                                    | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | _template_ | _E?_ S?_         | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                                              |

@@ -20,6 +20,7 @@ export function deriveCategory(relativePath: string): string {
   if (normalized.startsWith(".kiro/specs/")) return "kiro";
   if (normalized.startsWith("docs/specs/")) return "docs-specs";
   if (normalized.startsWith("docs/plans/")) return "plans";
+  if (normalized.startsWith("docs/adr/")) return "adr";
   if (normalized.startsWith("requirements/")) return "requirements";
   if (normalized.startsWith(".github/")) return "github";
   if (normalized.startsWith("_bmad-output/")) return "bmad-output";

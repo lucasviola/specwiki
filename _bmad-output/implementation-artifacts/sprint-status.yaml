@@ -1,5 +1,5 @@
 # generated: 2026-07-12
-# last_updated: 2026-07-18 (S24.3 story created)
+# last_updated: 2026-07-18 (S25.1 story created)
 # project: specwiki
 # project_key: NOKEY
 # tracking_system: file-system
@@ -90,8 +90,8 @@ development_status:
   8-4-readme-discovery-and-folder-index: done
   epic-8-retrospective: optional
   epic-9: done
-  9-1-json-machine-readable-output: review
-  9-2-wiki-llms-txt-export: review
+  9-1-json-machine-readable-output: done
+  9-2-wiki-llms-txt-export: done
   epic-9-retrospective: optional
   epic-10: backlog
   10-1-generate-check-ci-freshness: backlog
@@ -107,8 +107,8 @@ development_status:
   epic-12-retrospective: optional
   epic-13: in-progress
   13-1-npm-publish-preparation: in-progress
-  13-2-github-actions-ci-workflow: review
-  13-3-publication-readiness-and-launch-marketing: review
+  13-2-github-actions-ci-workflow: done
+  13-3-publication-readiness-and-launch-marketing: done
   13-4-version-1-0-0-release-and-maintainer-docs: superseded
   epic-13-retrospective: optional
   epic-14: backlog
@@ -119,16 +119,16 @@ development_status:
   epic-15: backlog
   15-1-ide-wiki-panel-extension: backlog
   epic-15-retrospective: optional
-  epic-16: in-progress
-  16-1-mustache-html-renderer-and-wikimedia-assets: review
+  epic-16: done
+  16-1-mustache-html-renderer-and-wikimedia-assets: done
   16-2-wikipedia-layout-chrome-and-navigation: done
   16-3-rich-html-content-rendering: done
-  16-4-client-side-wiki-search: review
+  16-4-client-side-wiki-search: done
   epic-16-retrospective: optional
-  epic-17: in-progress
-  17-1-broad-markdown-discovery-by-default: review
-  17-2-specwiki-open-browser-command: review
-  17-3-specwiki-init-config-scaffold: review
+  epic-17: done
+  17-1-broad-markdown-discovery-by-default: done
+  17-2-specwiki-open-browser-command: done
+  17-3-specwiki-init-config-scaffold: done
   epic-17-retrospective: optional
   epic-19: done
   19-1-dark-mode-pre-paint-theme-toggle: done
@@ -137,10 +137,10 @@ development_status:
   19-4-search-interaction-upgrade: done
   19-5-collapsible-category-navigation: done
   epic-19-retrospective: optional
-  epic-20: in-progress
-  20-1-landing-page-narrative-and-brand-treatment: review
-  20-2-responsive-accessible-landing-page-implementation: review
-  20-3-specwiki-ai-hosting-and-release-workflow: review
+  epic-20: done
+  20-1-landing-page-narrative-and-brand-treatment: done
+  20-2-responsive-accessible-landing-page-implementation: done
+  20-3-specwiki-ai-hosting-and-release-workflow: done
   epic-20-retrospective: optional
   epic-21: in-progress
   21-1-generate-output-confined-to-project-root: done
@@ -161,19 +161,26 @@ development_status:
   22-7-github-tag-release-automation: backlog
   epic-22-retrospective: optional
   epic-23: in-progress
-  23-1-nav-grouping-module-path-baseline: review
-  23-2-bmad-catalog-enrichment: review
-  23-3-nested-disclosure-ui: review
+  23-1-nav-grouping-module-path-baseline: done
+  23-2-bmad-catalog-enrichment: done
+  23-3-nested-disclosure-ui: done
   23-4-index-portal-parity: backlog
   23-5-search-subgroup-grouping: backlog
-  23-6-agent-skills-phase-group-dedup: review
-  23-7-breadcrumb-subgroup-parity: review
+  23-6-agent-skills-phase-group-dedup: done
+  23-7-breadcrumb-subgroup-parity: done
   epic-23-retrospective: optional
-  epic-24: in-progress
-  24-1-article-type-scale-and-heading-serif: review
-  24-2-type-tokens-and-chrome-alignment: review
-  24-3-typography-specification-doc: review
+  epic-24: done
+  24-1-article-type-scale-and-heading-serif: done
+  24-2-type-tokens-and-chrome-alignment: done
+  24-3-typography-specification-doc: done
   epic-24-retrospective: optional
+  epic-25: in-progress
+  25-1-adr-scaffolding-template-and-wiki-category: review
+  25-2-foundational-adrs: backlog
+  25-3-retroactive-adrs: backlog
+  25-4-architecture-spine-sync: backlog
+  25-5-pre-build-adrs-for-e11-e12: backlog
+  epic-25-retrospective: optional
 
 # MVP formally closed 2026-07-12 — all E1–E7 stories done; POST-MVP begins at E8
 mvp_status: closed

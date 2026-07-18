@@ -89,6 +89,8 @@ describe("deriveCategory", () => {
     [".kiro/specs/design.md", "kiro"],
     ["docs/specs/architecture.md", "docs-specs"],
     ["docs/plans/roadmap.md", "plans"],
+    ["docs/adr/index.md", "adr"],
+    ["docs/adr/template.md", "adr"],
     ["requirements/req-001.md", "requirements"],
     [".github/copilot-instructions.md", "github"],
     ["_bmad-output/planning/artifact.md", "bmad-output"],
@@ -108,6 +110,8 @@ describe("deriveCategory", () => {
     expect(deriveCategory(".cursor/skills/foo/SKILL.md")).toBe("cursor-skills");
     expect(deriveCategory("docs/specs/arch.md")).toBe("docs-specs");
     expect(deriveCategory("docs/plans/plan.md")).toBe("plans");
+    expect(deriveCategory("docs/adr/index.md")).toBe("adr");
+    expect(deriveCategory("docs/adr/template.md")).toBe("adr");
   });
 });
 

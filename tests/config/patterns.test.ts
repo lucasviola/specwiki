@@ -61,6 +61,7 @@ describe("patterns config", () => {
     expect(CATEGORY_LABELS["cursor-rules"]).toBe("Cursor Rules");
     expect(CATEGORY_LABELS["bmad-output"]).toBe("BMAD Output");
     expect(CATEGORY_LABELS["agent-skills"]).toBe("Agent Skills");
+    expect(CATEGORY_LABELS.adr).toBe("Architecture Decisions");
   });
 
   it.each([

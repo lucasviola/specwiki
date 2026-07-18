@@ -64,6 +64,7 @@ const CATEGORY_PATH_PREFIXES: Record<string, string> = {
   kiro: ".kiro/specs/",
   "docs-specs": "docs/specs/",
   plans: "docs/plans/",
+  adr: "docs/adr/",
   requirements: "requirements/",
   github: ".github/",
   root: "",
