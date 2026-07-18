@@ -1,5 +1,5 @@
 # generated: 2026-07-12
-# last_updated: 2026-07-18 (S25.1 story created)
+# last_updated: 2026-07-18 (S25.2 foundational ADRs)
 # project: specwiki
 # project_key: NOKEY
 # tracking_system: file-system
@@ -176,7 +176,7 @@ development_status:
   epic-24-retrospective: optional
   epic-25: in-progress
   25-1-adr-scaffolding-template-and-wiki-category: review
-  25-2-foundational-adrs: backlog
+  25-2-foundational-adrs: review
   25-3-retroactive-adrs: backlog
   25-4-architecture-spine-sync: backlog
   25-5-pre-build-adrs-for-e11-e12: backlog
