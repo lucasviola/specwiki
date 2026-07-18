@@ -72,6 +72,8 @@ Deepen integration with the SDD/agent instruction landscape: machine-readable ou
 | Cursor rule badges, OpenSpec change-set grouping, BMAD kernel cards | E9 / S9.1–S9.3 | E     |
 | Duplicate instruction drift detection                               | E11 / S11.1    | F     |
 | MCP manifest indexing                                               | E11 / S11.2    | F     |
+| MemPalace palace browse export (future bet)                         | —              | Bet 7 |
+| Obsidian vault export (future bet)                                  | —              | Bet 8 |
 
 ---
 
@@ -455,6 +457,48 @@ These items are **not sequenced** in Phases A–F. They depend on ecosystem matu
 **Risk:** New dependencies (remark/rehype chain ~2 MB); performance regression vs marked.
 
 **If validated:** Opt-in `--sanitize-html` using pipeline in technical research §4.4.
+
+---
+
+### Bet 7: MemPalace integration — structured palace browse view
+
+**Hypothesis:** MemPalace users want a human-navigable view of wing → room → drawer taxonomy, not only semantic MCP search. SpecWiki can serve as the readability layer for palace content exported to markdown.
+
+**Proposed shape:**
+
+- Export bridge (or native `discover/mempalace` adapter) paginates `mempalace_list_drawers` / `mempalace_get_taxonomy` and writes `mempalace-export/{wing}/{room}/{slug}.md` with YAML frontmatter (`title`, `wing`, `room`, `drawer_id`, `source_file`)
+- Dedicated `mempalace-wiki` project runs `specwiki generate` on the export tree
+- Wing/room filters for large palaces (e.g. skip 3k+ drawer rooms until hybrid index mode exists)
+- Complements MemPalace-side `mempalace export --format markdown` if that ships separately
+
+**Evidence needed:** Owner or user demand for browsable palace beyond `mempalace status`; palace drawer count exceeds comfortable MCP pagination; MemPalace MCP stable enough for batch read.
+
+**Risk:** Palace is live vector DB — export is snapshot, not live sync; large exports (6k+ drawers) need filtering/summary modes; couples specwiki to MemPalace schema/MCP contract.
+
+**If validated:** POST-MVP plugin or `discover/mempalace.ts` adapter; `deriveCategory()` for `mempalace-export/`; documented sync script in `examples/`.
+
+**MemPalace filing:** `app_ideas/devtools` — source `cursor/chat/specwiki-mempalace-obsidian-integration`.
+
+---
+
+### Bet 8: Obsidian integration — LLM wiki exploration layer
+
+**Hypothesis:** Users who live in Obsidian (graph view, wikilinks, Dataview, Copilot/Smart Connections) want specwiki output as a first-class vault — or want to use Obsidian as the write surface and specwiki as the publish surface.
+
+**Use cases:**
+
+1. **Read-only exploration** — open generated `wiki/` in Obsidian for graph + LLM RAG over spec landscape
+2. **Obsidian as source, specwiki as publisher** — vault in git → `specwiki generate` → HTML wiki for team
+3. **Annotation layer** — generated `wiki/` read-only; personal notes in separate vault folder linking to spec concepts
+4. **`--format obsidian` export** — folder-per-category, wikilinks `[[page]]`, YAML frontmatter, optional MOC index notes per category
+
+**Evidence needed:** User requests for wikilink/frontmatter export; Obsidian-as-source repos in the wild; demand beyond flat `wiki/*.md` (works today but not Obsidian-native).
+
+**Risk:** Regenerating overwrites vault edits unless output is clearly derived/read-only; Obsidian plugin ecosystem churn; scope overlap with planned VitePress/MkDocs SSG export (Phase F).
+
+**If validated:** `specwiki export --format obsidian` alongside `vitepress|mkdocs`; document read-only vs annotation vault patterns; optional `.obsidian/` scaffold with graph filters.
+
+**MemPalace filing:** `app_ideas/devtools` — source `cursor/chat/specwiki-mempalace-obsidian-integration`.
 
 ---
 

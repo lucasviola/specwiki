@@ -808,6 +808,45 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 **Logging & diagnostics:** Extension uses its own debug channel — not core Logger.  
 **Quality measures:** Extension test suite; core package unchanged.
 
+**Roadmap:** POST-MVP-ROADMAP.md Bet 1.
+
+---
+
+### E23 — MemPalace Integration (future bet)
+
+**Vertical slice:** Export MemPalace wing → room → drawer taxonomy to markdown and run specwiki generate for a browsable palace view — complementing MemPalace MCP semantic search.
+
+**Binds:** POST-MVP-ROADMAP.md Bet 7; ecosystem theme
+
+**Proposed capabilities:**
+
+- Export bridge or `discover/mempalace` adapter reading palace via MCP/sqlite
+- `mempalace-export/{wing}/{room}/{slug}.md` with YAML frontmatter
+- Wing/room filters and hybrid index mode for large palaces
+- `deriveCategory()` for `mempalace-export/` prefix
+
+**Not sequenced.** Depends on MemPalace batch-read API stability and user demand for structured browse beyond `mempalace status`.
+
+**MemPalace filing:** `app_ideas/devtools` — source `cursor/chat/specwiki-mempalace-obsidian-integration`.
+
+---
+
+### E24 — Obsidian Integration (future bet)
+
+**Vertical slice:** First-class Obsidian vault export and documented Obsidian-as-source / annotation-layer workflows.
+
+**Binds:** POST-MVP-ROADMAP.md Bet 8; ecosystem theme; Phase F SSG export family
+
+**Proposed capabilities:**
+
+- `specwiki export --format obsidian` — folder-per-category, wikilinks, YAML frontmatter, MOC pages
+- Read-only `wiki/` vault pattern vs separate annotation vault
+- Obsidian vault in git as spec source → HTML publish for team
+
+**Not sequenced.** Pairs with `--emit-llms-txt` (agent-oriented) vs Obsidian (human-oriented exploration).
+
+**MemPalace filing:** `app_ideas/devtools` — source `cursor/chat/specwiki-mempalace-obsidian-integration`.
+
 ---
 
 ### E16 — Wikipedia-Style HTML Wiki

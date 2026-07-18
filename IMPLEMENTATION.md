@@ -134,7 +134,9 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
 - [ ] **E13 — Distribution & Publish** — npm, GitHub Actions _(in progress)_
   - [ ] S13.1 — npm publish preparation _(Task 1 package contract complete; awaiting review)_
 - [ ] **E14 — Ecosystem Export & Intelligence** — SSG export, drift, plugins
-- [ ] **E15 — IDE Integration** — wiki panel extension (future bet)
+- [ ] **E15 — IDE Integration** — wiki panel extension (future bet; POST-MVP Bet 1)
+- [ ] **E23 — MemPalace Integration** — palace export → browsable wiki (future bet; POST-MVP Bet 7)
+- [ ] **E24 — Obsidian Integration** — vault export + Obsidian-as-source workflows (future bet; POST-MVP Bet 8)
 - [ ] **E16 — Wikipedia-Style HTML Wiki** — Vector-inspired skin, navigation chrome, search _(in progress)_
   - [x] S16.1 — Mustache HTML renderer and Wikimedia assets _(review)_
   - [x] S16.2 — Wikipedia layout chrome and navigation
