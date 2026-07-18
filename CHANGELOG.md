@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.2] - 2026-07-17
+## [1.1.0] - 2026-07-18
 
 ### Added
 
@@ -15,6 +15,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Richer Agent Skills navigation from the BMad catalog (titles and hierarchy)
 - Nested multi-page Agent Skills under phase groups
 - Collapsible nested nav subgroups for denser category trees
+- Article breadcrumbs now include the same subgroup path as the navigation drawer (e.g. `Main Page › Cursor Skills › Team A › Skill`)
+- Explicit `aria-current="page"` only on the final breadcrumb segment
+
+## [1.0.2] - 2026-07-17
+
+### Added
+
+- Fixed layout shift on content
 
 ### Fixed
 
@@ -43,8 +51,3 @@ First public release of [`@lucasviola/specwiki`](https://www.npmjs.com/package/@
 - Project config file support and `--patterns` override
 - Output path confinement and related npm-safety guards for `generate` / `open`
 - Requires Node.js 20+; MIT licensed
-
-[Unreleased]: https://github.com/lucasviola/specwiki/compare/v1.0.2...HEAD
-[1.0.2]: https://github.com/lucasviola/specwiki/compare/v1.0.1...v1.0.2
-[1.0.1]: https://github.com/lucasviola/specwiki/compare/v1.0.0...v1.0.1
-[1.0.0]: https://github.com/lucasviola/specwiki/releases/tag/v1.0.0
