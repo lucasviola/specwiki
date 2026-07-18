@@ -181,6 +181,12 @@ development_status:
   25-4-architecture-spine-sync: backlog
   25-5-pre-build-adrs-for-e11-e12: backlog
   epic-25-retrospective: optional
+  epic-26: backlog
+  26-1-local-media-asset-resolver-and-html-integration: backlog
+  26-2-wiki-media-presentation-and-theme-aware-assets: backlog
+  26-3-remote-cdn-media-passthrough-and-opt-in-mirror: backlog
+  26-4-extensible-media-pipeline-and-adr: backlog
+  epic-26-retrospective: optional
 
 # MVP formally closed 2026-07-12 — all E1–E7 stories done; POST-MVP begins at E8
 mvp_status: closed
