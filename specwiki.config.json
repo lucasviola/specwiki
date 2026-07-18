@@ -1,9 +1,6 @@
 {
   "patterns": [
-    "README.md",
-    "IMPLEMENTATION.md",
-    "HARNESS.md",
-    "DISCOVERY-LOOP.md",
+    "*.md",
     "_bmad-output/**/*.md",
     ".agents/**/*.md",
     ".cursor/rules/**/*.{md,mdc}",
