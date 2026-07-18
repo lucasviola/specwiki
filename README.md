@@ -222,6 +222,8 @@ npm run typecheck
 npm test
 ```
 
+See [CHANGELOG.md](CHANGELOG.md) for release history. When shipping user-facing changes, add a bullet under `[Unreleased]` there.
+
 ## License
 
 MIT
