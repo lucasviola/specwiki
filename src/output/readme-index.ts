@@ -2,8 +2,13 @@ import path from "node:path";
 import { log } from "../core/Logger.js";
 import type { ParsedSpec } from "../types.js";
 
-export interface CategoryReadmeIntro {
+export interface CategoryReadmeIntroSegment {
   content: string;
+  sourcePath: string;
+}
+
+export interface CategoryReadmeIntro {
+  segments: CategoryReadmeIntroSegment[];
   sourcePaths: string[];
 }
 
@@ -92,11 +97,19 @@ export function resolveReadmeIndexBindings(
 
     const existing = categoryIntros.get(category);
     if (existing) {
-      existing.content = `${existing.content}\n\n${readme.rawContent}`;
+      existing.segments.push({
+        content: readme.rawContent,
+        sourcePath: relativePath,
+      });
       existing.sourcePaths.push(relativePath);
     } else {
       categoryIntros.set(category, {
-        content: readme.rawContent,
+        segments: [
+          {
+            content: readme.rawContent,
+            sourcePath: relativePath,
+          },
+        ],
         sourcePaths: [relativePath],
       });
     }

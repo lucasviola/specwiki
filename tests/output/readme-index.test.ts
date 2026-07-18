@@ -85,9 +85,12 @@ describe("resolveReadmeIndexBindings", () => {
     ]);
 
     expect(bindings.rootIntro).toBeNull();
-    expect(bindings.categoryIntros.get("other")?.content).toBe(
-      "Nested packages intro.",
-    );
+    expect(bindings.categoryIntros.get("other")?.segments).toEqual([
+      {
+        content: "Nested packages intro.",
+        sourcePath: "packages\\nested\\README.md",
+      },
+    ]);
   });
 
   it("binds root README to main index intro", () => {
@@ -114,7 +117,12 @@ describe("resolveReadmeIndexBindings", () => {
 
     expect(bindings.rootIntro).toBeNull();
     expect(bindings.categoryIntros.get("other")).toEqual({
-      content: "Nested packages intro.",
+      segments: [
+        {
+          content: "Nested packages intro.",
+          sourcePath: "packages/nested/README.md",
+        },
+      ],
       sourcePaths: ["packages/nested/README.md"],
     });
     expect(bindings.readmeIndexCount).toBe(1);

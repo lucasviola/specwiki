@@ -1,6 +1,7 @@
 <div align="center">
 
-<img src="docs/brand/specwiki-wordmark-light.svg" alt="[[specwiki]]" width="220">
+<img class="specwiki-wordmark-light" src="docs/brand/specwiki-wordmark-light.svg" alt="[[specwiki]]" width="220">
+<img class="specwiki-wordmark-dark" src="docs/brand/specwiki-wordmark-dark.svg" alt="[[specwiki]]" width="220" hidden>
 
 <br><br>
 

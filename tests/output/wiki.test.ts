@@ -735,6 +735,48 @@ describe("writeHtmlWiki", () => {
     expect(indexHtml).toContain("Custom Spec Title");
   });
 
+  it("copies README image assets into html/media and rewrites img src paths", async () => {
+    const projectRoot = path.join(
+      import.meta.dirname,
+      "../fixtures/sample-project",
+    );
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-media-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([
+      sampleSpec({
+        file: {
+          path: path.join(projectRoot, "README.md"),
+          relativePath: "README.md",
+          category: "root",
+          title: "Sample Project",
+        },
+        title: "Sample Project",
+        rawContent: "Root README for extended default pattern discovery.",
+      }),
+      sampleSpec(),
+    ]);
+    wiki.indexMeta.rootIntro =
+      "![Project logo](./docs/assets/logo.svg)\n\nRoot README for extended default pattern discovery.";
+    wiki.indexMeta.rootIntroSource = "README.md";
+
+    await writeHtmlWiki(outputDir, wiki, { projectRoot, noSearch: true });
+
+    const indexHtml = await fs.readFile(
+      path.join(outputDir, "html", "index.html"),
+      "utf-8",
+    );
+    expect(indexHtml).toContain('src="media/docs/assets/logo.svg"');
+    await expect(
+      fs.readFile(
+        path.join(outputDir, "html", "media", "docs", "assets", "logo.svg"),
+        "utf-8",
+      ),
+    ).resolves.toContain("<svg");
+  });
+
   it("threads projectRoot into nav grouping during HTML generation", async () => {
     const outputDir = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-html-nav-"),

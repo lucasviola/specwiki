@@ -59,7 +59,12 @@ describe("HtmlRenderer", () => {
         [
           "other",
           {
-            content: "Nested packages intro.",
+            segments: [
+              {
+                content: "Nested packages intro.",
+                sourcePath: "packages/nested/README.md",
+              },
+            ],
             sourcePaths: ["packages/nested/README.md"],
           },
         ],

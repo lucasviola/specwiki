@@ -799,6 +799,36 @@ body.specwiki {
   color: var(--color-base--subtle);
 }
 
+.specwiki-portal-intro .specwiki-wordmark-light {
+  display: none;
+}
+
+.specwiki-portal-intro .specwiki-wordmark-dark[hidden] {
+  display: inline !important;
+}
+
+:root[data-theme="light"] .specwiki-portal-intro .specwiki-wordmark-light {
+  display: inline;
+}
+
+:root[data-theme="light"] .specwiki-portal-intro .specwiki-wordmark-dark {
+  display: none !important;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"])
+    .specwiki-portal-intro
+    .specwiki-wordmark-light {
+    display: inline;
+  }
+
+  :root:not([data-theme="dark"])
+    .specwiki-portal-intro
+    .specwiki-wordmark-dark {
+    display: none !important;
+  }
+}
+
 .specwiki-category-section {
   margin-top: calc(var(--padding-horizontal-base) * 2);
   padding-top: var(--padding-horizontal-base);

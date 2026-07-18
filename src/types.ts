@@ -34,7 +34,13 @@ export interface WikiPage {
 export interface WikiIndexMeta {
   rootIntro: string | null;
   rootIntroSource: string | null;
-  categoryIntros: Map<string, { content: string; sourcePaths: string[] }>;
+  categoryIntros: Map<
+    string,
+    {
+      segments: Array<{ content: string; sourcePath: string }>;
+      sourcePaths: string[];
+    }
+  >;
   readmeIndexCount: number;
 }
 

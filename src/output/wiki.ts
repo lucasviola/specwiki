@@ -5,8 +5,8 @@ import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import { log } from "../core/Logger.js";
 import { CATEGORY_LABELS } from "../config/patterns.js";
-import { renderMarkdown } from "../parse/markdown.js";
 import { getHtmlRenderer, HtmlRenderer } from "./html/renderer.js";
+import { MediaAssetResolver, renderMarkdownHtml } from "./html/media-assets.js";
 import { loadNavGroupingContext } from "./html/nav-grouping.js";
 import {
   buildSearchIndex,
@@ -189,7 +189,10 @@ function buildIndex(
     lines.push(`## ${label}`, "");
 
     if (categoryIntro) {
-      lines.push(categoryIntro.content, "");
+      lines.push(
+        categoryIntro.segments.map((segment) => segment.content).join("\n\n"),
+        "",
+      );
     }
 
     for (const page of categoryPages) {
@@ -432,9 +435,18 @@ export async function writeHtmlWiki(
     ? await loadNavGroupingContext(options.projectRoot)
     : undefined;
 
+  const mediaResolver = options.projectRoot
+    ? new MediaAssetResolver({
+        projectRoot: options.projectRoot,
+        outputDir,
+        htmlDir,
+      })
+    : undefined;
+
   const htmlRenderOptions = {
     ...renderOptions,
     navGroupingContext,
+    mediaResolver,
   };
 
   let indexHtml: string;
@@ -453,6 +465,33 @@ export async function writeHtmlWiki(
     throw err;
   }
 
+  const articleHtmlBySlug = new Map<string, string>();
+  for (const page of wiki.pages) {
+    try {
+      log.info("output.render", { kind: "article", slug: page.slug });
+      articleHtmlBySlug.set(
+        page.slug,
+        renderer.renderArticle(
+          page,
+          wiki.pages,
+          renderMarkdownHtml(page.content, page.sourcePath, htmlRenderOptions),
+          htmlRenderOptions,
+        ),
+      );
+    } catch (err) {
+      log.error("output.error", {
+        relativePath: `html/${page.slug}.html`,
+        message: err instanceof Error ? err.message : String(err),
+      });
+      throw err;
+    }
+  }
+
+  if (mediaResolver) {
+    const mediaWritten = await mediaResolver.copyAssets();
+    written.push(...mediaWritten);
+  }
+
   const indexPath = path.join(htmlDir, "index.html");
   assertPathConfined(outputDir, indexPath, "html/index.html");
   try {
@@ -468,21 +507,9 @@ export async function writeHtmlWiki(
   log.info("output.write", { relativePath: "html/index.html" });
 
   for (const page of wiki.pages) {
-    let html: string;
-    try {
-      log.info("output.render", { kind: "article", slug: page.slug });
-      html = renderer.renderArticle(
-        page,
-        wiki.pages,
-        renderMarkdown(page.content),
-        htmlRenderOptions,
-      );
-    } catch (err) {
-      log.error("output.error", {
-        relativePath: `html/${page.slug}.html`,
-        message: err instanceof Error ? err.message : String(err),
-      });
-      throw err;
+    const html = articleHtmlBySlug.get(page.slug);
+    if (!html) {
+      continue;
     }
 
     const filePath = path.join(htmlDir, `${page.slug}.html`);

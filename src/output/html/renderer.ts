@@ -4,7 +4,7 @@ import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import Mustache from "mustache";
 import { CATEGORY_LABELS } from "../../config/patterns.js";
-import { renderMarkdown } from "../../parse/markdown.js";
+import { renderMarkdownHtml, type MediaAssetResolver } from "./media-assets.js";
 import type { SpecSection, WikiIndexMeta, WikiPage } from "../../types.js";
 import { isReadmeFile } from "../readme-index.js";
 import {
@@ -62,6 +62,7 @@ export interface HtmlRenderOptions {
   includeSearch?: boolean;
   searchIndexJson?: string;
   navGroupingContext?: NavGroupingContext;
+  mediaResolver?: MediaAssetResolver;
 }
 
 interface AllPagesEntry {
@@ -136,7 +137,17 @@ export class HtmlRenderer {
           ...category,
           portalPages,
           hasIntro: Boolean(intro),
-          introHtml: intro ? renderMarkdown(intro.content) : "",
+          introHtml: intro
+            ? intro.segments
+                .map((segment) =>
+                  renderMarkdownHtml(
+                    segment.content,
+                    segment.sourcePath,
+                    renderOptions,
+                  ),
+                )
+                .join("\n")
+            : "",
         };
       });
     const pageCount = pages.length;
@@ -150,7 +161,13 @@ export class HtmlRenderer {
         pageCountLabel: pageCount === 1 ? "spec file" : "spec files",
         allPages,
         hasRootIntro,
-        rootIntroHtml: hasRootIntro ? renderMarkdown(indexMeta.rootIntro!) : "",
+        rootIntroHtml: hasRootIntro
+          ? renderMarkdownHtml(
+              indexMeta.rootIntro!,
+              indexMeta.rootIntroSource ?? "README.md",
+              renderOptions,
+            )
+          : "",
       },
       this.partials,
     );
