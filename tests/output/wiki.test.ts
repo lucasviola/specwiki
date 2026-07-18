@@ -810,6 +810,73 @@ describe("writeHtmlWiki", () => {
     expect(css).toContain(".specwiki-theme-toggle[hidden]");
   });
 
+  it("writes article heading type scale with serif h1-h2 and sans h3-h6", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-heading-scale-"),
+    );
+    tempDirs.push(outputDir);
+
+    await writeHtmlWiki(outputDir, buildWiki([sampleSpec()]));
+
+    const css = await fs.readFile(
+      path.join(outputDir, "html", "assets", "specwiki.css"),
+      "utf-8",
+    );
+
+    const headingTokens: Record<string, string> = {
+      "--font-size-h1": "2rem",
+      "--font-size-h2": "1.625rem",
+      "--font-size-h3": "1.375rem",
+      "--font-size-h4": "1.125rem",
+      "--font-size-h5": "1rem",
+      "--font-size-h6": "0.875rem",
+    };
+    for (const [token, value] of Object.entries(headingTokens)) {
+      expect(css).toMatch(
+        new RegExp(`${token}:\\s*${value.replace(".", "\\.")}`),
+      );
+    }
+
+    expect(css).toMatch(
+      /\.specwiki-article-body \.mw-parser-output h1,\s*\.specwiki-article-body \.mw-parser-output h2\s*\{[^}]*font-family:\s*var\(--font-family-heading-main\)/s,
+    );
+    expect(css).toMatch(
+      /\.specwiki-article-body \.mw-parser-output h3,\s*\.specwiki-article-body \.mw-parser-output h4,\s*\.specwiki-article-body \.mw-parser-output h5,\s*\.specwiki-article-body \.mw-parser-output h6\s*\{[^}]*font-family:\s*var\(--font-family-base\)/s,
+    );
+    expect(css).toMatch(
+      /\.specwiki-article-body \.mw-parser-output h1,\s*\.specwiki-article-body \.mw-parser-output h2\s*\{[^}]*font-weight:\s*400/s,
+    );
+    expect(css).toMatch(
+      /\.specwiki-article-body \.mw-parser-output h3,\s*\.specwiki-article-body \.mw-parser-output h4,\s*\.specwiki-article-body \.mw-parser-output h5,\s*\.specwiki-article-body \.mw-parser-output h6\s*\{[^}]*font-weight:\s*600/s,
+    );
+
+    for (let level = 1; level <= 6; level += 1) {
+      expect(css).toMatch(
+        new RegExp(
+          `\\.specwiki-article-body \\.mw-parser-output h${level}\\s*\\{[^}]*font-size:\\s*var\\(--font-size-h${level}\\)`,
+          "s",
+        ),
+      );
+    }
+
+    expect(css).toMatch(
+      /\.specwiki-article-body \.mw-parser-output h2\s*\{[^}]*border-bottom:\s*1px solid var\(--border-color-divider\)/s,
+    );
+    expect(css).toMatch(
+      /\.specwiki-portal h1\s*\{[^}]*font-family:\s*var\(--font-family-heading-main\)/s,
+    );
+    expect(css).toMatch(
+      /\.specwiki-portal h1\s*\{[^}]*font-size:\s*var\(--font-size-h1\)/s,
+    );
+
+    // Negative: headings must not rely on line-height-only sizing (pre-S24.1 baseline)
+    expect(css).not.toMatch(
+      /\.specwiki-portal h1,\s*\.mw-parser-output h1,\s*\.mw-parser-output h2,\s*\.mw-parser-output h3\s*\{\s*line-height:\s*var\(--line-height-heading\);\s*\}/,
+    );
+    // Portal/category intros use mw-parser-output but must not inherit article heading scale
+    expect(css).not.toMatch(/^\.mw-parser-output h1\s*\{[^}]*font-size:/m);
+  });
+
   it("writes responsive layout, drawer, and overflow containment styles", async () => {
     const outputDir = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-html-responsive-"),
