@@ -1315,6 +1315,30 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 2. **E2 → E3 → E4** — Core journeys; logging in same story as feature
 3. **E5 → E6 → E7** — Trustworthy output, CLI, sign-off
 4. **POST-MVP:** E8 → E15; **E16** (wiki HTML skin) recommended after E4; **E21** (npm security) before **E22 S22.6** first publish; **E22** (semver & release) S22.1–S22.6 for 1.0.0; **E20** follows E13 S13.1 once the package is published to npm.
+5. **Backlog idea:** **E27** (live hero example on specwiki.ai) — logged 2026-07-18; conversion-first; no stories started.
+
+---
+
+### E27 — Live Hero Example (specwiki.ai/examples) — **backlog / idea**
+
+**Status:** Logged only (2026-07-18). Owner decision: **conversion over breadth** — one live generated wiki on the landing page before a multi-example gallery.
+
+**Idea:** Replace the landing page’s static fake wiki mock with a build-time generated wiki for `examples/agent-harness-parcel`, served at `https://specwiki.ai/examples/agent-harness-parcel/`. Defer five-demo gallery hub until the hero proves it moves visitors toward install.
+
+**JTBD:** _“Show me the real output — then I’ll try it on my project.”_
+
+**Depends on:** E20 (complete).
+
+**Full spec:** [`epic-27-live-examples-gallery.md`](../../implementation-artifacts/epic-27-live-examples-gallery.md)
+
+| Story | Summary                                | v1?   |
+| ----- | -------------------------------------- | ----- |
+| S27.1 | Example metadata manifest (hero-first) | ✓     |
+| S27.2 | Build-time hero wiki generation        | ✓     |
+| S27.4 | Landing §04 → live hero wiki           | ✓     |
+| S27.5 | Deploy verification and site tests     | ✓     |
+| S27.3 | Examples gallery hub                   | defer |
+| S27.6 | Cross-example navigation chrome        | defer |
 
 ---
 
