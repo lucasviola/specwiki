@@ -4,3 +4,4 @@ coverage/
 wiki/
 .specwiki/
 package-lock.json
+**/*.html
