@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-18
-**Current position:** **E23 S23.7 Breadcrumb subgroup parity** — ready for review
-**Test count:** 516 passing
+**Current position:** **E24 S24.1 Article type scale and heading serif** — ready for review
+**Test count:** 517 passing
 
 ## Deliverables
 
@@ -221,6 +221,7 @@ Every MVP feature story shipped structured logging ACs. No deferred logging epic
 | S19.3      | output/wiki.ts (unchanged)   | output.write covers modified specwiki.css                           |
 | S19.5      | output/wiki.ts (unchanged)   | output.write covers modified specwiki.css                           |
 | E19 bugfix | output/wiki.ts (unchanged)   | output.write covers modified specwiki.css                           |
+| S24.1      | output/wiki.ts (unchanged)   | output.write covers modified specwiki.css                           |
 
 User-facing summaries remain on stdout via chalk; diagnostics use JSON stderr via `Logger.ts`.
 
@@ -279,4 +280,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-17 | E23 S23.6        | `feat(output): nest multi-page Agent Skills under phase groups` — hybrid phase buckets get skill-folder L2 (CSV/agent L4 as subgroup label; wiki titles on leaves); single-page skills stay as L4 phase leaves; uncatalogued multi-page uses humanized skill id; 23-IMP-1; 508 tests; `src/output/html/` ≥90%                                                                                                                | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-17 | E23 S23.3        | `feat(output): collapsible nested nav subgroups` — Mustache partials with nested `<details>` for L1/L2 subgroups; route-aware `open`; count badges; CSS chevrons; recursive template copy in `copy-html-assets.mjs`; 23-IMP-2; `src/output/html/` ≥90%                                                                                                                                                                       | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-18 | E23 S23.7        | `feat(output): breadcrumb subgroup parity with drawer ancestry` — `resolveActiveSubgroupTrail` walks finalized `NavSubgroup[]`; `buildBreadcrumbs` inserts L1/L2 labels after category; explicit `current` flag fixes `aria-current`; 23-IMP-3; 516 tests; `src/output/html/` ≥90%                                                                                                                                           | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
+| 2026-07-18 | E24 S24.1        | `feat(output): article heading type scale and serif h1-h2` — `:root` `--font-size-h1`–`h6` tokens; `.specwiki-article-body .mw-parser-output` heading typography (serif h1–h2, sans h3–h6, h2 divider); `.specwiki-portal h1` parity; generated-CSS regression test; portal-intro scope fix from code review; 517 tests; `src/output/html/` 97.11%                                                                           | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | _template_ | _E?_ S?_         | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                                              |
