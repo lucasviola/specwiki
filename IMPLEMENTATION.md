@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-18
-**Current position:** **E25 S25.2 Foundational ADRs** — ready for review
-**Test count:** 520 passing
+**Current position:** **E16 S16.5 HTML inter-page link resolution** — done
+**Test count:** 548 passing
 
 ## Deliverables
 
@@ -137,12 +137,12 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
 - [ ] **E15 — IDE Integration** — wiki panel extension (future bet; POST-MVP Bet 1)
 - [ ] **E23 — MemPalace Integration** — palace export → browsable wiki (future bet; POST-MVP Bet 7)
 - [ ] **E24 — Obsidian Integration** — vault export + Obsidian-as-source workflows (future bet; POST-MVP Bet 8)
-- [ ] **E16 — Wikipedia-Style HTML Wiki** — Vector-inspired skin, navigation chrome, search _(in progress)_
+- [ ] **E16 — Wikipedia-Style HTML Wiki** — Vector-inspired skin, navigation chrome, search _(done)_
   - [x] S16.1 — Mustache HTML renderer and Wikimedia assets _(review)_
   - [x] S16.2 — Wikipedia layout chrome and navigation
   - [x] S16.3 — Rich HTML content rendering
   - [x] S16.4 — Client-side wiki search _(review)_
-  - [ ] S16.5 — HTML inter-page link resolution _(review)_
+  - [x] S16.5 — HTML inter-page link resolution
 - [ ] **E17 — CLI Developer Experience** — broad markdown discovery, `open`, `init` _(in progress — impromptu)_
   - [x] S17.1 — Broad markdown discovery by default _(review)_
   - [x] S17.2 — `specwiki open` browser command _(review)_

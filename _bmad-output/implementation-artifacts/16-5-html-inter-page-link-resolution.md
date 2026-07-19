@@ -4,7 +4,7 @@ baseline_commit: 255779dc916f4e821987238e7c03fec380aa29f2
 
 # Story 16.5: HTML inter-page link resolution
 
-Status: review
+Status: done
 
 ## Story
 
