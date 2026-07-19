@@ -21,13 +21,14 @@ Architecture Decision Records (ADRs) are the durable engineering record for spec
 
 ## Index
 
-| ID   | Title                                                                                   | Status   | Date       |
-| ---- | --------------------------------------------------------------------------------------- | -------- | ---------- |
-| 0001 | [Path confinement and trust boundary model](./0001-path-confinement-trust-boundary.md)  | accepted | 2026-07-18 |
-| 0003 | [Config loader execution model](./0003-config-loader-execution-model.md)                | accepted | 2026-07-18 |
-| 0004 | [Static-file-only output; no bundled server](./0004-static-output-no-bundled-server.md) | accepted | 2026-07-18 |
-| 0007 | [CLI dual-audience contract](./0007-cli-dual-audience-contract.md)                      | accepted | 2026-07-18 |
-| 0009 | [Runtime dependency budget policy](./0009-runtime-dependency-budget.md)                 | accepted | 2026-07-18 |
+| ID   | Title                                                                                                    | Status   | Date       |
+| ---- | -------------------------------------------------------------------------------------------------------- | -------- | ---------- |
+| 0001 | [Path confinement and trust boundary model](./0001-path-confinement-trust-boundary.md)                   | accepted | 2026-07-18 |
+| 0003 | [Config loader execution model](./0003-config-loader-execution-model.md)                                 | accepted | 2026-07-18 |
+| 0004 | [Static-file-only output; no bundled server](./0004-static-output-no-bundled-server.md)                  | accepted | 2026-07-18 |
+| 0007 | [CLI dual-audience contract](./0007-cli-dual-audience-contract.md)                                       | accepted | 2026-07-18 |
+| 0009 | [Runtime dependency budget policy](./0009-runtime-dependency-budget.md)                                  | accepted | 2026-07-18 |
+| 0010 | [Navigation drawer categorization and grouping](./0010-navigation-drawer-categorization-and-grouping.md) | accepted | 2026-07-19 |
 
 ### Summaries
 
@@ -36,6 +37,7 @@ Architecture Decision Records (ADRs) are the durable engineering record for spec
 - **0004** — Wiki output is static files; `open` uses the OS browser; no bundled HTTP server in core (E11 must revisit).
 - **0007** — stdout for humans/JSON, stderr for structured logs; exit 0/1/2 contract on all commands.
 - **0009** — Nine runtime deps with ADR gate for additions; supersedes spine AD-11 five-package freeze.
+- **0010** — Two-tier nav: path-prefix categories at discovery, L0–L4 layered subgroup inference at HTML render; BMAD CSV/TOML for Agent Skills; L3 conventions for BMAD Output; known label-collision bug tracked as 23-IMP-4.
 
 ## Template
 
