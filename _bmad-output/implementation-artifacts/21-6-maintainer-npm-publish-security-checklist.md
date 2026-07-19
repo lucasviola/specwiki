@@ -1,6 +1,8 @@
 # Story 21.6: Maintainer NPM Publish Security Checklist
 
-Status: backlog
+Status: review
+
+baseline_commit: cf713410b910b2d42534b052a39dfa37de2619ca
 
 ## Story
 
@@ -38,3 +40,39 @@ so that every release follows the same verify-package, dry-run, and account-hygi
 
 - Automating npm 2FA (manual maintainer ops).
 - Registry token storage in repo.
+
+## Tasks / Subtasks
+
+- [x] Create `docs/RELEASING.md` with numbered pre-publish security checklist (2FA, secrets, tarball review, verify-package, prepublishOnly, audit, dry-run, publish)
+- [x] Reference existing guards: no `postinstall`/`prepare`, `files` allowlist, `check-secrets` pre-commit
+- [x] Update README maintainer section to link to `docs/RELEASING.md`
+- [x] Add contract tests in `tests/package/releasing-doc.test.ts` for required scripts and checklist content
+- [x] Run full HARNESS §0.2 quality gate
+
+## QA Manual Validation
+
+1. `npm test -- tests/package/releasing-doc.test.ts` — all 8 contract tests pass
+2. `test -f docs/RELEASING.md && head -30 docs/RELEASING.md` — numbered checklist with 2FA, verify-package, dry-run steps
+3. `grep -n 'RELEASING.md' README.md` — maintainer section links to releasing doc
+4. `npm run verify-package` — tarball allowlist smoke test still passes (optional full gate before publish)
+
+## Dev Agent Record
+
+### Completion Notes
+
+- Added `docs/RELEASING.md` with 12-step numbered pre-publish checklist covering npm 2FA, clean git tree, check-secrets, tarball allowlist review, verify-package, prepublishOnly, audit, dry-run, and confirm publish.
+- README maintainer section now links to RELEASING.md; kept quick-reference commands and audit exception policy inline.
+- Contract tests assert required `package.json` scripts exist and RELEASING.md documents all checklist items.
+
+### File List
+
+- docs/RELEASING.md
+- README.md
+- tests/package/releasing-doc.test.ts
+- _bmad-output/implementation-artifacts/21-6-maintainer-npm-publish-security-checklist.md
+- _bmad-output/implementation-artifacts/sprint-status.yaml
+- IMPLEMENTATION.md
+
+## Change Log
+
+- 2026-07-19 — S21.6: maintainer npm publish security checklist in docs/RELEASING.md; README link; contract tests.

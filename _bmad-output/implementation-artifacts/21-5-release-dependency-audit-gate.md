@@ -1,6 +1,6 @@
 # Story 21.5: Release-Time Dependency Audit Gate
 
-Status: review
+Status: done
 
 ## Story
 

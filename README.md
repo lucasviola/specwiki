@@ -71,29 +71,23 @@ npm link              # optional: use `specwiki` globally from source
 
 ### For maintainers (npm publish prep)
 
-Before publishing to npm, run the local package verification and quality gate:
+**Full pre-publish security checklist:** [docs/RELEASING.md](docs/RELEASING.md) — numbered steps for 2FA, secret hygiene, tarball review, `verify-package`, `prepublishOnly`, audit, and `publish:package --dry-run` before `--confirm`.
+
+Quick reference (see RELEASING.md for the complete checklist):
 
 ```bash
 npm run verify-package   # pack tarball, clean-install, run specwiki --help
 npm run prepublishOnly   # full quality gate + production dependency audit (also runs automatically on npm publish)
 npm run audit            # production dependency audit only (high/critical CVEs fail)
+npm run publish:package -- --dry-run   # preview registry upload
+npm run publish:package -- --confirm   # publish after all checks pass
 ```
 
 **Dependency audit policy:** `prepublishOnly` runs `npm audit --audit-level=high --omit=dev` after the test/lint/build gate. Only **production** dependencies block publish; high and critical CVEs fail the release. **DevDependencies** are audited separately during development (`npm audit` without `--omit=dev`) and are not part of the publish gate.
 
 **Time-bounded audit exceptions:** If a false positive or accepted risk blocks publish, open a GitHub issue describing the advisory, why it is safe to ship, and an **expiry date** when the exception must be re-evaluated. Record the issue URL in the release notes or PR. Preferred unblock paths are upgrading or patching the dependency so `npm run audit` passes again. If maintainers approve shipping before a fix is available, the explicit escape hatch is `npm publish --ignore-scripts` (skips `prepublishOnly`, including the audit gate) — use only with team agreement and a tracked issue; do not bypass locally without maintainer consensus.
 
-**Publish to npm** (maintainer only, requires `npm login`):
-
-```bash
-# Preview what npm would upload (runs verify-package + prepublishOnly + dry-run publish)
-npm run publish:package -- --dry-run
-
-# Publish the version in package.json
-npm run publish:package -- --confirm
-```
-
-Publishing to the npm registry is an explicit maintainer action after these checks pass. Requires **Node.js 20+** and npm maintainer access to the `@lucasviola/specwiki` package. This repository does not automate registry credentials or release versioning.
+Publishing to the npm registry is an explicit maintainer action after the [RELEASING.md](docs/RELEASING.md) checklist passes. Requires **Node.js 20+** and npm maintainer access to the `@lucasviola/specwiki` package. This repository does not automate registry credentials or release versioning.
 
 ## Usage
 
