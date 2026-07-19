@@ -36,6 +36,33 @@ function readRootPackageVersion(): string {
   return pkg.version;
 }
 
+async function writeEsmJsConfigProject(
+  root: string,
+  options: {
+    patterns?: string[];
+    specRelativePath?: string;
+    specContent?: string;
+  } = {},
+): Promise<void> {
+  const patterns = options.patterns ?? ["custom/**/*.md"];
+  const specRelativePath = options.specRelativePath ?? "custom/notes.md";
+  const specContent =
+    options.specContent ?? "# Config Notes\n\nJS config content.";
+
+  await fs.mkdir(path.dirname(path.join(root, specRelativePath)), {
+    recursive: true,
+  });
+  await fs.writeFile(path.join(root, specRelativePath), specContent);
+  await fs.writeFile(
+    path.join(root, "package.json"),
+    JSON.stringify({ type: "module" }),
+  );
+  await fs.writeFile(
+    path.join(root, "specwiki.config.js"),
+    `export default { patterns: ${JSON.stringify(patterns)} };`,
+  );
+}
+
 describe("cli --version", () => {
   it("prints the version from package.json", async () => {
     const { stdout } = await execFileAsync(
@@ -879,6 +906,104 @@ describe("cli project config", () => {
           message: "Patterns must stay within the project root",
         });
       }
+    } finally {
+      await fs.rm(customRoot, { force: true, recursive: true });
+    }
+  });
+
+  it("warns on stderr when specwiki.config.js is loaded", async () => {
+    const customRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-config-js-warn-"),
+    );
+
+    try {
+      await writeEsmJsConfigProject(customRoot, {
+        specContent: "# Config Notes\n\nJS config discovery content.",
+      });
+
+      const listResult = await execFileAsync(
+        process.execPath,
+        ["--import", "tsx/esm", cliPath, "list", "--project", customRoot],
+        { cwd: projectRoot },
+      );
+
+      expect(listResult.stderr).toContain("specwiki.config.js");
+      expect(listResult.stderr).toContain("arbitrary Node.js");
+      expect(listResult.stderr).toContain("specwiki.config.json");
+      expect(
+        parseJsonStderrLines(listResult.stderr).filter(
+          (line) => line.event === "config.warn",
+        ),
+      ).toEqual([
+        {
+          event: "config.warn",
+          level: "warn",
+          sourcePath: "specwiki.config.js",
+        },
+      ]);
+    } finally {
+      await fs.rm(customRoot, { force: true, recursive: true });
+    }
+  });
+
+  it("does not emit config.warn for specwiki.config.json", async () => {
+    const customRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-config-json-no-warn-"),
+    );
+
+    try {
+      await fs.writeFile(
+        path.join(customRoot, "specwiki.config.json"),
+        JSON.stringify({ patterns: ["specs/**/*.md"] }),
+      );
+
+      const listResult = await execFileAsync(
+        process.execPath,
+        ["--import", "tsx/esm", cliPath, "list", "--project", customRoot],
+        { cwd: projectRoot },
+      );
+
+      expect(
+        parseJsonStderrLines(listResult.stderr).some(
+          (line) => line.event === "config.warn",
+        ),
+      ).toBe(false);
+    } finally {
+      await fs.rm(customRoot, { force: true, recursive: true });
+    }
+  });
+
+  it("keeps --json stdout clean when specwiki.config.js is loaded", async () => {
+    const customRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-cli-config-js-json-"),
+    );
+
+    try {
+      await writeEsmJsConfigProject(customRoot, {
+        specContent: "# Config Notes\n\nJS config JSON output content.",
+      });
+
+      const listResult = await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "list",
+          "--project",
+          customRoot,
+          "--json",
+        ],
+        { cwd: projectRoot },
+      );
+
+      expect(() => JSON.parse(listResult.stdout)).not.toThrow();
+      expect(listResult.stderr).toContain("specwiki.config.js");
+      expect(
+        parseJsonStderrLines(listResult.stderr).some(
+          (line) => line.event === "config.warn",
+        ),
+      ).toBe(true);
     } finally {
       await fs.rm(customRoot, { force: true, recursive: true });
     }

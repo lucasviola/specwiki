@@ -1,6 +1,8 @@
+import chalk from "chalk";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { log } from "../core/Logger.js";
 import { parsePatternList, validatePatternList } from "./patterns.js";
 
 export interface SpecwikiConfig {
@@ -16,6 +18,25 @@ const CONFIG_CANDIDATES = [
   "specwiki.config.js",
   "specwiki.config.json",
 ] as const;
+
+const JS_CONFIG_TRUST_WARNING =
+  "specwiki.config.js executes arbitrary Node.js code. Prefer specwiki.config.json for static patterns.";
+
+let jsConfigTrustWarningEmitted = false;
+
+export function resetJsConfigTrustWarningForTests(): void {
+  jsConfigTrustWarningEmitted = false;
+}
+
+function emitJsConfigTrustWarning(sourcePath: string): void {
+  if (jsConfigTrustWarningEmitted) {
+    return;
+  }
+
+  jsConfigTrustWarningEmitted = true;
+  process.stderr.write(chalk.yellow(`Warning: ${JS_CONFIG_TRUST_WARNING}\n`));
+  log.warn("config.warn", { sourcePath });
+}
 
 function assertConfigPathWithinProject(
   projectRoot: string,
@@ -131,6 +152,7 @@ export async function loadProjectConfig(
       }
 
       const exported = module.default ?? module;
+      emitJsConfigTrustWarning(filename);
       return {
         config: normalizeConfig(exported),
         sourcePath: filename,

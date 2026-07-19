@@ -147,7 +147,7 @@ development_status:
   21-1-generate-output-confined-to-project-root: done
   21-2-readme-security-section: done
   21-3-security-md-vulnerability-reporting: review
-  21-4-config-js-trust-warning: backlog
+  21-4-config-js-trust-warning: done
   21-5-release-dependency-audit-gate: backlog
   21-6-maintainer-npm-publish-security-checklist: backlog
   21-7-opt-in-html-sanitization: backlog

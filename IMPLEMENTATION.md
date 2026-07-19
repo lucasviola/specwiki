@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
-**Last updated:** 2026-07-18
-**Current position:** **E16 S16.5 HTML inter-page link resolution** — done
-**Test count:** 548 passing
+**Last updated:** 2026-07-19
+**Current position:** **E21 S21.4 config.js trust warning** — done
+**Test count:** 556 passing
 
 ## Deliverables
 
@@ -295,4 +295,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-18 | E27 (idea)       | Logged epic: live hero example on specwiki.ai — conversion-first (`agent-harness-parcel`); party-mode architecture + owner decision breadth→conversion; `epic-27-live-examples-gallery.md`, sprint-status, epics index; no stories started                                                                                                                                                                                   | uncommitted           | planning only                                                                        |
 | 2026-07-19 | E16 S16.5        | `feat(output): HTML inter-page link resolution for markdown body links` — `wiki-link-resolver.ts` index + resolver; optional `linkResolver` on `renderMarkdown`; wired in `writeHtmlWiki` + index intros; per-segment category intro link bases for merged READMEs; verbose `output.link-unresolved`; 28 new tests; 548 tests total; `wiki-link-resolver.ts` 95.87% coverage                                                 | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-19 | E21 S21.3        | `docs(security): add SECURITY.md vulnerability reporting policy` — GitHub Private Security Advisory path; supported versions table; in/out of scope aligned with README and ADR-0001/0003; README Security links to SECURITY.md; §0.8 N/A (doc-only)                                                                                                                                                                         | uncommitted           | typecheck ✓ · build ✓                                                                |
+| 2026-07-19 | E21 S21.4        | `feat(config): trust warning when loading specwiki.config.js` — stderr yellow user message + always-on `config.warn` with basename only; once-per-process guard; `log.warn` in Logger; review patches (ESM CLI fixture helper, warn-after-import test); 556 tests total; loader.ts 94.04% coverage                                                                                                                           | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | _template_ | _E?_ S?_         | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                                              |

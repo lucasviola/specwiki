@@ -3,7 +3,7 @@ type LogPayload = Record<string, unknown>;
 let verbose = false;
 
 function serializeLogLine(
-  level: "info" | "error",
+  level: "info" | "warn" | "error",
   event: string,
   payload: LogPayload,
 ): string {
@@ -23,7 +23,7 @@ function serializeLogLine(
 }
 
 function writeLog(
-  level: "info" | "error",
+  level: "info" | "warn" | "error",
   event: string,
   payload: LogPayload,
 ): void {
@@ -40,6 +40,10 @@ export const log = {
       return;
     }
     writeLog("info", event, payload);
+  },
+
+  warn(event: string, payload: LogPayload = {}): void {
+    writeLog("warn", event, payload);
   },
 
   error(event: string, payload: LogPayload = {}): void {

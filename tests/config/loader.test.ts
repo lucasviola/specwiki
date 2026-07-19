@@ -1,23 +1,46 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   ConfigError,
   loadProjectConfig,
+  resetJsConfigTrustWarningForTests,
   resolveEffectivePatterns,
   resolvePatternsFromEnv,
 } from "../../src/config/loader.js";
+import { log } from "../../src/core/Logger.js";
 
 const originalEnv = process.env.SPECWIKI_PATTERNS;
+let stderrSpy: ReturnType<typeof vi.spyOn>;
+
+beforeEach(() => {
+  resetJsConfigTrustWarningForTests();
+  log.setVerbose(false);
+  stderrSpy = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+});
 
 afterEach(async () => {
+  resetJsConfigTrustWarningForTests();
+  log.setVerbose(false);
+  stderrSpy.mockRestore();
   if (originalEnv === undefined) {
     delete process.env.SPECWIKI_PATTERNS;
   } else {
     process.env.SPECWIKI_PATTERNS = originalEnv;
   }
 });
+
+function parseStderrLines(): Record<string, unknown>[] {
+  return stderrSpy.mock.calls
+    .map(([chunk]) => String(chunk).trim())
+    .filter((line) => line.startsWith("{"))
+    .map((line) => JSON.parse(line) as Record<string, unknown>);
+}
+
+function stderrText(): string {
+  return stderrSpy.mock.calls.map(([chunk]) => String(chunk)).join("");
+}
 
 describe("loadProjectConfig", () => {
   it("loads patterns from specwiki.config.json", async () => {
@@ -145,6 +168,98 @@ describe("loadProjectConfig", () => {
     }
   });
 
+  it("emits one trust warning when specwiki.config.js loads", async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-config-js-warn-"),
+    );
+    try {
+      await fs.writeFile(
+        path.join(root, "specwiki.config.js"),
+        'export default { patterns: ["js/**/*.md"] };',
+      );
+
+      await loadProjectConfig(root);
+
+      expect(stderrText()).toContain("specwiki.config.js");
+      expect(stderrText()).toContain("arbitrary Node.js");
+      expect(stderrText()).toContain("specwiki.config.json");
+      expect(parseStderrLines()).toEqual([
+        {
+          event: "config.warn",
+          level: "warn",
+          sourcePath: "specwiki.config.js",
+        },
+      ]);
+    } finally {
+      await fs.rm(root, { force: true, recursive: true });
+    }
+  });
+
+  it("does not emit trust warning for specwiki.config.json", async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-config-json-no-warn-"),
+    );
+    try {
+      await fs.writeFile(
+        path.join(root, "specwiki.config.json"),
+        JSON.stringify({ patterns: ["custom/**/*.md"] }),
+      );
+
+      await loadProjectConfig(root);
+
+      expect(stderrText()).toBe("");
+      expect(parseStderrLines()).toEqual([]);
+    } finally {
+      await fs.rm(root, { force: true, recursive: true });
+    }
+  });
+
+  it("emits trust warning only once per process", async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-config-js-warn-once-"),
+    );
+    try {
+      await fs.writeFile(
+        path.join(root, "specwiki.config.js"),
+        'export default { patterns: ["js/**/*.md"] };',
+      );
+
+      await loadProjectConfig(root);
+      await loadProjectConfig(root);
+
+      expect(parseStderrLines()).toHaveLength(1);
+      expect(stderrText().split("Warning:").length - 1).toBe(1);
+    } finally {
+      await fs.rm(root, { force: true, recursive: true });
+    }
+  });
+
+  it("emits trust warning when js import succeeds but config validation fails", async () => {
+    const root = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-config-js-warn-invalid-"),
+    );
+    try {
+      await fs.writeFile(
+        path.join(root, "specwiki.config.js"),
+        'export default { patterns: ["../**/*.md"] };',
+      );
+
+      await expect(loadProjectConfig(root)).rejects.toMatchObject({
+        name: "ConfigError",
+        message: "Patterns must stay within the project root",
+      });
+      expect(parseStderrLines()).toEqual([
+        {
+          event: "config.warn",
+          level: "warn",
+          sourcePath: "specwiki.config.js",
+        },
+      ]);
+    } finally {
+      await fs.rm(root, { force: true, recursive: true });
+    }
+  });
+
   it("reports invalid JavaScript without leaking loader internals", async () => {
     const root = await fs.mkdtemp(
       path.join(os.tmpdir(), "specwiki-config-bad-js-"),
@@ -166,6 +281,7 @@ describe("loadProjectConfig", () => {
           return true;
         },
       );
+      expect(parseStderrLines()).toEqual([]);
     } finally {
       await fs.rm(root, { force: true, recursive: true });
     }

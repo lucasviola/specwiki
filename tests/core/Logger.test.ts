@@ -45,6 +45,22 @@ describe("Logger", () => {
     });
   });
 
+  it("always emits log.warn regardless of verbose flag", () => {
+    log.warn("config.warn", { sourcePath: "specwiki.config.js" });
+
+    expect(stderrSpy).toHaveBeenCalledOnce();
+    expect(stdoutSpy).not.toHaveBeenCalled();
+
+    const line = String(stderrSpy.mock.calls[0]?.[0]);
+    const parsed = JSON.parse(line) as Record<string, unknown>;
+
+    expect(parsed).toEqual({
+      event: "config.warn",
+      level: "warn",
+      sourcePath: "specwiki.config.js",
+    });
+  });
+
   it("always emits log.error regardless of verbose flag", () => {
     log.error("parse.error", { path: "SPEC.md", message: "read failed" });
 
