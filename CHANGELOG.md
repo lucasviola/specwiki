@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.3] - 2026-07-19
+
+### Added
+
+- `SECURITY.md` with private vulnerability reporting via GitHub Security Advisories
+- Stderr trust warning when `specwiki.config.js` is loaded (arbitrary code execution reminder)
+- Production dependency audit gate in `prepublishOnly` (`npm audit --audit-level=high --omit=dev`)
+- Maintainer pre-publish security checklist in `docs/RELEASING.md` (2FA, secrets, tarball review, verify-package, dry-run)
+
+### Changed
+
+- README maintainer section links to `docs/RELEASING.md` for the full npm publish checklist
+
 ## [1.1.2] - 2026-07-19
 
 ### Fixed
