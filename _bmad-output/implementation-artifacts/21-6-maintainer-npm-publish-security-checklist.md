@@ -1,6 +1,6 @@
 # Story 21.6: Maintainer NPM Publish Security Checklist
 
-Status: review
+Status: done
 
 baseline_commit: cf713410b910b2d42534b052a39dfa37de2619ca
 
