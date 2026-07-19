@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-07-19
+
+### Fixed
+
+- HTML wiki inline markdown links now resolve to the correct generated `.html` pages when browsing locally via `file://` (cross-references no longer point at raw `.md` paths under `html/`)
+
+### Added
+
+- Verbose `output.link-unresolved` diagnostic when a relative spec link cannot be mapped during HTML generation
+- Per-folder README segment link resolution when multiple folder READMEs merge into one category intro on the index page
+
 ## [1.1.1] - 2026-07-18
 
 ### Added
