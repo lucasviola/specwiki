@@ -1108,6 +1108,110 @@ describe("cli exit codes", () => {
       });
     }
   });
+
+  it("exits 0 on generate --check when wiki is fresh", async () => {
+    const outputDir = ignoredFixtureOutput("check-cli-fresh");
+
+    try {
+      await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "generate",
+          "--project",
+          fixtureRoot,
+          "--output",
+          outputDir,
+        ],
+        { cwd: projectRoot },
+      );
+
+      const { stderr } = await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "generate",
+          "--check",
+          "--verbose",
+          "--project",
+          fixtureRoot,
+          "--output",
+          outputDir,
+        ],
+        { cwd: projectRoot },
+      );
+
+      const lines = parseJsonStderrLines(stderr);
+      expect(lines.some((line) => line.event === "check.diff")).toBe(true);
+      expect(lines.some((line) => line.event === "check.fail")).toBe(false);
+    } finally {
+      await fs.rm(path.join(fixtureRoot, outputDir), {
+        force: true,
+        recursive: true,
+      });
+    }
+  });
+
+  it("exits 1 on generate --check when wiki is stale", async () => {
+    const outputDir = ignoredFixtureOutput("check-cli-stale");
+    const outputPath = path.join(fixtureRoot, outputDir);
+
+    try {
+      await execFileAsync(
+        process.execPath,
+        [
+          "--import",
+          "tsx/esm",
+          cliPath,
+          "generate",
+          "--project",
+          fixtureRoot,
+          "--output",
+          outputDir,
+        ],
+        { cwd: projectRoot },
+      );
+
+      const indexPath = path.join(outputPath, "index.md");
+      const content = await fs.readFile(indexPath, "utf-8");
+      await fs.writeFile(indexPath, `${content}\n<!-- stale -->\n`, "utf-8");
+
+      try {
+        await execFileAsync(
+          process.execPath,
+          [
+            "--import",
+            "tsx/esm",
+            cliPath,
+            "generate",
+            "--check",
+            "--project",
+            fixtureRoot,
+            "--output",
+            outputDir,
+          ],
+          { cwd: projectRoot },
+        );
+        expect.fail("expected generate --check to exit non-zero");
+      } catch (err) {
+        const execError = err as { code?: number; stderr?: string };
+        expect(execError.code).toBe(1);
+
+        const lines = parseJsonStderrLines(String(execError.stderr ?? ""));
+        expect(lines.some((line) => line.event === "check.fail")).toBe(true);
+        expect(lines.some((line) => line.event === "cli.error")).toBe(false);
+      }
+    } finally {
+      await fs.rm(path.join(fixtureRoot, outputDir), {
+        force: true,
+        recursive: true,
+      });
+    }
+  });
 });
 
 describe("cli generate failure", () => {

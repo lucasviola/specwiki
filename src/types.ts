@@ -63,6 +63,7 @@ export interface GenerateOptions {
   noSearch?: boolean;
   json?: boolean;
   emitLlmsTxt?: boolean;
+  check?: boolean;
 }
 
 export interface JsonListFile {

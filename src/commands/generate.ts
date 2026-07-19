@@ -1,10 +1,13 @@
-import chalk from "chalk";
+import fs from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
+import chalk from "chalk";
 import { DEFAULT_SPEC_PATTERNS } from "../config/patterns.js";
 import { log } from "../core/Logger.js";
 import { PathEscapeError, resolveOutputWithinProject } from "../core/paths.js";
 import { discoverSpecs } from "../discover/specs.js";
 import { parseSpecFile } from "../parse/markdown.js";
+import { compareWikiOutput, directoryHasWikiFiles } from "../output/compare.js";
 import { writeLlmsTxt } from "../output/llms.js";
 import { buildWiki, writeHtmlWiki, writeWiki } from "../output/wiki.js";
 import type {
@@ -21,6 +24,15 @@ const ZERO_SPECS_TIP =
 type CliCommand = "generate" | "list";
 
 type CliError = Error & { cliErrorLogged?: boolean };
+
+export class WikiCheckFailedError extends Error {
+  readonly cliErrorLogged = true;
+
+  constructor(message: string) {
+    super(message);
+    this.name = "WikiCheckFailedError";
+  }
+}
 
 function printZeroSpecsMessage(): void {
   console.log(chalk.yellow("No spec files found."));
@@ -113,6 +125,57 @@ function propagateCliError(command: CliCommand, err: unknown): never {
   throw error;
 }
 
+async function generateWikiToDirectory(
+  outputDir: string,
+  wiki: Awaited<ReturnType<typeof buildWiki>>,
+  options: Pick<GenerateOptions, "noSearch" | "emitLlmsTxt"> & {
+    projectRoot: string;
+  },
+): Promise<void> {
+  await writeWiki(outputDir, wiki);
+  await writeHtmlWiki(outputDir, wiki, {
+    noSearch: options.noSearch,
+    projectRoot: options.projectRoot,
+  });
+  if (options.emitLlmsTxt) {
+    await writeLlmsTxt(outputDir, wiki.pages);
+  }
+}
+
+async function runWikiCheck(
+  expectedRoot: string,
+  actualRoot: string,
+  verbose: boolean,
+): Promise<void> {
+  const result = await compareWikiOutput(expectedRoot, actualRoot);
+
+  if (verbose) {
+    log.info("check.diff", {
+      fileCount: result.fileCount,
+      diffCount: result.diffCount,
+    });
+  }
+
+  if (result.fresh) {
+    return;
+  }
+
+  log.error("check.fail", {
+    diffCount: result.diffCount,
+    missingCount: result.missing.length,
+    extraCount: result.extra.length,
+    changedCount: result.changed.length,
+  });
+
+  console.log(
+    chalk.red(
+      `✗ Wiki is stale (${result.diffCount} difference(s) in ${result.fileCount} expected file(s))`,
+    ),
+  );
+
+  throw new WikiCheckFailedError("Wiki output is stale");
+}
+
 export async function generateWiki(options: GenerateOptions): Promise<void> {
   log.setVerbose(Boolean(options.verbose));
   const { projectRoot, outputDir } = options;
@@ -151,6 +214,27 @@ export async function generateWiki(options: GenerateOptions): Promise<void> {
     });
 
     if (specFiles.length === 0) {
+      if (options.check) {
+        const hasStaleOutput = await directoryHasWikiFiles(resolvedOutput);
+        if (hasStaleOutput) {
+          log.error("check.fail", {
+            diffCount: 1,
+            missingCount: 0,
+            extraCount: 1,
+            changedCount: 0,
+          });
+          console.log(
+            chalk.red(
+              "✗ Wiki is stale (output exists but no specs were discovered)",
+            ),
+          );
+          throw new WikiCheckFailedError("Wiki output is stale");
+        }
+        if (options.verbose) {
+          log.info("check.diff", { fileCount: 0, diffCount: 0 });
+        }
+        return;
+      }
       if (options.json) {
         printJsonResult("generate", {
           specCount: 0,
@@ -165,6 +249,29 @@ export async function generateWiki(options: GenerateOptions): Promise<void> {
 
     const parsed = await Promise.all(specFiles.map(parseSpecFile));
     const wiki = buildWiki(parsed);
+
+    if (options.check) {
+      const tempRoot = await fs.mkdtemp(
+        path.join(os.tmpdir(), "specwiki-check-"),
+      );
+      try {
+        await generateWikiToDirectory(tempRoot, wiki, {
+          noSearch: options.noSearch,
+          emitLlmsTxt: options.emitLlmsTxt,
+          projectRoot: resolvedProjectRoot,
+        });
+        await runWikiCheck(tempRoot, resolvedOutput, Boolean(options.verbose));
+      } finally {
+        try {
+          await fs.rm(tempRoot, { force: true, recursive: true });
+        } catch (err) {
+          log.error("check.cleanup", {
+            message: err instanceof Error ? err.message : String(err),
+          });
+        }
+      }
+      return;
+    }
 
     const written = await writeWiki(resolvedOutput, wiki);
     const htmlWritten = await writeHtmlWiki(resolvedOutput, wiki, {
@@ -198,6 +305,9 @@ export async function generateWiki(options: GenerateOptions): Promise<void> {
       chalk.dim(`  ${written.length + htmlWritten.length} files written`),
     );
   } catch (err) {
+    if (err instanceof WikiCheckFailedError) {
+      throw err;
+    }
     propagateCliError("generate", err);
   }
 }
