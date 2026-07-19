@@ -93,8 +93,8 @@ development_status:
   9-1-json-machine-readable-output: done
   9-2-wiki-llms-txt-export: done
   epic-9-retrospective: optional
-  epic-10: backlog
-  10-1-generate-check-ci-freshness: backlog
+  epic-10: in-progress
+  10-1-generate-check-ci-freshness: review
   epic-10-retrospective: optional
   epic-11: backlog
   11-1-generate-watch: backlog

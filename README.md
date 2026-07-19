@@ -118,6 +118,9 @@ npx @lucasviola/specwiki generate --json
 # Generate an llms.txt manifest grouped by wiki category
 npx @lucasviola/specwiki generate --emit-llms-txt
 
+# Verify committed wiki output is up to date (CI-friendly; no writes)
+npx @lucasviola/specwiki generate --check
+
 # Keep JSON stdout clean while sending verbose diagnostics to stderr
 npx @lucasviola/specwiki list --json --verbose
 
@@ -146,6 +149,20 @@ are written to stderr.
 Use `generate --emit-llms-txt` to add `llms.txt` to the generated wiki root. The
 opt-in manifest starts with a project summary, groups every generated page by category,
 and links to its local Markdown wiki page with its description when available.
+
+### CI freshness check
+
+Use `generate --check` in CI to fail when the committed wiki is out of date. The command
+runs the same discovery and generation pipeline into a temporary directory, compares
+markdown and HTML output (including bundled assets) against your resolved `--output`
+directory, and performs **no writes** to the target path. Exit code **0** means fresh;
+exit code **1** means stale, missing, or extra generated files. Respects `--no-search`
+and `--emit-llms-txt` the same as a normal generate.
+
+```yaml
+- name: Verify wiki is up to date
+  run: npx @lucasviola/specwiki generate --check
+```
 
 ## Output
 

@@ -6,7 +6,11 @@ import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_SPEC_PATTERNS } from "../../src/config/patterns.js";
 import { log } from "../../src/core/Logger.js";
-import { generateWiki, listSpecs } from "../../src/commands/generate.js";
+import {
+  generateWiki,
+  listSpecs,
+  WikiCheckFailedError,
+} from "../../src/commands/generate.js";
 import * as wikiModule from "../../src/output/wiki.js";
 
 const fixtureRoot = path.resolve(
@@ -819,5 +823,151 @@ describe("listSpecs", () => {
       command: "list",
       message: "discover boom",
     });
+  });
+});
+
+describe("generateWiki --check", () => {
+  it("passes when existing output matches a fresh generation", async () => {
+    const projectRoot = fixtureRoot;
+    const outputDir = ignoredFixtureOutput(projectRoot, "check-fresh");
+
+    await generateWiki({
+      projectRoot,
+      outputDir,
+    });
+
+    await expect(
+      generateWiki({
+        projectRoot,
+        outputDir,
+        check: true,
+        verbose: true,
+      }),
+    ).resolves.toBeUndefined();
+
+    const lines = parseStderrLines();
+    expect(lines.some((line) => line.event === "check.diff")).toBe(true);
+    expect(lines.some((line) => line.event === "check.fail")).toBe(false);
+  });
+
+  it("fails when output differs without writing to the target directory", async () => {
+    const projectRoot = fixtureRoot;
+    const outputDir = ignoredFixtureOutput(projectRoot, "check-stale");
+    const outputPath = path.join(projectRoot, outputDir);
+
+    await generateWiki({
+      projectRoot,
+      outputDir,
+    });
+
+    const indexPath = path.join(outputPath, "index.md");
+    const before = await fs.readFile(indexPath, "utf-8");
+
+    await fs.writeFile(indexPath, `${before}\n<!-- stale -->\n`, "utf-8");
+    const tamperedMtime = (await fs.stat(indexPath)).mtimeMs;
+
+    await expect(
+      generateWiki({
+        projectRoot,
+        outputDir,
+        check: true,
+      }),
+    ).rejects.toBeInstanceOf(WikiCheckFailedError);
+
+    const after = await fs.readFile(indexPath, "utf-8");
+    const afterMtime = (await fs.stat(indexPath)).mtimeMs;
+    expect(after).toContain("<!-- stale -->");
+    expect(afterMtime).toBe(tamperedMtime);
+
+    const lines = parseStderrLines();
+    expect(lines.some((line) => line.event === "check.fail")).toBe(true);
+  });
+
+  it("fails when output is missing but specs exist", async () => {
+    const projectRoot = fixtureRoot;
+    const outputDir = ignoredFixtureOutput(projectRoot, "check-missing");
+
+    await expect(
+      generateWiki({
+        projectRoot,
+        outputDir,
+        check: true,
+      }),
+    ).rejects.toBeInstanceOf(WikiCheckFailedError);
+  });
+
+  it("passes for zero-match projects with no output directory", async () => {
+    const projectRoot = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-empty-"),
+    );
+    tempDirs.push(projectRoot);
+    const outputDir = ignoredFixtureOutput(projectRoot, "check-zero-fresh");
+
+    await expect(
+      generateWiki({
+        projectRoot,
+        outputDir,
+        check: true,
+        verbose: true,
+      }),
+    ).resolves.toBeUndefined();
+  });
+
+  it("fails for zero-match projects when stale output remains", async () => {
+    const projectRoot = fixtureRoot;
+    const outputDir = ignoredFixtureOutput(projectRoot, "check-zero-stale");
+
+    await generateWiki({
+      projectRoot,
+      outputDir,
+    });
+
+    const emptyProject = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-zero-match-"),
+    );
+    tempDirs.push(emptyProject);
+    await fs.cp(
+      path.join(projectRoot, outputDir),
+      path.join(emptyProject, outputDir),
+      {
+        recursive: true,
+      },
+    );
+
+    await expect(
+      generateWiki({
+        projectRoot: emptyProject,
+        outputDir,
+        check: true,
+      }),
+    ).rejects.toBeInstanceOf(WikiCheckFailedError);
+  });
+
+  it("respects --emit-llms-txt during check comparisons", async () => {
+    const projectRoot = fixtureRoot;
+    const outputDir = ignoredFixtureOutput(projectRoot, "check-llms");
+
+    await generateWiki({
+      projectRoot,
+      outputDir,
+      emitLlmsTxt: true,
+    });
+
+    await expect(
+      generateWiki({
+        projectRoot,
+        outputDir,
+        check: true,
+        emitLlmsTxt: true,
+      }),
+    ).resolves.toBeUndefined();
+
+    await expect(
+      generateWiki({
+        projectRoot,
+        outputDir,
+        check: true,
+      }),
+    ).rejects.toBeInstanceOf(WikiCheckFailedError);
   });
 });
