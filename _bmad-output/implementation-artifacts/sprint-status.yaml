@@ -1,5 +1,5 @@
 # generated: 2026-07-12
-# last_updated: 2026-07-18 (S25.2 foundational ADRs)
+# last_updated: 2026-07-19 (S16.5 HTML inter-page link resolution)
 # project: specwiki
 # project_key: NOKEY
 # tracking_system: file-system
@@ -45,7 +45,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-07-12
-last_updated: 2026-07-18 (E27 live examples gallery epic)
+last_updated: 2026-07-19 (S16.5 HTML inter-page link resolution)
 project: specwiki
 project_key: NOKEY
 tracking_system: file-system
@@ -119,11 +119,12 @@ development_status:
   epic-15: backlog
   15-1-ide-wiki-panel-extension: backlog
   epic-15-retrospective: optional
-  epic-16: done
+  epic-16: in-progress
   16-1-mustache-html-renderer-and-wikimedia-assets: done
   16-2-wikipedia-layout-chrome-and-navigation: done
   16-3-rich-html-content-rendering: done
   16-4-client-side-wiki-search: done
+  16-5-html-inter-page-link-resolution: ready-for-dev
   epic-16-retrospective: optional
   epic-17: done
   17-1-broad-markdown-discovery-by-default: done

@@ -967,3 +967,49 @@ npm run format
 npm run coverage
 npm start list
 ```
+
+---
+
+## 15. Party mode huddles (global directive)
+
+**Mandatory for this project.** Whenever the owner invokes **`bmad-party-mode`** (party mode), persist session artifacts under **`{project-root}/huddles/`**.
+
+This directive applies to every party mode run in this repo until the owner changes it.
+
+### Folder layout
+
+| Path                                     | Purpose                                                                 |
+| ---------------------------------------- | ----------------------------------------------------------------------- |
+| `huddles/README.md`                      | Index of sessions (date, topic, file link)                              |
+| `huddles/{YYYY-MM-DD}-{short-slug}.md`   | Session summary — decisions, dissent, outcomes, artifact links          |
+| `huddles/{YYYY-MM-DD}-{short-slug}.html` | Optional party-mode keepsake HTML (when offered at wrap-up)             |
+| `huddles/memories/`                      | BMAD party-mode per-party memlogs (append-only; see party-memory skill) |
+
+### Agent obligations
+
+**On activation**
+
+- Ensure `huddles/` exists.
+- Open or create `huddles/{YYYY-MM-DD}-{short-slug}.md` for the session topic.
+- Add YAML frontmatter: `date`, `topic`, `roster`, `related`, `status`.
+
+**During the session**
+
+- Append memorable beats, decisions, and open questions — not full transcripts.
+- Capture artifact paths (stories, ADRs, epics) as they are created.
+
+**On wrap-up**
+
+- Set `status: closed` (or `status: open` if follow-up expected).
+- Record final decisions and next steps.
+- Update `huddles/README.md` session table.
+- If party mode offers an HTML keepsake, write it beside the markdown file in `huddles/` (not `_bmad-output/party-mode/`).
+
+### BMAD skill alignment
+
+Party-mode output and memory paths are overridden in **`_bmad/custom/bmad-party-mode.user.toml`**:
+
+- `output_dir` → `{project-root}/huddles`
+- `memory_dir` → `{project-root}/huddles/memories`
+
+Agents running party mode must read HARNESS §15 even when the skill’s default paths differ.

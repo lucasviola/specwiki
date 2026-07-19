@@ -863,6 +863,7 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 | S16.2 | Wikipedia layout chrome and navigation      | 4+      |
 | S16.3 | Rich HTML content rendering                 | 4+      |
 | S16.4 | Client-side wiki search                     | 4+      |
+| S16.5 | HTML inter-page link resolution             | 4+      |
 
 #### S16.1 — Mustache HTML renderer and Wikimedia assets
 
@@ -983,7 +984,38 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 - [ ] Unit test: search index JSON schema and document count matches page count
 - [ ] No new network I/O in `generate` beyond existing filesystem writes (NFR-012)
 
-**E16 gate:** Fixture wiki opens in browser with Wikipedia-like layout, navigation, highlighted code, and working client-side search; markdown output unchanged; frozen `wiki/html/` contract preserved.
+#### S16.5 — HTML inter-page link resolution
+
+**As** Alex, **I want** markdown links inside wiki article bodies to open the correct HTML pages, **so that** cross-references work when browsing via `file://` without a server.
+
+**INVEST:** I✓ N✓ V✓ E✓ S✓ T✓  
+**Depends on:** S16.2, S16.3  
+**Demo path:** `npm run dev generate -- --project . --output wiki` → open `wiki/html/docs-adr-index.html` → click `./template.md` and ARCHITECTURE-SPINE links → land on `{slug}.html` pages; open `wiki/html/readme.html` → click `CHANGELOG.md` → lands on `changelog.html`.
+
+**FR:** FR-033 (completes S16.2 inter-page link AC for body content) | **AD:** AD-4, AD-7
+
+**Functional:**
+
+- [ ] Build a `WikiLinkIndex` at generate time mapping discovered source paths → output slugs (collision-aware, reusing `assignUniqueSlugs`)
+- [ ] Resolve relative markdown hrefs from the **source file path** (not the flat `html/` output location) and rewrite known targets to `{slug}.html` (preserve `#fragment`)
+- [ ] Wire link resolver into HTML rendering only: article bodies, index root intro, and category README intros — **not** markdown `wiki/*.md` output
+- [ ] Pass through unchanged: `#anchors`, `http(s):`, `mailto:`, and targets not in the discovered corpus
+- [ ] Reject rewriting dangerous schemes (`javascript:`, `data:`, `vbscript:`); do not emit absolute `file://` hrefs
+- [ ] Verbose `output.link-unresolved` when a relative `.md`/`.mdc`/`.txt` href cannot be mapped (optional CSS class deferred)
+
+**Logging & diagnostics (§0.8):**
+
+- [ ] `output.link-unresolved` logs `{ sourcePath, href }` when rewrite lookup fails (verbose only)
+- [ ] `render.error` unchanged on markdown failure (always)
+
+**Quality measures:**
+
+- [ ] Full §0.2 gate passes
+- [ ] Unit tests for resolver matrix (same-dir, parent traversal, cross-tree, fragments, externals, escape paths)
+- [ ] Integration test: generated HTML body links contain no raw `.md` hrefs for discovered targets
+- [ ] Markdown wiki output byte-identical aside from unrelated changes
+
+**E16 gate:** Fixture wiki opens in browser with Wikipedia-like layout, navigation, highlighted code, working client-side search, and **clickable inline cross-links**; markdown output unchanged; frozen `wiki/html/` contract preserved.
 
 ---
 
@@ -1197,7 +1229,7 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 | E13 Distribution     | S13.1–S13.4 | FR-027, FR-028; go-to-market (S13.3); release (S13.4) | backlog       |
 | E14 Ecosystem        | S14.1–S14.3 | FR-018, FR-029                                        | backlog       |
 | E15 IDE              | S15.1       | —                                                     | backlog       |
-| E16 Wiki HTML skin   | S16.1–S16.4 | FR-032–FR-034                                         | backlog       |
+| E16 Wiki HTML skin   | S16.1–S16.5 | FR-032–FR-034                                         | backlog       |
 | E20 specwiki.ai      | S20.1–S20.3 | New public web surface; depends on E13 S13.1          | backlog       |
 | E21 NPM security     | S21.1–S21.7 | Pre-publish hardening; gate before E22 S22.6          | in-progress   |
 | E22 SemVer & release | S22.1–S22.7 | FR-027 release process; supersedes E13 S13.4          | ready-for-dev |

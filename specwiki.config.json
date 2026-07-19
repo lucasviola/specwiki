@@ -1,10 +1,12 @@
 {
   "patterns": [
-    "*.md",
     "_bmad-output/**/*.md",
     ".agents/**/*.md",
     ".cursor/rules/**/*.{md,mdc}",
     "tests/fixtures/**/*.{md,mdc}",
-    "docs/**/*.{md,mdc}"
+    "docs/**/*.{md,mdc}",
+    "huddles/*.md",
+    "./*.md",
+    "·/**/*.md"
   ]
 }
