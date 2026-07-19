@@ -4,7 +4,7 @@ baseline_commit: e4a607d
 
 # Story 25.1: ADR Scaffolding, Template, and Wiki Category
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -331,6 +331,7 @@ Composer
 ### Change Log
 
 - 2026-07-18 — S25.1 ADR scaffolding, template, and wiki category discovery (Composer)
+- 2026-07-19 — Owner sign-off; story → done.
 
 ## Senior Developer Review (AI)
 

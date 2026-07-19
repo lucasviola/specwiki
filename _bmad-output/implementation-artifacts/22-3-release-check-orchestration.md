@@ -4,7 +4,7 @@ baseline_commit: HEAD
 
 # Story 22.3: Release check orchestration
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 

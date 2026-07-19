@@ -4,7 +4,7 @@ baseline_commit: HEAD
 
 # Story 22.4: CHANGELOG and SemVer policy
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 

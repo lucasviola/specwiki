@@ -4,7 +4,7 @@ baseline_commit: HEAD
 
 # Story 22.6: Version 1.0.0 first public release
 
-Status: ready-for-dev
+Status: backlog
 
 ## Story
 

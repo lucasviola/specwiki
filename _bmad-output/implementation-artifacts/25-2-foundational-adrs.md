@@ -4,7 +4,7 @@ baseline_commit: 309d559
 
 # Story 25.2: Foundational ADRs (0001, 0003, 0004, 0007, 0009)
 
-Status: review
+Status: done
 
 ## Story
 
@@ -147,6 +147,7 @@ Composer
 ### Change Log
 
 - 2026-07-18 — S25.2 foundational ADRs 0001, 0003, 0004, 0007, 0009 (Composer)
+- 2026-07-19 — Owner sign-off; story → done.
 
 ## Senior Developer Review (AI)
 

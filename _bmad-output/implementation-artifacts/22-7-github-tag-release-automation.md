@@ -4,7 +4,7 @@ baseline_commit: HEAD
 
 # Story 22.7: GitHub tag-triggered npm publish (optional)
 
-Status: backlog
+Status: done
 
 ## Story
 

@@ -4,7 +4,7 @@ baseline_commit: HEAD
 
 # Story 22.2: Release version bump script
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 

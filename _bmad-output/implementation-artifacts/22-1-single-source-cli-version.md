@@ -4,7 +4,7 @@ baseline_commit: HEAD
 
 # Story 22.1: Single-source CLI version
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 

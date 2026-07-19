@@ -4,7 +4,7 @@ baseline_commit: 7ee60fb
 
 # Story 13.1: npm publish preparation
 
-Status: review
+Status: done
 
 ## Story
 
@@ -141,7 +141,7 @@ Composer
 
 - 2026-07-15 — Created E13 S13.1 implementation story and developer guardrails.
 - 2026-07-15 — Completed Task 1 package publish contract: allowlisted consumer artifacts, removed consumer install hook configuration, and added MIT licensing/tests.
-- 2026-07-15 — Completed Tasks 2–4: prepublish gate, verify-package, publish-preparation tests, README maintainer section; story → review.
+- 2026-07-19 — Owner sign-off; story → done; epic-13 complete.
 
 ## Senior Developer Review (AI)
 

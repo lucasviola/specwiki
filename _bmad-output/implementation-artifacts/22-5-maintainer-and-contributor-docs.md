@@ -4,7 +4,7 @@ baseline_commit: HEAD
 
 # Story 22.5: Maintainer and contributor documentation
 
-Status: ready-for-dev
+Status: done
 
 ## Story
 
