@@ -4,6 +4,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import {
+  AUDIT_STEP,
+  PREPUBLISH_STEPS,
   QUALITY_GATE_STEPS,
   formatPrepMessage,
   parsePrepublishArgs,
@@ -64,6 +66,27 @@ describe("prepublish check", () => {
     }
   });
 
+  it("includes production dependency audit after the quality gate", () => {
+    expect(PREPUBLISH_STEPS).toEqual([...QUALITY_GATE_STEPS, AUDIT_STEP]);
+
+    const script = readScript("scripts/prepublish-check.mjs");
+    expect(script).toContain("PREPUBLISH_STEPS");
+    expect(script).toContain('"audit"');
+
+    const auditScript = readPackageJson().scripts.audit;
+    expect(auditScript).toContain("--audit-level=high");
+    expect(auditScript).toContain("--omit=dev");
+  });
+
+  it("passes npm audit on production dependencies in the clean tree", () => {
+    const result = spawnSync("npm", ["run", "audit"], {
+      cwd: projectRoot,
+      encoding: "utf8",
+    });
+
+    expect(result.status).toBe(0);
+  });
+
   it("formats deterministic publish.prep diagnostics", () => {
     expect(formatPrepMessage("test", "start")).toBe("publish.prep test start");
     expect(formatPrepMessage("build", "ok")).toBe("publish.prep build ok");
@@ -87,7 +110,7 @@ describe("prepublish check", () => {
       .filter((line) => line.startsWith("publish.prep "));
 
     expect(lines).toEqual(
-      QUALITY_GATE_STEPS.flatMap((step) => [
+      PREPUBLISH_STEPS.flatMap((step) => [
         `publish.prep ${step} skip`,
         `publish.prep ${step} ok`,
       ]),

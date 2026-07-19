@@ -13,6 +13,11 @@ export const QUALITY_GATE_STEPS = [
   "build",
 ];
 
+/** Production dependency audit; runs after the HARNESS §0.2 quality gate. */
+export const AUDIT_STEP = "audit";
+
+export const PREPUBLISH_STEPS = [...QUALITY_GATE_STEPS, AUDIT_STEP];
+
 /**
  * @param {string} step
  * @param {PrepStatus} status
@@ -58,6 +63,15 @@ export function runGateStep(step, verbose, dryRun) {
     console.log(formatPrepMessage(step, exitCode === 0 ? "ok" : "fail"));
   }
 
+  if (exitCode !== 0 && step === AUDIT_STEP) {
+    console.error(
+      "publish.prep audit blocked: npm audit failed for production dependencies.",
+    );
+    console.error(
+      "Run `npm run audit` for details. See README maintainer section for time-bounded exceptions.",
+    );
+  }
+
   return exitCode;
 }
 
@@ -67,7 +81,7 @@ export function runGateStep(step, verbose, dryRun) {
 export function runPrepublishCheck(argv = process.argv.slice(2)) {
   const { verbose, dryRun } = parsePrepublishArgs(argv);
 
-  for (const step of QUALITY_GATE_STEPS) {
+  for (const step of PREPUBLISH_STEPS) {
     const exitCode = runGateStep(step, verbose, dryRun);
     if (exitCode !== 0) {
       process.exit(exitCode);

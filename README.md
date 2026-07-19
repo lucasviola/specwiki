@@ -75,8 +75,13 @@ Before publishing to npm, run the local package verification and quality gate:
 
 ```bash
 npm run verify-package   # pack tarball, clean-install, run specwiki --help
-npm run prepublishOnly   # full quality gate (also runs automatically on npm publish)
+npm run prepublishOnly   # full quality gate + production dependency audit (also runs automatically on npm publish)
+npm run audit            # production dependency audit only (high/critical CVEs fail)
 ```
+
+**Dependency audit policy:** `prepublishOnly` runs `npm audit --audit-level=high --omit=dev` after the test/lint/build gate. Only **production** dependencies block publish; high and critical CVEs fail the release. **DevDependencies** are audited separately during development (`npm audit` without `--omit=dev`) and are not part of the publish gate.
+
+**Time-bounded audit exceptions:** If a false positive or accepted risk blocks publish, open a GitHub issue describing the advisory, why it is safe to ship, and an **expiry date** when the exception must be re-evaluated. Record the issue URL in the release notes or PR. Preferred unblock paths are upgrading or patching the dependency so `npm run audit` passes again. If maintainers approve shipping before a fix is available, the explicit escape hatch is `npm publish --ignore-scripts` (skips `prepublishOnly`, including the audit gate) — use only with team agreement and a tracked issue; do not bypass locally without maintainer consensus.
 
 **Publish to npm** (maintainer only, requires `npm login`):
 
@@ -207,7 +212,7 @@ Run `specwiki` only on repositories you trust. The tool reads markdown from your
 
 - The published tarball includes only `dist/`, `README.md`, and `LICENSE` (verified by `npm run verify-package`).
 - No `postinstall` or `prepare` scripts run on consumer installs.
-- `prepublishOnly` runs the full test/lint/build quality gate before publish.
+- `prepublishOnly` runs the full test/lint/build quality gate and a production dependency audit before publish.
 
 See [SECURITY.md](SECURITY.md) for how to report vulnerabilities privately.
 

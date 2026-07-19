@@ -28,7 +28,8 @@
     "coverage": "vitest run --coverage",
     "lint": "eslint .",
     "format": "prettier --check .",
-    "format:write": "prettier --write ."
+    "format:write": "prettier --write .",
+    "audit": "npm audit --audit-level=high --omit=dev"
   },
   "keywords": [
     "cli",
