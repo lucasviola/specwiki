@@ -31,10 +31,21 @@ export interface WikiPage {
   sections: SpecSection[];
 }
 
+export interface CategoryReadmeIntroSegment {
+  content: string;
+  sourcePath: string;
+}
+
+export interface CategoryReadmeIntro {
+  content: string;
+  sourcePaths: string[];
+  segments: CategoryReadmeIntroSegment[];
+}
+
 export interface WikiIndexMeta {
   rootIntro: string | null;
   rootIntroSource: string | null;
-  categoryIntros: Map<string, { content: string; sourcePaths: string[] }>;
+  categoryIntros: Map<string, CategoryReadmeIntro>;
   readmeIndexCount: number;
 }
 

@@ -4,7 +4,7 @@ baseline_commit: 255779dc916f4e821987238e7c03fec380aa29f2
 
 # Story 16.5: HTML inter-page link resolution
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -41,27 +41,27 @@ INVEST: I✓ N✓ V✓ E✓ S✓ T✓
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Add `wiki-link-resolver` module (AC: #1, #4, #5)
-  - [ ] Create `src/output/html/wiki-link-resolver.ts` with `buildWikiLinkIndex`, `createHtmlLinkResolver`
-  - [ ] Index keys: normalized POSIX relative paths (forward slashes, lowercase) for `.md`, `.mdc`, `.txt`
-  - [ ] Lookup uses slugs from existing `assignUniqueSlugs` / `WikiPage.slug` — do not re-derive collision logic
-  - [ ] Resolver: allowed schemes pass through; block dangerous schemes; resolve relative paths under `projectRoot`
-  - [ ] Path escape (`..` leaving project root) → leave href unchanged, do not rewrite
-- [ ] Task 2: Extend `renderMarkdown` with optional link context (AC: #2, #3, #8)
-  - [ ] Add `RenderMarkdownOptions` with optional `linkResolver: (href: string) => string`
-  - [ ] Custom `marked` `link` renderer applies resolver; preserve `title` attribute; marked escapes href
-  - [ ] Default call sites without options behave exactly as today (markdown wiki unaffected)
-- [ ] Task 3: Wire resolver into HTML generation (AC: #3, #6, #7)
-  - [ ] `writeHtmlWiki`: build index once; pass resolver + `page.sourcePath` per article
-  - [ ] `HtmlRenderer.renderIndex`: pass resolver for `rootIntroHtml` using `indexMeta.rootIntroSource`
-  - [ ] Category intros: use first path from `intro.sourcePaths[0]` as link resolution base
-  - [ ] Thread `projectRoot` from existing `WriteHtmlWikiOptions` (already available when nav grouping loads)
-- [ ] Task 4: Tests and quality gate (AC: #9, #10, #11, #12)
-  - [ ] Unit tests in `tests/output/html/wiki-link-resolver.test.ts`
-  - [ ] Extend `tests/parse/markdown.test.ts` for link renderer hook
-  - [ ] Integration tests in `tests/output/wiki.test.ts` with inline fixture pages containing cross-links
-  - [ ] Assert dogfood cases: `docs/adr/index.md` links, `README.md` → `CHANGELOG.md`
-  - [ ] Run full §0.2 gate; update `IMPLEMENTATION.md`
+- [x] Task 1: Add `wiki-link-resolver` module (AC: #1, #4, #5)
+  - [x] Create `src/output/html/wiki-link-resolver.ts` with `buildWikiLinkIndex`, `createHtmlLinkResolver`
+  - [x] Index keys: normalized POSIX relative paths (forward slashes, lowercase) for `.md`, `.mdc`, `.txt`
+  - [x] Lookup uses slugs from existing `assignUniqueSlugs` / `WikiPage.slug` — do not re-derive collision logic
+  - [x] Resolver: allowed schemes pass through; block dangerous schemes; resolve relative paths under `projectRoot`
+  - [x] Path escape (`..` leaving project root) → leave href unchanged, do not rewrite
+- [x] Task 2: Extend `renderMarkdown` with optional link context (AC: #2, #3, #8)
+  - [x] Add `RenderMarkdownOptions` with optional `linkResolver: (href: string) => string`
+  - [x] Custom `marked` `link` renderer applies resolver; preserve `title` attribute; marked escapes href
+  - [x] Default call sites without options behave exactly as today (markdown wiki unaffected)
+- [x] Task 3: Wire resolver into HTML generation (AC: #3, #6, #7)
+  - [x] `writeHtmlWiki`: build index once; pass resolver + `page.sourcePath` per article
+  - [x] `HtmlRenderer.renderIndex`: pass resolver for `rootIntroHtml` using `indexMeta.rootIntroSource`
+- Category intros: render each `intro.segments[]` entry with its own `sourcePath` link base (multi-README merge safe)
+  - [x] Thread `projectRoot` from existing `WriteHtmlWikiOptions` (already available when nav grouping loads)
+- [x] Task 4: Tests and quality gate (AC: #9, #10, #11, #12)
+  - [x] Unit tests in `tests/output/html/wiki-link-resolver.test.ts`
+  - [x] Extend `tests/parse/markdown.test.ts` for link renderer hook
+  - [x] Integration tests in `tests/output/wiki.test.ts` with inline fixture pages containing cross-links
+  - [x] Assert dogfood cases: `docs/adr/index.md` links, `README.md` → `CHANGELOG.md`
+  - [x] Run full §0.2 gate; update `IMPLEMENTATION.md`
 
 ## Dev Notes
 
@@ -214,25 +214,53 @@ renderMarkdown(page.content, { linkResolver: createHtmlLinkResolver({ ... }) })
 
 ### Agent Model Used
 
-_(unset — story not yet implemented)_
+Composer
 
 ### Debug Log References
 
 ### Completion Notes List
 
+- Added `wiki-link-resolver.ts` with O(1) index lookup from `WikiPage.slug` and `createHtmlLinkResolver` resolving relative hrefs from source markdown directory with project-root confinement.
+- Extended `renderMarkdown` with optional `linkResolver` and custom marked `link` renderer (href/title escaped).
+- Wired resolver in `writeHtmlWiki` (articles) and `HtmlRenderer.renderIndex` (root + category intros).
+- Review patch: `CategoryReadmeIntro.segments` — category intros render per-README segment with correct link base when multiple folder READMEs merge.
+- 28 new tests total; full §0.2 gate passes; `wiki-link-resolver.ts` at 95.87% coverage.
+
 ### File List
+
+- `src/output/html/wiki-link-resolver.ts` (new)
+- `src/parse/markdown.ts`
+- `src/output/wiki.ts`
+- `src/output/html/renderer.ts`
+- `src/output/readme-index.ts`
+- `src/types.ts`
+- `tests/output/html/wiki-link-resolver.test.ts` (new)
+- `tests/parse/markdown.test.ts`
+- `tests/output/wiki.test.ts`
+- `tests/output/readme-index.test.ts`
+- `tests/output/html/renderer.test.ts`
+- `IMPLEMENTATION.md`
+- `_bmad-output/implementation-artifacts/sprint-status.yaml`
 
 ### Change Log
 
+- 2026-07-19: S16.5 — HTML inter-page link resolution for markdown body links in generated HTML wiki.
+- 2026-07-19: Review patch — per-segment category intro link resolution for merged folder READMEs.
+
 ## Senior Developer Review (AI)
 
-**Review date:**  
-**Review outcome:**  
-**Reviewer model:**
+**Review date:** 2026-07-19  
+**Review outcome:** Approve (after review patch)  
+**Reviewer model:** Bugbot (claude-sonnet-5)
 
 ### Action Items
 
+- [x] [High] Category intro link base — render each merged README segment with its own `sourcePath` (fixed via `CategoryReadmeIntro.segments` + `renderCategoryIntroHtml`)
+
 ### Review Findings
+
+- Initial review: merged category intros used `sourcePaths[0]` for all links — wrong when multiple folder READMEs share a category.
+- Re-review after patch: no bugs found.
 
 ## QA Manual Validation
 

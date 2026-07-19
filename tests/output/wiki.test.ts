@@ -1743,3 +1743,137 @@ describe("path traversal guards", () => {
     expect(errorEvents.length).toBeGreaterThan(0);
   });
 });
+
+describe("HTML inter-page link resolution", () => {
+  it("rewrites discovered markdown hrefs to slug.html in article bodies", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-links-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([
+      sampleSpec({
+        file: {
+          path: "/tmp/project/README.md",
+          relativePath: "README.md",
+          category: "root",
+          title: "Readme",
+        },
+        title: "Readme",
+        rawContent: "See [changelog](CHANGELOG.md) for updates.",
+      }),
+      sampleSpec({
+        file: {
+          path: "/tmp/project/CHANGELOG.md",
+          relativePath: "CHANGELOG.md",
+          category: "root",
+          title: "Changelog",
+        },
+        title: "Changelog",
+        rawContent: "Release notes.",
+      }),
+    ]);
+
+    await writeHtmlWiki(outputDir, wiki, { projectRoot: "/tmp/project" });
+
+    const readmeHtml = await fs.readFile(
+      path.join(outputDir, "html", "readme.html"),
+      "utf-8",
+    );
+    expect(readmeHtml).toContain('href="changelog.html"');
+    expect(readmeHtml).not.toMatch(/href="[^"]*CHANGELOG\.md"/);
+  });
+
+  it("rewrites cross-directory links in generated HTML", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-html-cross-links-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([
+      sampleSpec({
+        file: {
+          path: "/tmp/project/docs/adr/index.md",
+          relativePath: "docs/adr/index.md",
+          category: "docs",
+          title: "ADR Index",
+        },
+        title: "ADR Index",
+        rawContent:
+          "Use [template](./template.md) and [spine](../../_bmad-output/planning-artifacts/discovery/architecture/ARCHITECTURE-SPINE.md).",
+      }),
+      sampleSpec({
+        file: {
+          path: "/tmp/project/docs/adr/template.md",
+          relativePath: "docs/adr/template.md",
+          category: "docs",
+          title: "ADR Template",
+        },
+        title: "ADR Template",
+        rawContent: "Template body.",
+      }),
+      sampleSpec({
+        file: {
+          path: "/tmp/project/_bmad-output/planning-artifacts/discovery/architecture/ARCHITECTURE-SPINE.md",
+          relativePath:
+            "_bmad-output/planning-artifacts/discovery/architecture/ARCHITECTURE-SPINE.md",
+          category: "planning",
+          title: "Architecture Spine",
+        },
+        title: "Architecture Spine",
+        rawContent: "Spine body.",
+      }),
+    ]);
+
+    await writeHtmlWiki(outputDir, wiki, { projectRoot: "/tmp/project" });
+
+    const indexHtml = await fs.readFile(
+      path.join(outputDir, "html", "docs-adr-index.html"),
+      "utf-8",
+    );
+    expect(indexHtml).toContain('href="docs-adr-template.html"');
+    expect(indexHtml).toContain(
+      'href="_bmad-output-planning-artifacts-discovery-architecture-architecture-spine.html"',
+    );
+    expect(indexHtml).not.toMatch(/href="[^"]*\.md"/);
+  });
+
+  it("leaves markdown wiki output unchanged", async () => {
+    const outputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-md-links-"),
+    );
+    tempDirs.push(outputDir);
+
+    const wiki = buildWiki([
+      sampleSpec({
+        file: {
+          path: "/tmp/project/README.md",
+          relativePath: "README.md",
+          category: "root",
+          title: "Readme",
+        },
+        title: "Readme",
+        rawContent: "See [changelog](CHANGELOG.md).",
+      }),
+      sampleSpec({
+        file: {
+          path: "/tmp/project/CHANGELOG.md",
+          relativePath: "CHANGELOG.md",
+          category: "root",
+          title: "Changelog",
+        },
+        title: "Changelog",
+        rawContent: "Notes.",
+      }),
+    ]);
+
+    await writeWiki(outputDir, wiki);
+
+    const readmeMd = await fs.readFile(
+      path.join(outputDir, "readme.md"),
+      "utf-8",
+    );
+    expect(readmeMd).toContain("(CHANGELOG.md)");
+    expect(readmeMd).not.toContain("(changelog.html)");
+  });
+});

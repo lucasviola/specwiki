@@ -116,8 +116,39 @@ describe("resolveReadmeIndexBindings", () => {
     expect(bindings.categoryIntros.get("other")).toEqual({
       content: "Nested packages intro.",
       sourcePaths: ["packages/nested/README.md"],
+      segments: [
+        {
+          content: "Nested packages intro.",
+          sourcePath: "packages/nested/README.md",
+        },
+      ],
     });
     expect(bindings.readmeIndexCount).toBe(1);
+  });
+
+  it("merges multiple folder READMEs in one category with per-source segments", () => {
+    const bindings = resolveReadmeIndexBindings([
+      parsedSpec("packages/a/README.md", "other", "Package A intro."),
+      agentSpec("packages/a/AGENTS.md", "other"),
+      parsedSpec("packages/b/README.md", "other", "Package B intro."),
+      agentSpec("packages/b/AGENTS.md", "other"),
+    ]);
+
+    expect(bindings.categoryIntros.get("other")).toEqual({
+      content: "Package A intro.\n\nPackage B intro.",
+      sourcePaths: ["packages/a/README.md", "packages/b/README.md"],
+      segments: [
+        {
+          content: "Package A intro.",
+          sourcePath: "packages/a/README.md",
+        },
+        {
+          content: "Package B intro.",
+          sourcePath: "packages/b/README.md",
+        },
+      ],
+    });
+    expect(bindings.readmeIndexCount).toBe(2);
   });
 
   it("skips folder README when directory has no other specs", () => {

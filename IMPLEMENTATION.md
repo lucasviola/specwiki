@@ -142,6 +142,7 @@ Story status mirrors [`sprint-status.yaml`](./_bmad-output/implementation-artifa
   - [x] S16.2 — Wikipedia layout chrome and navigation
   - [x] S16.3 — Rich HTML content rendering
   - [x] S16.4 — Client-side wiki search _(review)_
+  - [ ] S16.5 — HTML inter-page link resolution _(review)_
 - [ ] **E17 — CLI Developer Experience** — broad markdown discovery, `open`, `init` _(in progress — impromptu)_
   - [x] S17.1 — Broad markdown discovery by default _(review)_
   - [x] S17.2 — `specwiki open` browser command _(review)_
@@ -204,29 +205,30 @@ Verified 2026-07-12 as part of E7 S7.2. Automated guards in `tests/harness/deliv
 
 Every MVP feature story shipped structured logging ACs. No deferred logging epic.
 
-| Story      | Module(s)                    | Events verified                                                     |
-| ---------- | ---------------------------- | ------------------------------------------------------------------- |
-| S2.3       | discover/specs.ts            | discover.start, discover.match, discover.complete, discover.error   |
-| S2.4       | discover/specs.ts            | discover.empty                                                      |
-| S3.1       | parse/markdown.ts            | parse.file, parse.error                                             |
-| S3.2       | output/wiki.ts               | output.write, output.error                                          |
-| S4.1       | parse/markdown.ts            | render.error                                                        |
-| S4.2       | output/wiki.ts               | output.write (html/), output.error                                  |
-| S5.1       | output/wiki.ts               | output.slug-collision                                               |
-| S5.2       | output/wiki.ts               | output.error (path guard)                                           |
-| S6.1       | commands/generate.ts, cli.ts | cli.command, cli.error, generate.summary                            |
-| S6.2       | cli.ts                       | cli.error (usage vs runtime)                                        |
-| S7.1       | (integration)                | Full verbose chain in dogfood CLI test                              |
-| S16.3      | parse/markdown.ts            | render.error (unchanged)                                            |
-| S16.4      | output/wiki.ts, search-index | output.write (search-index.json), output.search-index, output.error |
-| S17.2      | commands/open.ts, cli.ts     | cli.command, open.error, open.launch                                |
-| S17.3      | commands/init.ts, cli.ts     | cli.command, init.error, init.write                                 |
-| S19.1      | output/wiki.ts (unchanged)   | output.write covers specwiki.css and highlight.css                  |
-| S19.2      | output/wiki.ts (unchanged)   | output.write covers modified specwiki.css                           |
-| S19.3      | output/wiki.ts (unchanged)   | output.write covers modified specwiki.css                           |
-| S19.5      | output/wiki.ts (unchanged)   | output.write covers modified specwiki.css                           |
-| E19 bugfix | output/wiki.ts (unchanged)   | output.write covers modified specwiki.css                           |
-| S24.1      | output/wiki.ts (unchanged)   | output.write covers modified specwiki.css                           |
+| Story      | Module(s)                      | Events verified                                                     |
+| ---------- | ------------------------------ | ------------------------------------------------------------------- |
+| S2.3       | discover/specs.ts              | discover.start, discover.match, discover.complete, discover.error   |
+| S2.4       | discover/specs.ts              | discover.empty                                                      |
+| S3.1       | parse/markdown.ts              | parse.file, parse.error                                             |
+| S3.2       | output/wiki.ts                 | output.write, output.error                                          |
+| S4.1       | parse/markdown.ts              | render.error                                                        |
+| S4.2       | output/wiki.ts                 | output.write (html/), output.error                                  |
+| S5.1       | output/wiki.ts                 | output.slug-collision                                               |
+| S5.2       | output/wiki.ts                 | output.error (path guard)                                           |
+| S6.1       | commands/generate.ts, cli.ts   | cli.command, cli.error, generate.summary                            |
+| S6.2       | cli.ts                         | cli.error (usage vs runtime)                                        |
+| S7.1       | (integration)                  | Full verbose chain in dogfood CLI test                              |
+| S16.3      | parse/markdown.ts              | render.error (unchanged)                                            |
+| S16.4      | output/wiki.ts, search-index   | output.write (search-index.json), output.search-index, output.error |
+| S16.5      | wiki-link-resolver.ts, wiki.ts | output.link-unresolved (verbose); render.error unchanged            |
+| S17.2      | commands/open.ts, cli.ts       | cli.command, open.error, open.launch                                |
+| S17.3      | commands/init.ts, cli.ts       | cli.command, init.error, init.write                                 |
+| S19.1      | output/wiki.ts (unchanged)     | output.write covers specwiki.css and highlight.css                  |
+| S19.2      | output/wiki.ts (unchanged)     | output.write covers modified specwiki.css                           |
+| S19.3      | output/wiki.ts (unchanged)     | output.write covers modified specwiki.css                           |
+| S19.5      | output/wiki.ts (unchanged)     | output.write covers modified specwiki.css                           |
+| E19 bugfix | output/wiki.ts (unchanged)     | output.write covers modified specwiki.css                           |
+| S24.1      | output/wiki.ts (unchanged)     | output.write covers modified specwiki.css                           |
 
 User-facing summaries remain on stdout via chalk; diagnostics use JSON stderr via `Logger.ts`.
 
@@ -291,4 +293,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-18 | E25 S25.1        | `feat(adr): scaffold docs/adr with wiki category discovery` — `docs/adr/index.md` + `template.md` (MADR skeleton, status lifecycle, authoring norms); `deriveCategory` maps `docs/adr/` → `adr`; `CATEGORY_LABELS.adr` = Architecture Decisions; `CATEGORY_PATH_PREFIXES` parity; 520 tests; `src/discover/specs.ts` 100%                                                                                                    | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-18 | E25 S25.2        | `docs(adr): foundational ADRs 0001, 0003, 0004, 0007, 0009` — path confinement, config trust model, static output boundary, CLI dual-audience contract, runtime dep budget (supersedes AD-11); index table + summaries; doc-only; §0.8 N/A; no src/ changes                                                                                                                                                                  | uncommitted           | wiki smoke ✓                                                                         |
 | 2026-07-18 | E27 (idea)       | Logged epic: live hero example on specwiki.ai — conversion-first (`agent-harness-parcel`); party-mode architecture + owner decision breadth→conversion; `epic-27-live-examples-gallery.md`, sprint-status, epics index; no stories started                                                                                                                                                                                   | uncommitted           | planning only                                                                        |
+| 2026-07-19 | E16 S16.5        | `feat(output): HTML inter-page link resolution for markdown body links` — `wiki-link-resolver.ts` index + resolver; optional `linkResolver` on `renderMarkdown`; wired in `writeHtmlWiki` + index intros; per-segment category intro link bases for merged READMEs; verbose `output.link-unresolved`; 28 new tests; 548 tests total; `wiki-link-resolver.ts` 95.87% coverage                                                 | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | _template_ | _E?_ S?_         | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                                              |

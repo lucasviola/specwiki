@@ -544,6 +544,39 @@ User section.
 
     highlightSpy.mockRestore();
   });
+
+  it("applies linkResolver to markdown links", () => {
+    const html = renderMarkdown("[changelog](CHANGELOG.md)", {
+      linkResolver: (href) =>
+        href === "CHANGELOG.md" ? "changelog.html" : href,
+    });
+
+    expect(html).toContain('href="changelog.html"');
+    expect(html).not.toContain('href="CHANGELOG.md"');
+  });
+
+  it("preserves link title attributes through linkResolver", () => {
+    const html = renderMarkdown('[docs](./guide.md "User guide")', {
+      linkResolver: () => "guide.html",
+    });
+
+    expect(html).toContain('href="guide.html"');
+    expect(html).toContain('title="User guide"');
+  });
+
+  it("escapes malicious href values from linkResolver output", () => {
+    const html = renderMarkdown("[x](safe.md)", {
+      linkResolver: () => '"><script>alert(1)</script>',
+    });
+
+    expect(html).not.toContain("<script>");
+    expect(html).toContain("&quot;&gt;&lt;script&gt;");
+  });
+
+  it("renders markdown links unchanged without linkResolver", () => {
+    const html = renderMarkdown("[changelog](CHANGELOG.md)");
+    expect(html).toContain('href="CHANGELOG.md"');
+  });
 });
 
 describe("slugify", () => {

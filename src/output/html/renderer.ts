@@ -5,7 +5,16 @@ import { fileURLToPath } from "node:url";
 import Mustache from "mustache";
 import { CATEGORY_LABELS } from "../../config/patterns.js";
 import { renderMarkdown } from "../../parse/markdown.js";
-import type { SpecSection, WikiIndexMeta, WikiPage } from "../../types.js";
+import type {
+  CategoryReadmeIntro,
+  SpecSection,
+  WikiIndexMeta,
+  WikiPage,
+} from "../../types.js";
+import {
+  createHtmlLinkResolver,
+  type WikiLinkIndex,
+} from "./wiki-link-resolver.js";
 import { isReadmeFile } from "../readme-index.js";
 import {
   buildCategoryNavSubgroups,
@@ -62,6 +71,8 @@ export interface HtmlRenderOptions {
   includeSearch?: boolean;
   searchIndexJson?: string;
   navGroupingContext?: NavGroupingContext;
+  linkIndex?: WikiLinkIndex;
+  projectRoot?: string;
 }
 
 interface AllPagesEntry {
@@ -136,7 +147,7 @@ export class HtmlRenderer {
           ...category,
           portalPages,
           hasIntro: Boolean(intro),
-          introHtml: intro ? renderMarkdown(intro.content) : "",
+          introHtml: intro ? renderCategoryIntroHtml(intro, renderOptions) : "",
         };
       });
     const pageCount = pages.length;
@@ -150,7 +161,14 @@ export class HtmlRenderer {
         pageCountLabel: pageCount === 1 ? "spec file" : "spec files",
         allPages,
         hasRootIntro,
-        rootIntroHtml: hasRootIntro ? renderMarkdown(indexMeta.rootIntro!) : "",
+        rootIntroHtml: hasRootIntro
+          ? renderMarkdown(indexMeta.rootIntro!, {
+              linkResolver: linkResolverForSource(
+                renderOptions,
+                indexMeta.rootIntroSource,
+              ),
+            })
+          : "",
       },
       this.partials,
     );
@@ -238,6 +256,48 @@ export class HtmlRenderer {
     const highlightPath = path.join(ASSETS_DIR, HIGHLIGHT_CSS_FILENAME);
     return fs.readFile(highlightPath, "utf-8");
   }
+}
+
+function renderCategoryIntroHtml(
+  intro: CategoryReadmeIntro,
+  renderOptions: HtmlRenderOptions,
+): string {
+  const segments =
+    intro.segments.length > 0
+      ? intro.segments
+      : [
+          {
+            content: intro.content,
+            sourcePath: intro.sourcePaths[0] ?? "",
+          },
+        ];
+
+  if (!renderOptions.linkIndex) {
+    return renderMarkdown(intro.content);
+  }
+
+  return segments
+    .map((segment) =>
+      renderMarkdown(segment.content, {
+        linkResolver: linkResolverForSource(renderOptions, segment.sourcePath),
+      }),
+    )
+    .join("\n");
+}
+
+function linkResolverForSource(
+  renderOptions: HtmlRenderOptions,
+  sourcePath: string | null | undefined,
+): ((href: string) => string) | undefined {
+  if (!renderOptions.linkIndex || !sourcePath) {
+    return undefined;
+  }
+
+  return createHtmlLinkResolver({
+    index: renderOptions.linkIndex,
+    sourcePath,
+    projectRoot: renderOptions.projectRoot ?? "",
+  });
 }
 
 function categoryLabelFor(category: string): string {

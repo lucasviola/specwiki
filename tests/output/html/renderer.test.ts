@@ -7,6 +7,7 @@ import {
   getHtmlRenderer,
   resetHtmlRendererCache,
 } from "../../../src/output/html/renderer.js";
+import { buildWikiLinkIndex } from "../../../src/output/html/wiki-link-resolver.js";
 import type { WikiIndexMeta, WikiPage } from "../../../src/types.js";
 
 function emptyIndexMeta(): WikiIndexMeta {
@@ -61,6 +62,12 @@ describe("HtmlRenderer", () => {
           {
             content: "Nested packages intro.",
             sourcePaths: ["packages/nested/README.md"],
+            segments: [
+              {
+                content: "Nested packages intro.",
+                sourcePath: "packages/nested/README.md",
+              },
+            ],
           },
         ],
       ]),
@@ -96,6 +103,70 @@ describe("HtmlRenderer", () => {
     );
     expect(html).toContain("Nested packages intro.");
     expect(html).toContain('id="category-other"');
+  });
+
+  it("resolves category intro links per merged README segment source path", () => {
+    const pages: WikiPage[] = [
+      samplePage({
+        slug: "packages-a-doc",
+        title: "Doc A",
+        category: "other",
+        sourcePath: "packages/a/DOC.md",
+      }),
+      samplePage({
+        slug: "packages-b-doc",
+        title: "Doc B",
+        category: "other",
+        sourcePath: "packages/b/DOC.md",
+      }),
+      samplePage({
+        slug: "packages-a-agents",
+        title: "Agents A",
+        category: "other",
+        sourcePath: "packages/a/AGENTS.md",
+      }),
+      samplePage({
+        slug: "packages-b-agents",
+        title: "Agents B",
+        category: "other",
+        sourcePath: "packages/b/AGENTS.md",
+      }),
+    ];
+
+    const indexMeta: WikiIndexMeta = {
+      rootIntro: null,
+      rootIntroSource: null,
+      categoryIntros: new Map([
+        [
+          "other",
+          {
+            content:
+              "Package A: [doc](./DOC.md).\n\nPackage B: [doc](./DOC.md).",
+            sourcePaths: ["packages/a/README.md", "packages/b/README.md"],
+            segments: [
+              {
+                content: "Package A: [doc](./DOC.md).",
+                sourcePath: "packages/a/README.md",
+              },
+              {
+                content: "Package B: [doc](./DOC.md).",
+                sourcePath: "packages/b/README.md",
+              },
+            ],
+          },
+        ],
+      ]),
+      readmeIndexCount: 2,
+    };
+
+    const html = renderer.renderIndex(pages, indexMeta, {
+      linkIndex: buildWikiLinkIndex(pages),
+      projectRoot: "/tmp/project",
+    });
+
+    expect(html).toContain('href="packages-a-doc.html"');
+    expect(html).toContain('href="packages-b-doc.html"');
+    expect(html).not.toMatch(/href="[^"]*\.md"/);
   });
 
   it("omits category nav groups when category has only README pages", () => {

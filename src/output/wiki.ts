@@ -7,6 +7,10 @@ import { log } from "../core/Logger.js";
 import { CATEGORY_LABELS } from "../config/patterns.js";
 import { renderMarkdown } from "../parse/markdown.js";
 import { getHtmlRenderer, HtmlRenderer } from "./html/renderer.js";
+import {
+  buildWikiLinkIndex,
+  createHtmlLinkResolver,
+} from "./html/wiki-link-resolver.js";
 import { loadNavGroupingContext } from "./html/nav-grouping.js";
 import {
   buildSearchIndex,
@@ -432,9 +436,14 @@ export async function writeHtmlWiki(
     ? await loadNavGroupingContext(options.projectRoot)
     : undefined;
 
+  const linkIndex = buildWikiLinkIndex(wiki.pages);
+  const projectRoot = options.projectRoot ?? "";
+
   const htmlRenderOptions = {
     ...renderOptions,
     navGroupingContext,
+    linkIndex,
+    projectRoot: options.projectRoot,
   };
 
   let indexHtml: string;
@@ -474,7 +483,13 @@ export async function writeHtmlWiki(
       html = renderer.renderArticle(
         page,
         wiki.pages,
-        renderMarkdown(page.content),
+        renderMarkdown(page.content, {
+          linkResolver: createHtmlLinkResolver({
+            index: linkIndex,
+            sourcePath: page.sourcePath,
+            projectRoot,
+          }),
+        }),
         htmlRenderOptions,
       );
     } catch (err) {

@@ -73,11 +73,26 @@ function highlightCode(text: string, language: string): string | null {
   }
 }
 
+export interface RenderMarkdownOptions {
+  linkResolver?: (href: string) => string;
+}
+
 let allocateHeadingAnchor = createAnchorAllocator();
+let activeLinkResolver: ((href: string) => string) | undefined;
 
 marked.use({
   gfm: true,
   renderer: {
+    link({ href, title, tokens }: Tokens.Link) {
+      const inner = this.parser.parseInline(tokens);
+      const rawHref = href ?? "";
+      const resolvedHref = activeLinkResolver
+        ? activeLinkResolver(rawHref)
+        : rawHref;
+      const escapedHref = escapeHtml(resolvedHref);
+      const titleAttr = title ? ` title="${escapeHtml(title)}"` : "";
+      return `<a href="${escapedHref}"${titleAttr}>${inner}</a>`;
+    },
     heading({ tokens, depth, text, raw }: Tokens.Heading) {
       const inner = this.parser.parseInline(tokens);
       const tag = `h${depth}`;
@@ -245,8 +260,13 @@ export async function parseSpecFile(file: SpecFile): Promise<ParsedSpec> {
   }
 }
 
-export function renderMarkdown(markdown: string): string {
+export function renderMarkdown(
+  markdown: string,
+  options: RenderMarkdownOptions = {},
+): string {
   allocateHeadingAnchor = createAnchorAllocator();
+  const previousLinkResolver = activeLinkResolver;
+  activeLinkResolver = options.linkResolver;
   try {
     return marked.parse(markdown, { async: false }) as string;
   } catch (err) {
@@ -254,5 +274,7 @@ export function renderMarkdown(markdown: string): string {
       message: err instanceof Error ? err.message : String(err),
     });
     throw err;
+  } finally {
+    activeLinkResolver = previousLinkResolver;
   }
 }

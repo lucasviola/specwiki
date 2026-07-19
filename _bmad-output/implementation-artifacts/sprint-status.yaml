@@ -124,7 +124,7 @@ development_status:
   16-2-wikipedia-layout-chrome-and-navigation: done
   16-3-rich-html-content-rendering: done
   16-4-client-side-wiki-search: done
-  16-5-html-inter-page-link-resolution: ready-for-dev
+  16-5-html-inter-page-link-resolution: review
   epic-16-retrospective: optional
   epic-17: done
   17-1-broad-markdown-discovery-by-default: done
