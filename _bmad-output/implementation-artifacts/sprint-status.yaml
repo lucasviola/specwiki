@@ -45,7 +45,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-07-12
-last_updated: 2026-07-19 (S16.5 HTML inter-page link resolution)
+last_updated: 2026-07-19 (S21.3 SECURITY.md done — review)
 project: specwiki
 project_key: NOKEY
 tracking_system: file-system
@@ -146,7 +146,7 @@ development_status:
   epic-21: in-progress
   21-1-generate-output-confined-to-project-root: done
   21-2-readme-security-section: done
-  21-3-security-md-vulnerability-reporting: backlog
+  21-3-security-md-vulnerability-reporting: review
   21-4-config-js-trust-warning: backlog
   21-5-release-dependency-audit-gate: backlog
   21-6-maintainer-npm-publish-security-checklist: backlog

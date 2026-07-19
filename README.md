@@ -209,7 +209,7 @@ Run `specwiki` only on repositories you trust. The tool reads markdown from your
 - No `postinstall` or `prepare` scripts run on consumer installs.
 - `prepublishOnly` runs the full test/lint/build quality gate before publish.
 
-Report security issues privately to the maintainer before opening a public issue.
+See [SECURITY.md](SECURITY.md) for how to report vulnerabilities privately.
 
 ## Development
 
