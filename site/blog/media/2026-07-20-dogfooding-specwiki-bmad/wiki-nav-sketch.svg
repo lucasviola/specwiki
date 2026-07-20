@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" role="img" aria-label="Generated wiki sidebar with architecture, stories, and decisions">
+  <title>Wiki navigation: architecture, stories, and architecture decisions</title>
+  <rect width="720" height="400" fill="#f8f9fa"/>
+  <rect x="24" y="24" width="220" height="352" rx="6" fill="#ffffff" stroke="#a2a9b1" stroke-width="2"/>
+  <text x="40" y="52" font-family="ui-monospace, monospace" font-size="12" font-weight="700" fill="#3366cc">Architecture</text>
+  <rect x="40" y="64" width="180" height="10" rx="2" fill="#c8ccd1"/>
+  <rect x="40" y="82" width="160" height="10" rx="2" fill="#c8ccd1"/>
+  <text x="40" y="118" font-family="ui-monospace, monospace" font-size="12" font-weight="700" fill="#3366cc">Stories</text>
+  <rect x="40" y="130" width="170" height="8" rx="2" fill="#eaecf0"/>
+  <rect x="40" y="144" width="150" height="8" rx="2" fill="#eaecf0"/>
+  <rect x="40" y="158" width="160" height="8" rx="2" fill="#eaecf0"/>
+  <text x="40" y="194" font-family="ui-monospace, monospace" font-size="12" font-weight="700" fill="#3366cc">Decisions</text>
+  <rect x="40" y="206" width="140" height="8" rx="2" fill="#c8ccd1"/>
+  <rect x="40" y="220" width="130" height="8" rx="2" fill="#c8ccd1"/>
+  <text x="40" y="256" font-family="ui-monospace, monospace" font-size="12" font-weight="700" fill="#3366cc">Build log</text>
+  <rect x="40" y="268" width="120" height="8" rx="2" fill="#c8ccd1"/>
+  <rect x="260" y="24" width="436" height="352" rx="6" fill="#ffffff" stroke="#a2a9b1" stroke-width="2"/>
+  <rect x="284" y="56" width="280" height="20" rx="2" fill="#202122"/>
+  <rect x="284" y="96" width="380" height="10" rx="2" fill="#c8ccd1"/>
+  <rect x="284" y="120" width="360" height="10" rx="2" fill="#c8ccd1"/>
+  <rect x="284" y="144" width="340" height="10" rx="2" fill="#c8ccd1"/>
+  <text x="478" y="380" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="13" fill="#54595d">one browseable view of everything you decided while building</text>
+</svg>
