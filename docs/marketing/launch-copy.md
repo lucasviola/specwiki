@@ -14,6 +14,7 @@
 - [x] No unsupported superlatives ("best", "revolutionary", "game-changing")
 - [x] Messaging guardrails: discovers/synthesizes; does not author specs, run agents, or host docs
 - [x] JTBD hook present: _one command → categorized wiki from scattered agent specs_
+- [x] Blog discovery URL: `https://specwiki.ai/blog/` (publisher updates — use in Reddit, LinkedIn, and HN CTAs below)
 
 ---
 
@@ -44,6 +45,8 @@ It discovers and synthesizes what already exists. It does not author specs, run 
 ### CTA
 
 Try `npx specwiki list` on a repo with Cursor rules and tell me what categories show up. Repo: [GitHub link]. MIT licensed, Node 20+.
+
+**Blog (optional follow-up):** Field notes and release stories at `https://specwiki.ai/blog/` — link in a comment after the main post lands, not as the primary CTA.
 
 ### Constraints
 
@@ -90,6 +93,8 @@ I built [[specwiki]] — a CLI documentation synthesizer for this exact problem.
 
 If you work with Cursor or similar agents, try `npx specwiki list` on your current repo. I'd welcome feedback from teams standardizing agent conventions.
 
+**Blog:** Ongoing field notes and release stories at `https://specwiki.ai/blog/` — optional second paragraph or comment link after the install CTA.
+
 ### Constraints
 
 - Professional tone; avoid hype adjectives
@@ -131,6 +136,8 @@ npx specwiki open
 **Differentiation from OpenSpec/BMAD:** Those create and manage spec lifecycles. [[specwiki]] aggregates what already exists across tools into one browsable view.
 
 Happy to answer questions on discovery patterns, HTML output, or how it handles slug collisions.
+
+**Blog:** Publisher updates at `https://specwiki.ai/blog/` — mention in a follow-up comment if readers ask where to follow along after launch.
 
 ### CTA
 
@@ -268,4 +275,5 @@ Dev.to uses tags, not hashtags — see Constraints above.
 - [ ] README consumer install matches copy
 - [ ] Screenshot/GIF of `wiki/html/` category index prepared
 - [ ] GitHub repo URL confirmed in all CTAs
+- [ ] Blog URL `https://specwiki.ai/blog/` confirmed in Reddit, LinkedIn, and HN variants
 - [ ] Owner reviews tone and guardrails in each channel draft

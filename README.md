@@ -89,6 +89,8 @@ npm run publish:package -- --confirm   # publish after all checks pass
 
 Publishing to the npm registry is an explicit maintainer action after the [RELEASING.md](docs/RELEASING.md) checklist passes. Requires **Node.js 20+** and npm maintainer access to the `@lucasviola/specwiki` package. This repository does not automate registry credentials or release versioning.
 
+**Blog:** Field notes, release stories, and ecosystem posts at [specwiki.ai/blog](https://specwiki.ai/blog/).
+
 ## Usage
 
 Use `npx @lucasviola/specwiki …` without a global install, or `specwiki …` after `npm install -g @lucasviola/specwiki`.

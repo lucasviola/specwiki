@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-20
-**Current position:** **E28 S28.10 blog image assets (hero + inline)** — review
-**Test count:** 604 passing
+**Current position:** **E28 S28.5 README + launch-copy blog discovery links** — review
+**Test count:** 616 passing
 
 ## Deliverables
 
@@ -303,4 +303,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-20 | E28 S28.3        | `feat(site): landing Blog nav + deploy/CI site tests` — `site/index.html` header Blog link (`blog/index.html`); `docs/hosting/specwiki-ai.md` `/blog/` verification step; `deploy-site.yml` runs full `tests/site/`; 5 new guard tests (589 total); §0.8 N/A (static site)                                                                                                                                                   | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-20 | E28 S28.10       | `feat(site): blog hero + inline media assets` — `buildBlog` copies `site/blog/media/` → dist; optional `hero`/`heroAlt` frontmatter with path validation; default `media/default-hero.svg`; fail build on missing/remote body images; CSS for card/post/body images; seed post inline SVG; review patches (post-render `<img>` scan, string heroAlt); 15 new tests (604 total); §0.8 N/A (static site)                       | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-20 | E28 S28.4        | `docs(blog): editorial guide and seed post conventions` — `docs/blog/EDITORIAL.md` (lanes, voice, cross-linking, cadence, Lucas-only until 1.0, images); `_template.md` link; `tests/docs/blog-editorial.test.ts`; seed post conventions validated; §0.8 N/A (doc-only)                                                                                                                                                      | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
+| 2026-07-20 | E28 S28.5        | `docs(blog): README and launch-copy discovery links` — blog one-liner after README Install; Reddit/LinkedIn/HN placeholders in `launch-copy.md`; `tests/docs/blog-discovery-links.test.ts`; wiki templates unchanged; §0.8 N/A (doc-only)                                                                                                                                                                                    | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | _template_ | _E?_ S?_         | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                                              |

@@ -1,5 +1,5 @@
 # generated: 2026-07-12
-# last_updated: "2026-07-20" (Epic 28 S28.4 seed post + editorial conventions review)
+# last_updated: "2026-07-20" (Epic 28 S28.5 README + launch-copy blog discovery links review)
 # project: specwiki
 # project_key: NOKEY
 # tracking_system: file-system
@@ -45,7 +45,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-07-12
-last_updated: 2026-07-20 (Epic 28 S28.4 seed post + editorial conventions review)
+last_updated: 2026-07-20 (Epic 28 S28.5 README + launch-copy blog discovery links review)
 project: specwiki
 project_key: NOKEY
 tracking_system: file-system
@@ -202,7 +202,7 @@ development_status:
   28-3-landing-nav-integration-deploy-ci-tests: done
   28-10-blog-image-assets-hero-and-inline: done
   28-4-seed-post-editorial-conventions: review
-  28-5-readme-launch-copy-discovery-links: backlog
+  28-5-readme-launch-copy-discovery-links: review
   28-6-launch-trilogy-posts-editorial: backlog
   28-7-rss-syndication: backlog
   28-8-sitemap-og-images: backlog
