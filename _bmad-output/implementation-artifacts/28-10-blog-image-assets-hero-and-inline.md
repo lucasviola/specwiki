@@ -4,7 +4,7 @@ baseline_commit: 0d8e17b396e4d5a1f86bea2cb43ce489534d4110
 
 # Story 28.10: Blog image assets (hero + inline)
 
-Status: review
+Status: done
 
 <!-- Ultimate context engine analysis completed - comprehensive developer guide created -->
 
@@ -277,13 +277,14 @@ Cursor Grok 4.5
 - `tests/scripts/build-blog.test.ts` — unit/integration coverage for ACs
 - `tests/site/blog.test.ts` — seed/default hero + CSS + href guards
 - `IMPLEMENTATION.md` — S28.10 log entry
-- `_bmad-output/implementation-artifacts/sprint-status.yaml` — story → review
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` — story → done
 - `_bmad-output/implementation-artifacts/28-10-blog-image-assets-hero-and-inline.md` — this story
 
 ### Change Log
 
 - 2026-07-20: Implemented blog media pipeline (hero + inline); status → review.
 - 2026-07-20: Addressed code review findings — 2 Patch items resolved (post-render img scan; string heroAlt).
+- 2026-07-20: Owner marked story done after review approval.
 
 ## Senior Developer Review (AI)
 

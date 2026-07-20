@@ -119,15 +119,15 @@ GitHub Pages → specwiki.ai/blog/
 | S28.1  | Blog build pipeline + frontmatter validation | ✓     | E20     | done           |
 | S28.2  | Blog index, post layout, and longform CSS    | ✓     | S28.1   | done           |
 | S28.3  | Landing nav integration + deploy/CI tests    | ✓     | S28.2   | done (in code) |
-| S28.10 | Blog image assets (hero + inline)            | ✓     | S28.2   | ready-for-dev  |
-| S28.4  | Seed post + editorial conventions            | ✓     | S28.10  | backlog        |
+| S28.10 | Blog image assets (hero + inline)            | ✓     | S28.2   | done           |
+| S28.4  | Seed post + editorial conventions            | ✓     | S28.10  | review         |
 | S28.5  | README and launch-copy discovery links       | ✓     | S28.3   | backlog        |
 | S28.6  | Launch trilogy posts (editorial)             | defer | S28.4   | backlog        |
 | S28.7  | RSS syndication                              | defer | S28.1   | backlog        |
 | S28.8  | sitemap.xml + per-post OG images             | defer | S28.10  | backlog        |
 | S28.9  | Email subscribe CTA                          | defer | S28.3   | backlog        |
 
-**Recommended next PR:** S28.10 — image assets (hero + inline) before polishing S28.4 seed/editorial.
+**Recommended next PR:** S28.5 — README and launch-copy discovery links (S28.4 editorial guide in review).
 
 ---
 

@@ -1,5 +1,6 @@
 ---
 # Copy this file to site/blog/YYYY-MM-DD-your-slug.md — do not publish _-prefixed files.
+# Editorial guide: docs/blog/EDITORIAL.md (lanes, voice, cross-linking, images).
 title: "Human title"
 date: "YYYY-MM-DD"
 author: Lucas
