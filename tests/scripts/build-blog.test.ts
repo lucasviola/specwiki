@@ -33,6 +33,22 @@ describe("build-blog helpers", () => {
     );
   });
 
+  it("normalizes Date frontmatter with local calendar parts", () => {
+    expect(() =>
+      validateFrontmatter(
+        {
+          title: "Hello",
+          date: new Date(2026, 6, 20),
+          author: "Lucas",
+          lane: "field-notes",
+          summary: "Summary",
+          audience: "all",
+        },
+        "site/blog/local-date.md",
+      ),
+    ).not.toThrow();
+  });
+
   it("rejects missing required frontmatter with an actionable path", () => {
     expect(() =>
       validateFrontmatter({ title: "Hello" }, "site/blog/bad-post.md"),
@@ -109,6 +125,7 @@ Body copy.
     const posts = await loadPosts(tempSourceDir);
     expect(posts).toHaveLength(1);
     expect(posts[0]?.title).toBe("Valid post");
+    expect(posts[0]?.date).toBe("2026-07-20");
   });
 
   it("builds post HTML and index for a valid post", async () => {
@@ -148,6 +165,39 @@ Body copy.
     const indexHtml = fs.readFileSync(indexPath, "utf8");
     expect(indexHtml).toContain("Field Notes");
     expect(indexHtml).toContain("2026-07-20-valid-post.html");
+  });
+
+  it("removes stale post HTML from previous builds", async () => {
+    fs.writeFileSync(
+      path.join(tempOutputDir, "2026-07-19-retired-post.html"),
+      "<html>stale</html>",
+    );
+    fs.writeFileSync(
+      path.join(tempSourceDir, "2026-07-20-valid-post.md"),
+      `---
+title: Valid post
+date: 2026-07-20
+author: Lucas
+lane: field-notes
+summary: One sentence summary.
+audience: all
+---
+
+Body copy.
+`,
+    );
+
+    await buildBlog({
+      sourceDir: tempSourceDir,
+      outputDir: tempOutputDir,
+    });
+
+    expect(
+      fs.existsSync(path.join(tempOutputDir, "2026-07-19-retired-post.html")),
+    ).toBe(false);
+    expect(
+      fs.existsSync(path.join(tempOutputDir, "2026-07-20-valid-post.html")),
+    ).toBe(true);
   });
 
   it("fails the build on invalid frontmatter with an actionable message", async () => {

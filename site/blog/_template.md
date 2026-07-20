@@ -1,7 +1,7 @@
 ---
 # Copy this file to site/blog/YYYY-MM-DD-your-slug.md — do not publish _-prefixed files.
 title: "Human title"
-date: YYYY-MM-DD
+date: "YYYY-MM-DD"
 author: Lucas
 lane: field-notes # field-notes | release-story | ecosystem
 summary: "One sentence — OG description and index card."
@@ -13,6 +13,8 @@ audience: all # alex | jordan | sam | all
 ---
 
 Write the post body in Markdown below this frontmatter block.
+
+Use **quoted** dates (`date: "2026-07-20"`) so the build keeps the literal YYYY-MM-DD string.
 
 **Content lanes**
 
