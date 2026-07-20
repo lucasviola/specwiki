@@ -1348,6 +1348,33 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 3. **E5 → E6 → E7** — Trustworthy output, CLI, sign-off
 4. **POST-MVP:** E8 → E15; **E16** (wiki HTML skin) recommended after E4; **E21** (npm security) before **E22 S22.6** first publish; **E22** (semver & release) S22.1–S22.6 for 1.0.0; **E20** follows E13 S13.1 once the package is published to npm.
 5. **Backlog idea:** **E27** (live hero example on specwiki.ai) — logged 2026-07-18; conversion-first; no stories started.
+6. **Backlog:** **E28** (specwiki blog at specwiki.ai/blog) — logged 2026-07-20; no RSS in v1.
+
+---
+
+### E28 — specwiki Blog (specwiki.ai/blog) — **backlog**
+
+**Status:** Epic created 2026-07-20 from party-mode huddle. Publisher editorial channel; markdown-in-repo; extends landing build.
+
+**JTBD:** _“Tell me why I should care today, what changed, and how specwiki fits the SDD ecosystem.”_
+
+**Depends on:** E20 (complete).
+
+**Owner decisions:** No RSS, no comments UI, analytics-free, markdown-in-PR authoring.
+
+**Full spec:** [`epic-28-specwiki-blog.md`](../../implementation-artifacts/epic-28-specwiki-blog.md)
+
+| Story | Summary                                      | v1?   |
+| ----- | -------------------------------------------- | ----- |
+| S28.1 | Blog build pipeline + frontmatter validation | ✓     |
+| S28.2 | Blog index, post layout, longform CSS        | ✓     |
+| S28.3 | Landing nav integration + deploy/CI tests    | ✓     |
+| S28.4 | Seed post + editorial conventions            | ✓     |
+| S28.5 | README and launch-copy discovery links       | ✓     |
+| S28.6 | Launch trilogy posts (editorial)             | defer |
+| S28.7 | RSS syndication                              | defer |
+| S28.8 | sitemap.xml + per-post OG images             | defer |
+| S28.9 | Email subscribe CTA                          | defer |
 
 ---
 

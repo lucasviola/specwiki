@@ -1,5 +1,5 @@
 # generated: 2026-07-12
-# last_updated: 2026-07-19 (S16.5 done; epic-16 complete)
+# last_updated: 2026-07-20 (Epic 28 specwiki blog created)
 # project: specwiki
 # project_key: NOKEY
 # tracking_system: file-system
@@ -45,7 +45,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-07-12
-last_updated: 2026-07-19 (S21.6 done)
+last_updated: 2026-07-20 (Epic 28 specwiki blog created)
 project: specwiki
 project_key: NOKEY
 tracking_system: file-system
@@ -196,6 +196,17 @@ development_status:
   27-5-deploy-verification-and-site-tests: backlog
   27-6-cross-example-navigation-chrome: backlog
   epic-27-retrospective: optional
+  epic-28: backlog
+  28-1-blog-build-pipeline-frontmatter-validation: backlog
+  28-2-blog-index-post-layout-longform-css: backlog
+  28-3-landing-nav-integration-deploy-ci-tests: backlog
+  28-4-seed-post-editorial-conventions: backlog
+  28-5-readme-launch-copy-discovery-links: backlog
+  28-6-launch-trilogy-posts-editorial: backlog
+  28-7-rss-syndication: backlog
+  28-8-sitemap-og-images: backlog
+  28-9-email-subscribe-cta: backlog
+  epic-28-retrospective: optional
 
 # MVP formally closed 2026-07-12 — all E1–E7 stories done; POST-MVP begins at E8
 mvp_status: closed
