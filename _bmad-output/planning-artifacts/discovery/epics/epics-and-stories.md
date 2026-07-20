@@ -1364,17 +1364,18 @@ Each story: functional ACs; `export.write` / `drift.warn` / `plugin.load` events
 
 **Full spec:** [`epic-28-specwiki-blog.md`](../../implementation-artifacts/epic-28-specwiki-blog.md)
 
-| Story | Summary                                      | v1?   |
-| ----- | -------------------------------------------- | ----- |
-| S28.1 | Blog build pipeline + frontmatter validation | ✓     |
-| S28.2 | Blog index, post layout, longform CSS        | ✓     |
-| S28.3 | Landing nav integration + deploy/CI tests    | ✓     |
-| S28.4 | Seed post + editorial conventions            | ✓     |
-| S28.5 | README and launch-copy discovery links       | ✓     |
-| S28.6 | Launch trilogy posts (editorial)             | defer |
-| S28.7 | RSS syndication                              | defer |
-| S28.8 | sitemap.xml + per-post OG images             | defer |
-| S28.9 | Email subscribe CTA                          | defer |
+| Story  | Summary                                      | v1?   |
+| ------ | -------------------------------------------- | ----- |
+| S28.1  | Blog build pipeline + frontmatter validation | ✓     |
+| S28.2  | Blog index, post layout, longform CSS        | ✓     |
+| S28.3  | Landing nav integration + deploy/CI tests    | ✓     |
+| S28.10 | Blog image assets (hero + inline)            | ✓     |
+| S28.4  | Seed post + editorial conventions            | ✓     |
+| S28.5  | README and launch-copy discovery links       | ✓     |
+| S28.6  | Launch trilogy posts (editorial)             | defer |
+| S28.7  | RSS syndication                              | defer |
+| S28.8  | sitemap.xml + per-post OG images             | defer |
+| S28.9  | Email subscribe CTA                          | defer |
 
 ---
 

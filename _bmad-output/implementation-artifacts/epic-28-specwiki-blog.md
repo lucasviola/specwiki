@@ -30,17 +30,18 @@ Ship a **publisher-owned editorial blog** at `specwiki.ai/blog` for current and 
 
 ## v1 scope
 
-| In v1                                                        | Deferred                                              |
-| ------------------------------------------------------------ | ----------------------------------------------------- |
-| Markdown posts in `site/blog/*.md`                           | RSS feed (`/blog/rss.xml`)                            |
-| Build pipeline → static HTML under `dist/landing-site/blog/` | Email subscribe (Buttondown, etc.)                    |
-| Blog index grouped by content lane                           | Per-post GitHub Discussions footer                    |
-| Post pages with OG meta from frontmatter `summary`           | Privacy analytics (Plausible/Fathom)                  |
-| Landing-family header + **Blog** nav link                    | `npm run new:post` scaffold                           |
-| Longform typography (~65ch), not wiki skin                   | Guest/community posts                                 |
-| Frontmatter + link validation tests in CI                    | Default OG image per post (static site-wide OK in v1) |
-| Seed post + editorial conventions doc                        | Full launch trilogy (separate content story)          |
-| README + launch-copy cross-links                             | `sitemap.xml` (optional follow-up)                    |
+| In v1                                                        | Deferred                                        |
+| ------------------------------------------------------------ | ----------------------------------------------- |
+| Markdown posts in `site/blog/*.md`                           | RSS feed (`/blog/rss.xml`)                      |
+| Build pipeline → static HTML under `dist/landing-site/blog/` | Email subscribe (Buttondown, etc.)              |
+| Blog index grouped by content lane                           | Per-post GitHub Discussions footer              |
+| Post pages with OG meta from frontmatter `summary`           | Privacy analytics (Plausible/Fathom)            |
+| Landing-family header + **Blog** nav link                    | `npm run new:post` scaffold                     |
+| Longform typography (~65ch), not wiki skin                   | Guest/community posts                           |
+| Frontmatter + link validation tests in CI                    | Full launch trilogy (separate content story)    |
+| Optional hero + default + inline `media/` images             | Social `og:image` absolute URLs + `sitemap.xml` |
+| Seed post + editorial conventions doc                        |                                                 |
+| README + launch-copy cross-links                             |                                                 |
 
 ### Content lanes (editorial IA)
 
@@ -87,6 +88,15 @@ audience: alex | jordan | sam | all
 
 Optional: `related:` list (CHANGELOG anchors, ADR paths) — validated as internal links where resolvable.
 
+Optional images (S28.10):
+
+```yaml
+hero: media/<path-under-media> # optional; default → media/default-hero.svg
+heroAlt: "Required when hero set"
+```
+
+Inline body: `![alt](media/...)` — assets under `site/blog/media/`, copied to `dist/landing-site/blog/media/` at build time.
+
 ### Build flow
 
 ```text
@@ -104,19 +114,20 @@ GitHub Pages → specwiki.ai/blog/
 
 ## Stories
 
-| Story | Summary                                      | v1?   | Depends | Status  |
-| ----- | -------------------------------------------- | ----- | ------- | ------- |
-| S28.1 | Blog build pipeline + frontmatter validation | ✓     | E20     | backlog |
-| S28.2 | Blog index, post layout, and longform CSS    | ✓     | S28.1   | backlog |
-| S28.3 | Landing nav integration + deploy/CI tests    | ✓     | S28.2   | backlog |
-| S28.4 | Seed post + editorial conventions            | ✓     | S28.2   | backlog |
-| S28.5 | README and launch-copy discovery links       | ✓     | S28.3   | backlog |
-| S28.6 | Launch trilogy posts (editorial)             | defer | S28.4   | backlog |
-| S28.7 | RSS syndication                              | defer | S28.1   | backlog |
-| S28.8 | sitemap.xml + per-post OG images             | defer | S28.2   | backlog |
-| S28.9 | Email subscribe CTA                          | defer | S28.3   | backlog |
+| Story  | Summary                                      | v1?   | Depends | Status         |
+| ------ | -------------------------------------------- | ----- | ------- | -------------- |
+| S28.1  | Blog build pipeline + frontmatter validation | ✓     | E20     | done           |
+| S28.2  | Blog index, post layout, and longform CSS    | ✓     | S28.1   | done           |
+| S28.3  | Landing nav integration + deploy/CI tests    | ✓     | S28.2   | done (in code) |
+| S28.10 | Blog image assets (hero + inline)            | ✓     | S28.2   | ready-for-dev  |
+| S28.4  | Seed post + editorial conventions            | ✓     | S28.10  | backlog        |
+| S28.5  | README and launch-copy discovery links       | ✓     | S28.3   | backlog        |
+| S28.6  | Launch trilogy posts (editorial)             | defer | S28.4   | backlog        |
+| S28.7  | RSS syndication                              | defer | S28.1   | backlog        |
+| S28.8  | sitemap.xml + per-post OG images             | defer | S28.10  | backlog        |
+| S28.9  | Email subscribe CTA                          | defer | S28.3   | backlog        |
 
-**Recommended first PR:** S28.1 + S28.2 — pipeline and one rendered post.
+**Recommended next PR:** S28.10 — image assets (hero + inline) before polishing S28.4 seed/editorial.
 
 ---
 
@@ -167,6 +178,28 @@ GitHub Pages → specwiki.ai/blog/
 
 ---
 
+### S28.10 — Blog image assets (hero + inline)
+
+**As** a blog reader, **I want** visual anchors on the index and in posts, **so that** scanning and longform reading feel intentional.
+
+**As** a publisher, **I want** optional hero frontmatter and markdown images backed by repo files, **so that** imagery stays PR-reviewable.
+
+**Story file:** [`28-10-blog-image-assets-hero-and-inline.md`](./28-10-blog-image-assets-hero-and-inline.md)
+
+**Demo path:** Custom or default hero on index cards → post page hero + inline `media/` image → missing path fails build.
+
+**Functional (summary):**
+
+- [ ] `site/blog/media/` copied to `dist/landing-site/blog/media/`; `.md` still not published
+- [ ] Optional `hero` + required `heroAlt`; default `media/default-hero.svg` when omitted
+- [ ] Index card + post page hero slots; inline markdown images validated (local only)
+- [ ] `blog.css` hero/body image styles; `_template.md` authoring notes
+- [ ] Tests for default/custom/missing/remote rejection
+
+**Out of scope:** `og:image` absolute URLs + sitemap → S28.8; full `EDITORIAL.md` → S28.4.
+
+---
+
 ### S28.3 — Landing nav integration + deploy/CI tests
 
 **As** a landing-page visitor, **I want** a **Blog** link in the site header, **so that** I can discover posts without guessing the URL.
@@ -191,13 +224,15 @@ GitHub Pages → specwiki.ai/blog/
 
 **As** Lucas (publisher), **I want** one real post and a short editorial guide, **so that** the blog launches with voice and template — not an empty index.
 
+**Depends:** S28.10 (so seed/editorial can document and demonstrate image conventions).
+
 **Demo path:** Read `docs/blog/EDITORIAL.md` → copy `_template.md` → seed post live at `/blog/` after deploy.
 
 **Functional:**
 
-- [ ] Add `docs/blog/EDITORIAL.md`: content lanes, voice (developer-credible, no unsupported superlatives), cross-linking rules (blog → CHANGELOG/ADRs; never duplicate install docs), biweekly cadence note, Lucas-only until 1.0
-- [ ] Ship one seed post in `site/blog/` (Field Note tone preferred — workflow pain before product pitch)
-- [ ] Post passes S28.1 validation and appears on index under correct lane
+- [ ] Add `docs/blog/EDITORIAL.md`: content lanes, voice (developer-credible, no unsupported superlatives), cross-linking rules (blog → CHANGELOG/ADRs; never duplicate install docs), biweekly cadence note, Lucas-only until 1.0, **Images** section (hero + `media/` + alt rules from S28.10)
+- [ ] Ship one seed post in `site/blog/` (Field Note tone preferred — workflow pain before product pitch); prefer exercising hero/inline images
+- [ ] Post passes S28.1/S28.10 validation and appears on index under correct lane
 
 **Quality measures:**
 
@@ -250,6 +285,8 @@ GitHub Pages → specwiki.ai/blog/
 
 **Trigger:** SEO/discovery push after launch trilogy; or analytics story unblocked.
 
+**Note:** Content heroes from S28.10 (`hero` / default) are the natural source for absolute `og:image` URLs when this story opens — do not rebuild a parallel image system.
+
 ---
 
 ### S28.9 — Email subscribe CTA — **deferred**
@@ -288,3 +325,4 @@ GitHub Pages → specwiki.ai/blog/
 | 2026-07-20 | Markdown-in-PR authoring; no `new:post` script                          | Lucas                              |
 | 2026-07-20 | No comments UI; analytics-free                                          | Lucas                              |
 | 2026-07-20 | Epic 28 created                                                         | Lucas                              |
+| 2026-07-20 | S28.10 added — hero + inline images as next slice (one story)           | Party mode (Sally, Winston, Paige) |

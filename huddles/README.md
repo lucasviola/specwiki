@@ -8,6 +8,7 @@ Global directive: **HARNESS.md §15** (also mirrored in generated `wiki/*/harnes
 
 | Date       | Topic                                                           | File                                                                                             |
 | ---------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| 2026-07-20 | Blog image assets → S28.10 (Sally + Winston + Paige)            | [2026-07-20-blog-image-assets.md](./2026-07-20-blog-image-assets.md)                             |
 | 2026-07-19 | HTML inter-page link resolution (Winston + Amelia + party mode) | [2026-07-19-html-inter-page-link-resolution.md](./2026-07-19-html-inter-page-link-resolution.md) |
 | 2026-07-19 | specwiki blog proposal → Epic 28 (Sally + Winston + Paige)      | [2026-07-19-specwiki-blog-proposal.md](./2026-07-19-specwiki-blog-proposal.md)                   |
 

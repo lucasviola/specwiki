@@ -76,6 +76,16 @@
   outline-offset: 2px;
 }
 
+.blog-card-hero {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 4px;
+  margin: 0 0 0.85rem;
+  background: var(--surface-raised);
+}
+
 .blog-card-title {
   margin: 0 0 0.45rem;
   font-size: 1.15rem;
@@ -113,14 +123,32 @@
 }
 
 .blog-post-title {
-  margin: 0.75rem 0 1.5rem;
+  margin: 0.75rem 0 1rem;
   font-size: clamp(1.65rem, 4vw, 2.1rem);
   line-height: 1.25;
+}
+
+.blog-post-hero {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 4px;
+  margin: 0 0 1.5rem;
+  background: var(--surface-raised);
 }
 
 .blog-post-body {
   font-size: 1.05rem;
   line-height: 1.7;
+}
+
+.blog-post-body img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 0 1rem;
+  border-radius: 4px;
 }
 
 .blog-post-body > :first-child {

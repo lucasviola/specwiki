@@ -74,6 +74,26 @@ describe("build-blog helpers", () => {
       "site/blog/bad-post.md: frontmatter 'lane' must be one of field-notes, release-story, ecosystem",
     );
   });
+
+  it("rejects non-string heroAlt when hero is set", () => {
+    expect(() =>
+      validateFrontmatter(
+        {
+          title: "Hello",
+          date: "2026-07-20",
+          author: "Lucas",
+          lane: "field-notes",
+          summary: "Summary",
+          audience: "all",
+          hero: "media/hero.svg",
+          heroAlt: 42,
+        },
+        "site/blog/bad-post.md",
+      ),
+    ).toThrow(
+      "site/blog/bad-post.md: frontmatter 'heroAlt' is required when 'hero' is set",
+    );
+  });
 });
 
 describe("build-blog", () => {
@@ -95,6 +115,11 @@ describe("build-blog", () => {
   });
 
   it("loads published posts and skips _-prefixed templates", async () => {
+    fs.mkdirSync(path.join(tempSourceDir, "media"), { recursive: true });
+    fs.writeFileSync(
+      path.join(tempSourceDir, "media/default-hero.svg"),
+      "<svg xmlns='http://www.w3.org/2000/svg'></svg>\n",
+    );
     fs.writeFileSync(
       path.join(tempSourceDir, "_template.md"),
       `---
@@ -129,6 +154,11 @@ Body copy.
   });
 
   it("builds post HTML and index for a valid post", async () => {
+    fs.mkdirSync(path.join(tempSourceDir, "media"), { recursive: true });
+    fs.writeFileSync(
+      path.join(tempSourceDir, "media/default-hero.svg"),
+      "<svg xmlns='http://www.w3.org/2000/svg'></svg>\n",
+    );
     fs.writeFileSync(
       path.join(tempSourceDir, "2026-07-20-valid-post.md"),
       `---
@@ -171,6 +201,11 @@ Body copy.
     fs.writeFileSync(
       path.join(tempOutputDir, "2026-07-19-retired-post.html"),
       "<html>stale</html>",
+    );
+    fs.mkdirSync(path.join(tempSourceDir, "media"), { recursive: true });
+    fs.writeFileSync(
+      path.join(tempSourceDir, "media/default-hero.svg"),
+      "<svg xmlns='http://www.w3.org/2000/svg'></svg>\n",
     );
     fs.writeFileSync(
       path.join(tempSourceDir, "2026-07-20-valid-post.md"),
@@ -220,6 +255,379 @@ audience: all
       }),
     ).rejects.toThrow(/missing required frontmatter field 'lane'/);
   });
+
+  it("uses default hero markup when frontmatter omits hero", async () => {
+    fs.mkdirSync(path.join(tempSourceDir, "media"), { recursive: true });
+    fs.writeFileSync(
+      path.join(tempSourceDir, "media/default-hero.svg"),
+      "<svg xmlns='http://www.w3.org/2000/svg'></svg>\n",
+    );
+    fs.writeFileSync(
+      path.join(tempSourceDir, "2026-07-20-valid-post.md"),
+      `---
+title: Valid post
+date: 2026-07-20
+author: Lucas
+lane: field-notes
+summary: One sentence summary.
+audience: all
+---
+
+Body copy.
+`,
+    );
+
+    await buildBlog({
+      sourceDir: tempSourceDir,
+      outputDir: tempOutputDir,
+    });
+
+    const indexHtml = fs.readFileSync(
+      path.join(tempOutputDir, "index.html"),
+      "utf8",
+    );
+    const postHtml = fs.readFileSync(
+      path.join(tempOutputDir, "2026-07-20-valid-post.html"),
+      "utf8",
+    );
+
+    expect(indexHtml).toMatch(
+      /<a class="blog-card-link"[^>]*>\s*<img class="blog-card-hero" src="media\/default-hero\.svg" alt="" \/>/,
+    );
+    expect(postHtml).toMatch(
+      /<h1 class="blog-post-title">Valid post<\/h1>\s*<img class="blog-post-hero" src="media\/default-hero\.svg" alt="" \/>/,
+    );
+  });
+
+  it("renders custom hero and heroAlt on index card and post page", async () => {
+    fs.mkdirSync(path.join(tempSourceDir, "media/custom"), { recursive: true });
+    fs.writeFileSync(
+      path.join(tempSourceDir, "media/default-hero.svg"),
+      "<svg xmlns='http://www.w3.org/2000/svg'></svg>\n",
+    );
+    fs.writeFileSync(
+      path.join(tempSourceDir, "media/custom/hero.svg"),
+      "<svg xmlns='http://www.w3.org/2000/svg'></svg>\n",
+    );
+    fs.writeFileSync(
+      path.join(tempSourceDir, "2026-07-20-valid-post.md"),
+      `---
+title: Valid post
+date: 2026-07-20
+author: Lucas
+lane: field-notes
+summary: One sentence summary.
+audience: all
+hero: media/custom/hero.svg
+heroAlt: 'Custom "hero" & alt'
+---
+
+Body copy.
+`,
+    );
+
+    await buildBlog({
+      sourceDir: tempSourceDir,
+      outputDir: tempOutputDir,
+    });
+
+    const indexHtml = fs.readFileSync(
+      path.join(tempOutputDir, "index.html"),
+      "utf8",
+    );
+    const postHtml = fs.readFileSync(
+      path.join(tempOutputDir, "2026-07-20-valid-post.html"),
+      "utf8",
+    );
+
+    expect(indexHtml).toContain(
+      '<img class="blog-card-hero" src="media/custom/hero.svg" alt="Custom &quot;hero&quot; &amp; alt" />',
+    );
+    expect(postHtml).toContain(
+      '<img class="blog-post-hero" src="media/custom/hero.svg" alt="Custom &quot;hero&quot; &amp; alt" />',
+    );
+  });
+
+  it("fails when hero file is missing", async () => {
+    fs.mkdirSync(path.join(tempSourceDir, "media"), { recursive: true });
+    fs.writeFileSync(
+      path.join(tempSourceDir, "media/default-hero.svg"),
+      "<svg xmlns='http://www.w3.org/2000/svg'></svg>\n",
+    );
+    fs.writeFileSync(
+      path.join(tempSourceDir, "2026-07-20-valid-post.md"),
+      `---
+title: Valid post
+date: 2026-07-20
+author: Lucas
+lane: field-notes
+summary: One sentence summary.
+audience: all
+hero: media/does-not-exist.png
+heroAlt: Missing file
+---
+
+Body copy.
+`,
+    );
+
+    await expect(
+      buildBlog({
+        sourceDir: tempSourceDir,
+        outputDir: tempOutputDir,
+      }),
+    ).rejects.toThrow(/missing image 'media\/does-not-exist\.png'/);
+  });
+
+  it("fails when hero is set without heroAlt", async () => {
+    fs.mkdirSync(path.join(tempSourceDir, "media"), { recursive: true });
+    fs.writeFileSync(
+      path.join(tempSourceDir, "media/default-hero.svg"),
+      "<svg xmlns='http://www.w3.org/2000/svg'></svg>\n",
+    );
+    fs.writeFileSync(
+      path.join(tempSourceDir, "media/hero.svg"),
+      "<svg xmlns='http://www.w3.org/2000/svg'></svg>\n",
+    );
+    fs.writeFileSync(
+      path.join(tempSourceDir, "2026-07-20-valid-post.md"),
+      `---
+title: Valid post
+date: 2026-07-20
+author: Lucas
+lane: field-notes
+summary: One sentence summary.
+audience: all
+hero: media/hero.svg
+---
+
+Body copy.
+`,
+    );
+
+    await expect(
+      buildBlog({
+        sourceDir: tempSourceDir,
+        outputDir: tempOutputDir,
+      }),
+    ).rejects.toThrow(/heroAlt/);
+  });
+
+  it("fails when hero path uses .. or remote URL", async () => {
+    fs.mkdirSync(path.join(tempSourceDir, "media"), { recursive: true });
+    fs.writeFileSync(
+      path.join(tempSourceDir, "media/default-hero.svg"),
+      "<svg xmlns='http://www.w3.org/2000/svg'></svg>\n",
+    );
+
+    fs.writeFileSync(
+      path.join(tempSourceDir, "2026-07-20-dotdot.md"),
+      `---
+title: Dotdot
+date: 2026-07-20
+author: Lucas
+lane: field-notes
+summary: Summary.
+audience: all
+hero: media/../secret.png
+heroAlt: Bad path
+---
+
+Body.
+`,
+    );
+
+    await expect(
+      buildBlog({
+        sourceDir: tempSourceDir,
+        outputDir: tempOutputDir,
+      }),
+    ).rejects.toThrow(/hero/);
+
+    fs.unlinkSync(path.join(tempSourceDir, "2026-07-20-dotdot.md"));
+    fs.writeFileSync(
+      path.join(tempSourceDir, "2026-07-20-remote.md"),
+      `---
+title: Remote
+date: 2026-07-20
+author: Lucas
+lane: field-notes
+summary: Summary.
+audience: all
+hero: https://example.com/hero.png
+heroAlt: Remote
+---
+
+Body.
+`,
+    );
+
+    await expect(
+      buildBlog({
+        sourceDir: tempSourceDir,
+        outputDir: tempOutputDir,
+      }),
+    ).rejects.toThrow(/hero/);
+  });
+
+  it("fails when a local media body image is missing", async () => {
+    fs.mkdirSync(path.join(tempSourceDir, "media"), { recursive: true });
+    fs.writeFileSync(
+      path.join(tempSourceDir, "media/default-hero.svg"),
+      "<svg xmlns='http://www.w3.org/2000/svg'></svg>\n",
+    );
+    fs.writeFileSync(
+      path.join(tempSourceDir, "2026-07-20-valid-post.md"),
+      `---
+title: Valid post
+date: 2026-07-20
+author: Lucas
+lane: field-notes
+summary: One sentence summary.
+audience: all
+---
+
+![Missing](media/missing-inline.png)
+`,
+    );
+
+    await expect(
+      buildBlog({
+        sourceDir: tempSourceDir,
+        outputDir: tempOutputDir,
+      }),
+    ).rejects.toThrow(/missing image 'media\/missing-inline\.png'/);
+  });
+
+  it("fails when body markdown references a remote image URL", async () => {
+    fs.mkdirSync(path.join(tempSourceDir, "media"), { recursive: true });
+    fs.writeFileSync(
+      path.join(tempSourceDir, "media/default-hero.svg"),
+      "<svg xmlns='http://www.w3.org/2000/svg'></svg>\n",
+    );
+    fs.writeFileSync(
+      path.join(tempSourceDir, "2026-07-20-valid-post.md"),
+      `---
+title: Valid post
+date: 2026-07-20
+author: Lucas
+lane: field-notes
+summary: One sentence summary.
+audience: all
+---
+
+![Remote](https://example.com/photo.png)
+`,
+    );
+
+    await expect(
+      buildBlog({
+        sourceDir: tempSourceDir,
+        outputDir: tempOutputDir,
+      }),
+    ).rejects.toThrow(/remote|https?:/i);
+  });
+
+  it("fails when reference-style image target is missing", async () => {
+    fs.mkdirSync(path.join(tempSourceDir, "media"), { recursive: true });
+    fs.writeFileSync(
+      path.join(tempSourceDir, "media/default-hero.svg"),
+      "<svg xmlns='http://www.w3.org/2000/svg'></svg>\n",
+    );
+    fs.writeFileSync(
+      path.join(tempSourceDir, "2026-07-20-valid-post.md"),
+      `---
+title: Valid post
+date: 2026-07-20
+author: Lucas
+lane: field-notes
+summary: One sentence summary.
+audience: all
+---
+
+![Missing ref][sidebar]
+
+[sidebar]: media/missing-ref.png
+`,
+    );
+
+    await expect(
+      buildBlog({
+        sourceDir: tempSourceDir,
+        outputDir: tempOutputDir,
+      }),
+    ).rejects.toThrow(/missing image 'media\/missing-ref\.png'/);
+  });
+
+  it("fails when raw HTML img references a remote URL", async () => {
+    fs.mkdirSync(path.join(tempSourceDir, "media"), { recursive: true });
+    fs.writeFileSync(
+      path.join(tempSourceDir, "media/default-hero.svg"),
+      "<svg xmlns='http://www.w3.org/2000/svg'></svg>\n",
+    );
+    fs.writeFileSync(
+      path.join(tempSourceDir, "2026-07-20-valid-post.md"),
+      `---
+title: Valid post
+date: 2026-07-20
+author: Lucas
+lane: field-notes
+summary: One sentence summary.
+audience: all
+---
+
+<img src="https://example.com/hotlink.png" alt="Hotlink" />
+`,
+    );
+
+    await expect(
+      buildBlog({
+        sourceDir: tempSourceDir,
+        outputDir: tempOutputDir,
+      }),
+    ).rejects.toThrow(/remote|https?:/i);
+  });
+
+  it("copies media tree into output and keeps markdown out of dist", async () => {
+    fs.mkdirSync(path.join(tempSourceDir, "media/nested"), { recursive: true });
+    fs.writeFileSync(
+      path.join(tempSourceDir, "media/default-hero.svg"),
+      "<svg xmlns='http://www.w3.org/2000/svg'></svg>\n",
+    );
+    fs.writeFileSync(
+      path.join(tempSourceDir, "media/nested/example.svg"),
+      "<svg xmlns='http://www.w3.org/2000/svg'></svg>\n",
+    );
+    fs.writeFileSync(
+      path.join(tempSourceDir, "2026-07-20-valid-post.md"),
+      `---
+title: Valid post
+date: 2026-07-20
+author: Lucas
+lane: field-notes
+summary: One sentence summary.
+audience: all
+---
+
+![Inline](media/nested/example.svg)
+`,
+    );
+
+    await buildBlog({
+      sourceDir: tempSourceDir,
+      outputDir: tempOutputDir,
+    });
+
+    expect(
+      fs.existsSync(path.join(tempOutputDir, "media/default-hero.svg")),
+    ).toBe(true);
+    expect(
+      fs.existsSync(path.join(tempOutputDir, "media/nested/example.svg")),
+    ).toBe(true);
+    expect(
+      fs.existsSync(path.join(tempOutputDir, "2026-07-20-valid-post.md")),
+    ).toBe(false);
+  });
 });
 
 describe("build-landing-site blog integration", () => {
@@ -250,6 +658,12 @@ describe("build-landing-site blog integration", () => {
     expect(fs.existsSync(sourceMdPath)).toBe(false);
     expect(fs.existsSync(path.join(tempOutputDir, "assets/blog.css"))).toBe(
       true,
+    );
+    expect(
+      fs.existsSync(path.join(tempOutputDir, "blog/media/default-hero.svg")),
+    ).toBe(true);
+    expect(fs.existsSync(path.join(tempOutputDir, "blog/_template.md"))).toBe(
+      false,
     );
   });
 

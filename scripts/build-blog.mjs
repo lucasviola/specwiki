@@ -2,6 +2,8 @@
 /**
  * Compile site/blog/*.md into static HTML under dist/landing-site/blog/.
  * Invoked from scripts/build-landing-site.mjs during npm run build:site.
+ *
+ * Also copies site/blog/media/ → output media/ (markdown sources stay out of dist).
  */
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -31,6 +33,12 @@ const AUDIENCES = ["alex", "jordan", "sam", "all"];
 
 const LANE_ORDER = ["field-notes", "release-story", "ecosystem"];
 
+const DEFAULT_HERO = "media/default-hero.svg";
+
+/** Post-render scan — catches inline, reference-style, and raw HTML `<img>` tags. */
+const HTML_IMG_SRC_RE =
+  /<img\b[^>]*?\bsrc\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi;
+
 export function escapeHtml(text) {
   return String(text)
     .replace(/&/g, "&amp;")
@@ -53,6 +61,81 @@ function normalizeDate(value) {
 
 function formatSourcePath(sourceDir, filename) {
   return path.join("site/blog", filename).split(path.sep).join("/");
+}
+
+/**
+ * Validate a relative media/ path string (no filesystem check).
+ * @returns {string} normalized posix-style path under media/
+ */
+export function assertSafeMediaPath(imagePath, sourceLabel, fieldLabel) {
+  const raw = String(imagePath ?? "").trim();
+  if (!raw) {
+    throw new Error(
+      `${sourceLabel}: ${fieldLabel} must be a non-empty relative path under media/`,
+    );
+  }
+
+  if (/^[a-z][a-z0-9+.-]*:/i.test(raw) || raw.startsWith("//")) {
+    throw new Error(
+      `${sourceLabel}: ${fieldLabel} must be a local media/ path (got remote '${raw}')`,
+    );
+  }
+
+  if (raw.startsWith("/") || raw.includes("\\")) {
+    throw new Error(
+      `${sourceLabel}: ${fieldLabel} must be a relative media/ path (got '${raw}')`,
+    );
+  }
+
+  const segments = raw.split("/");
+  if (segments.some((segment) => segment === ".." || segment === "")) {
+    throw new Error(
+      `${sourceLabel}: ${fieldLabel} must not contain '..' or empty segments (got '${raw}')`,
+    );
+  }
+
+  if (segments[0] !== "media") {
+    throw new Error(
+      `${sourceLabel}: ${fieldLabel} must be under media/ (got '${raw}')`,
+    );
+  }
+
+  return segments.join("/");
+}
+
+async function assertMediaFileExists(mediaPath, sourceDir, sourceLabel) {
+  const absolute = path.join(sourceDir, ...mediaPath.split("/"));
+  try {
+    const stat = await fs.stat(absolute);
+    if (!stat.isFile()) {
+      throw new Error(
+        `${sourceLabel}: missing image '${mediaPath}' (not a file)`,
+      );
+    }
+  } catch (err) {
+    if (
+      err &&
+      typeof err === "object" &&
+      "code" in err &&
+      err.code === "ENOENT"
+    ) {
+      throw new Error(`${sourceLabel}: missing image '${mediaPath}'`);
+    }
+    throw err;
+  }
+}
+
+function extractHtmlImageTargets(html) {
+  const targets = [];
+  HTML_IMG_SRC_RE.lastIndex = 0;
+  let match;
+  while ((match = HTML_IMG_SRC_RE.exec(html)) !== null) {
+    const src = match[1] ?? match[2] ?? match[3];
+    if (src !== undefined) {
+      targets.push(src);
+    }
+  }
+  return targets;
 }
 
 export function validateFrontmatter(data, sourceLabel) {
@@ -86,6 +169,19 @@ export function validateFrontmatter(data, sourceLabel) {
     throw new Error(
       `${sourceLabel}: frontmatter 'audience' must be one of ${AUDIENCES.join(", ")} (got '${data.audience}')`,
     );
+  }
+
+  const heroRaw = data.hero;
+  const heroSet =
+    heroRaw !== undefined && heroRaw !== null && String(heroRaw).trim() !== "";
+  if (heroSet) {
+    assertSafeMediaPath(heroRaw, sourceLabel, "frontmatter 'hero'");
+    const heroAlt = data.heroAlt;
+    if (typeof heroAlt !== "string" || heroAlt.trim() === "") {
+      throw new Error(
+        `${sourceLabel}: frontmatter 'heroAlt' is required when 'hero' is set`,
+      );
+    }
   }
 }
 
@@ -157,8 +253,17 @@ ${body}
 `;
 }
 
+function renderHeroImg({ className, src, alt }) {
+  return `<img class="${className}" src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" />`;
+}
+
 function renderPostPage(post) {
   const laneLabel = LANE_LABELS[post.lane];
+  const hero = renderHeroImg({
+    className: "blog-post-hero",
+    src: post.heroSrc,
+    alt: post.heroAlt,
+  });
   const article = `<article class="blog-post">
         <p class="blog-meta">
           <time datetime="${escapeHtml(post.date)}">${escapeHtml(post.date)}</time>
@@ -168,6 +273,7 @@ function renderPostPage(post) {
           <span class="blog-lane-badge" data-lane="${escapeHtml(post.lane)}">${escapeHtml(laneLabel)}</span>
         </p>
         <h1 class="blog-post-title">${escapeHtml(post.title)}</h1>
+        ${hero}
         <div class="blog-post-body">
 ${post.htmlBody}
         </div>
@@ -191,9 +297,15 @@ function renderIndexPage(posts) {
     }
 
     const cards = lanePosts
-      .map(
-        (post) => `<li class="blog-card">
+      .map((post) => {
+        const hero = renderHeroImg({
+          className: "blog-card-hero",
+          src: post.heroSrc,
+          alt: post.heroAlt,
+        });
+        return `<li class="blog-card">
               <a class="blog-card-link" href="${escapeHtml(post.htmlName)}">
+                ${hero}
                 <h3 class="blog-card-title">${escapeHtml(post.title)}</h3>
                 <p class="blog-card-summary">${escapeHtml(post.summary)}</p>
                 <p class="blog-card-meta">
@@ -202,8 +314,8 @@ function renderIndexPage(posts) {
                   <span>${escapeHtml(post.author)}</span>
                 </p>
               </a>
-            </li>`,
-      )
+            </li>`;
+      })
       .join("\n            ");
 
     return `<section class="blog-lane" aria-labelledby="lane-${lane}">
@@ -231,6 +343,59 @@ function renderIndexPage(posts) {
     body,
     mainClass: "blog-main blog-main--index",
   });
+}
+
+async function resolveHero(data, sourceDir, sourceLabel) {
+  const heroRaw = data.hero;
+  const heroSet =
+    heroRaw !== undefined && heroRaw !== null && String(heroRaw).trim() !== "";
+
+  if (heroSet) {
+    const heroSrc = assertSafeMediaPath(
+      heroRaw,
+      sourceLabel,
+      "frontmatter 'hero'",
+    );
+    await assertMediaFileExists(heroSrc, sourceDir, sourceLabel);
+    return {
+      heroSrc,
+      heroAlt: String(data.heroAlt).trim(),
+    };
+  }
+
+  await assertMediaFileExists(DEFAULT_HERO, sourceDir, sourceLabel);
+  return {
+    heroSrc: DEFAULT_HERO,
+    heroAlt: "",
+  };
+}
+
+async function validateBodyImages(htmlBody, sourceDir, sourceLabel) {
+  for (const target of extractHtmlImageTargets(htmlBody)) {
+    const mediaPath = assertSafeMediaPath(target, sourceLabel, "image");
+    await assertMediaFileExists(mediaPath, sourceDir, sourceLabel);
+  }
+}
+
+async function copyMediaTree(sourceDir, outputDir) {
+  const mediaSource = path.join(sourceDir, "media");
+  const mediaDest = path.join(outputDir, "media");
+
+  try {
+    await fs.access(mediaSource);
+  } catch (err) {
+    if (
+      err &&
+      typeof err === "object" &&
+      "code" in err &&
+      err.code === "ENOENT"
+    ) {
+      return;
+    }
+    throw err;
+  }
+
+  await fs.cp(mediaSource, mediaDest, { recursive: true });
 }
 
 export async function loadPosts(sourceDir) {
@@ -266,6 +431,15 @@ export async function loadPosts(sourceDir) {
 
     validateFrontmatter(data, sourceLabel);
 
+    const bodyMarkdown = content.trim();
+    const htmlBody = renderMarkdown(bodyMarkdown);
+    await validateBodyImages(htmlBody, sourceDir, sourceLabel);
+    const { heroSrc, heroAlt } = await resolveHero(
+      data,
+      sourceDir,
+      sourceLabel,
+    );
+
     const htmlName = entry.name.replace(/\.md$/, ".html");
     posts.push({
       title: String(data.title).trim(),
@@ -275,7 +449,9 @@ export async function loadPosts(sourceDir) {
       summary: String(data.summary).trim(),
       audience: data.audience,
       htmlName,
-      htmlBody: renderMarkdown(content.trim()),
+      heroSrc,
+      heroAlt,
+      htmlBody,
     });
   }
 
@@ -310,6 +486,8 @@ export async function buildBlog({ sourceDir, outputDir }) {
       "utf8",
     );
   }
+
+  await copyMediaTree(sourceDir, outputDir);
 
   return posts;
 }

@@ -103,3 +103,42 @@ describe("S28.2 blog navigation chrome", () => {
     );
   });
 });
+
+describe("S28.10 blog image assets", () => {
+  it("ships default hero media and renders heroes on index and seed post", () => {
+    expect(
+      fs.existsSync(path.join(outputDir, "blog/media/default-hero.svg")),
+    ).toBe(true);
+    expect(indexHtml).toMatch(/class="blog-card-hero"/);
+    expect(indexHtml).toMatch(/src="media\//);
+    expect(postHtml).toMatch(/class="blog-post-hero"/);
+    expect(postHtml).toMatch(
+      /<h1 class="blog-post-title">[\s\S]*?<img class="blog-post-hero"/,
+    );
+  });
+
+  it("renders at least one inline body image from media/", () => {
+    expect(postHtml).toMatch(
+      /<img[^>]+src="media\/2026-07-20-seed-post\/[^"]+"/,
+    );
+  });
+
+  it("styles heroes and body images in blog.css only", () => {
+    const blogCss = fs.readFileSync(blogCssPath, "utf8");
+    expect(blogCss).toMatch(/\.blog-card-hero/);
+    expect(blogCss).toMatch(/\.blog-post-hero/);
+    expect(blogCss).toMatch(/\.blog-post-body img/);
+    expect(blogCss).toMatch(/max-width:\s*100%/);
+
+    const landingCss = fs.readFileSync(
+      path.join(projectRoot, "site/assets/landing.css"),
+      "utf8",
+    );
+    expect(landingCss).not.toContain(".blog-card-hero");
+  });
+
+  it("keeps blog pages free of root-absolute hrefs", () => {
+    expect(indexHtml).not.toMatch(/href="\//);
+    expect(postHtml).not.toMatch(/href="\//);
+  });
+});
