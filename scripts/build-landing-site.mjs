@@ -6,6 +6,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { buildBlog } from "./build-blog.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sourceDir = path.join(root, "site");
@@ -41,6 +42,10 @@ async function copySite(source, destination) {
   await fs.mkdir(destination, { recursive: true });
 
   for (const entry of await fs.readdir(source, { withFileTypes: true })) {
+    // Blog markdown is compiled to HTML separately — do not copy source posts.
+    if (entry.isDirectory() && entry.name === "blog") {
+      continue;
+    }
     await copyEntry(source, destination, entry);
   }
 }
@@ -51,6 +56,10 @@ async function main() {
 
   await fs.access(sourceDir);
   await copySite(sourceDir, outputDir);
+  await buildBlog({
+    sourceDir: path.join(sourceDir, "blog"),
+    outputDir: path.join(outputDir, "blog"),
+  });
   if (shouldWriteCname(args)) {
     await fs.writeFile(path.join(outputDir, "CNAME"), "specwiki.ai\n");
   }

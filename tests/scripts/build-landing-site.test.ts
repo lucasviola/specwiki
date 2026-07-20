@@ -47,6 +47,9 @@ describe("build-landing-site", () => {
     expect(fs.existsSync(path.join(tempOutputDir, "assets/landing.css"))).toBe(
       true,
     );
+    expect(fs.existsSync(path.join(tempOutputDir, "assets/blog.css"))).toBe(
+      true,
+    );
   });
 
   it("omits CNAME by default so GitHub Pages serves at lucasviola.github.io/specwiki", () => {
