@@ -94,8 +94,9 @@ Run after the first deploy and after any rollback:
 
 1. `curl -sI https://specwiki.ai` — expect `HTTP/2 200` (or `301` → `200`) and a valid TLS certificate for `specwiki.ai`.
 2. Open `https://specwiki.ai` in a browser — hero reads **"Make AI knowledge useful to humans."**
-3. Click **View source on GitHub** — lands on `https://github.com/lucasviola/specwiki`.
-4. `npm test -- tests/site/landing.test.ts` — all landing guard tests pass on the `site/` source that was deployed.
+3. Click **Blog** in the header — lands on `https://specwiki.ai/blog/` with the seed post listed.
+4. Click **View source on GitHub** — lands on `https://github.com/lucasviola/specwiki`.
+5. `npm test -- tests/site/` — all landing and blog guard tests pass on the `site/` source that was deployed.
 
 Until DNS is live, verify at **`https://lucasviola.github.io/specwiki/`** or the GitHub Pages preview URL from the PR or workflow summary instead of step 1–3.
 

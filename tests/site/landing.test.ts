@@ -368,6 +368,41 @@ describe("S20.2 landing page — responsive overflow containment (AC 2)", () => 
   });
 });
 
+describe("S28.3 landing page — blog nav integration", () => {
+  it("header nav includes a Blog link before GitHub", () => {
+    const nav = /<nav[^>]+aria-label="Primary"[^>]*>([\s\S]*?)<\/nav>/.exec(
+      html,
+    );
+    expect(nav, "primary nav must exist").not.toBeNull();
+    const navHtml = nav![1];
+    const blogIndex = navHtml.indexOf(">Blog<");
+    const githubIndex = navHtml.indexOf(">GitHub<");
+    expect(blogIndex).toBeGreaterThan(-1);
+    expect(githubIndex).toBeGreaterThan(blogIndex);
+  });
+
+  it("Blog link uses a relative path to blog/index.html", () => {
+    expect(html).toMatch(
+      /<a[^>]+class="[^"]*header-link[^"]*"[^>]+href="blog\/index\.html"[^>]*>Blog<\/a>/,
+    );
+    expect(html).not.toMatch(/href="\/blog/);
+  });
+
+  it("Blog link is not marked active on the landing page", () => {
+    const blogLink = /<a[^>]+href="blog\/index\.html"[^>]*>Blog<\/a>/.exec(
+      html,
+    );
+    expect(blogLink, "Blog link must exist").not.toBeNull();
+    expect(blogLink![0]).not.toContain("header-link--active");
+  });
+
+  it("landing page uses no root-absolute internal hrefs", () => {
+    const internalHrefs = [
+      ...html.matchAll(/<a[^>]+href="(\/[^"]*)"[^>]*>/g),
+    ].map((match) => match[1]);
+    expect(internalHrefs).toEqual([]);
+  });
+});
 describe("S20.2 landing page — contrast and motion (AC 1, 3)", () => {
   it("uses muted text at sufficient opacity for WCAG AA body copy", () => {
     const mutedMatches = css.match(/--text-muted:\s*rgba\([^)]+\)/g);

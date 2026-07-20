@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
-**Last updated:** 2026-07-19
-**Current position:** **E21 S21.6 maintainer npm publish security checklist** — done
-**Test count:** 567 passing
+**Last updated:** 2026-07-20
+**Current position:** **E28 S28.3 landing nav integration + deploy/CI tests** — done
+**Test count:** 589 passing
 
 ## Deliverables
 
@@ -300,4 +300,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-19 | E21 S21.6        | `docs(publish): maintainer npm publish security checklist` — `docs/RELEASING.md` numbered pre-publish steps (2FA, secrets, tarball review, verify-package, prepublishOnly, audit, dry-run); README maintainer link; contract tests in `releasing-doc.test.ts`; §0.8 N/A (doc-only)                                                                                                                                           | 7537b8a               | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-20 | E28 S28.1–S28.2  | `feat(site): blog build pipeline, index, and longform layout` — `scripts/build-blog.mjs` (gray-matter + marked, frontmatter validation); wired into `build-landing-site.mjs`; `site/blog/_template.md` + seed post; `site/assets/blog.css`; 15 new tests (582 total); HTML under `dist/landing-site/blog/` only at build time                                                                                                | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-20 | E28 review fixes | `fix(site): blog date normalization and stale HTML cleanup` — local-calendar `normalizeDate`; remove orphaned `blog/*.html` on rebuild; quoted dates in template/seed post; stale-post test                                                                                                                                                                                                                                  | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
+| 2026-07-20 | E28 S28.3        | `feat(site): landing Blog nav + deploy/CI site tests` — `site/index.html` header Blog link (`blog/index.html`); `docs/hosting/specwiki-ai.md` `/blog/` verification step; `deploy-site.yml` runs full `tests/site/`; 5 new guard tests (589 total); §0.8 N/A (static site)                                                                                                                                                   | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | _template_ | _E?_ S?_         | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                                              |

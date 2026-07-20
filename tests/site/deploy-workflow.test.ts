@@ -59,10 +59,10 @@ describe("S20.3 deploy-site workflow", () => {
     expect(workflow).not.toMatch(/secrets\./);
   });
 
-  it("verifies the landing page before building and deploying", () => {
+  it("verifies the landing page and blog before building and deploying", () => {
     const workflow = readWorkflow();
 
-    expect(workflow).toMatch(/npm test -- tests\/site\/landing\.test\.ts/);
+    expect(workflow).toMatch(/npm test -- tests\/site\//);
     expect(workflow).toMatch(/npm run build:site/);
     expect(workflow).toMatch(/actions\/upload-pages-artifact@v3/);
     expect(workflow).toMatch(/actions\/deploy-pages@v4/);
@@ -112,6 +112,13 @@ describe("S20.3 hosting documentation", () => {
     expect(doc).toMatch(/HTTPS/i);
     expect(doc).not.toMatch(/ghp_[A-Za-z0-9]{20,}/);
     expect(doc).not.toMatch(/secrets?\s*[:=]/i);
+  });
+
+  it("includes /blog/ in the production verification checklist", () => {
+    const doc = fs.readFileSync(hostingDocPath, "utf8");
+
+    expect(doc).toMatch(/specwiki\.ai\/blog/);
+    expect(doc).toMatch(/npm test -- tests\/site\//);
   });
 
   it("documents the default GitHub Pages URL before custom domain setup", () => {
