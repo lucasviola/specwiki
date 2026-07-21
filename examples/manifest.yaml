@@ -1,0 +1,53 @@
+# examples/manifest.yaml — catalog of mock projects for specwiki demos and specwiki.ai live examples.
+#
+# Schema:
+#   hero: string              — slug of the primary live example (must match a catalog entry)
+#   examples: array           — all mock projects under examples/<slug>/
+#     - slug: string          — directory name under examples/ (kebab-case)
+#       title: string         — short display name
+#       tagline: string       — one-line description for gallery cards and README tables
+#       framework: string      — workflow label (agent-harness | bmad | article-research | …)
+#       commands:              — optional; required on the hero entry for docs parity
+#         generate: string     — full generate command from repo root
+#         open: string        — full open command from repo root
+#       landing:               — optional; hero only until S27.4 wires build-time injection
+#         section_title: string
+#         section_prose: string
+#
+# Sync point (v1): site/index.html §04 section-title and section-prose must match
+# hero.examples[].landing until build:site injects them from this manifest (S27.4).
+#
+# Only the hero example is generated for specwiki.ai in v1; other catalog entries are
+# GitHub-only until the gallery hub ships (S27.3).
+
+hero: agent-harness-parcel
+
+examples:
+  - slug: agent-harness-parcel
+    title: Agent harness parcel
+    tagline: Three root files many AI tools read first — README, AGENTS, CLAUDE
+    framework: agent-harness
+    commands:
+      generate: npx @lucasviola/specwiki generate --project examples/agent-harness-parcel
+      open: npx @lucasviola/specwiki open --project examples/agent-harness-parcel
+    landing:
+      section_title: Three root files in. A browsable wiki out.
+      section_prose: >-
+        examples/agent-harness-parcel is a minimal agent harness — the three root
+        files many AI tools read first. Point specwiki at it (from the specwiki repo root):
+
+  - slug: bmad-research-relay
+    title: BMAD research relay
+    tagline: BMAD-style _bmad-output technical research for a mock CLI
+    framework: bmad
+    commands:
+      generate: npx @lucasviola/specwiki generate --project examples/bmad-research-relay
+      open: npx @lucasviola/specwiki open --project examples/bmad-research-relay
+
+  - slug: article-research-mycelium
+    title: Article research mycelium
+    tagline: Loose research markdowns for a long-form article
+    framework: article-research
+    commands:
+      generate: npx @lucasviola/specwiki generate --project examples/article-research-mycelium
+      open: npx @lucasviola/specwiki open --project examples/article-research-mycelium

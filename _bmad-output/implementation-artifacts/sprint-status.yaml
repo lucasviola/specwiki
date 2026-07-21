@@ -1,5 +1,5 @@
 # generated: 2026-07-12
-# last_updated: "2026-07-20" (Epic 28 S28.5 README + launch-copy blog discovery links review)
+# last_updated: "2026-07-21" (Review stories marked done; Epic 13 closed)
 # project: specwiki
 # project_key: NOKEY
 # tracking_system: file-system
@@ -45,7 +45,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-07-12
-last_updated: 2026-07-20 (Epic 28 S28.5 README + launch-copy blog discovery links review)
+last_updated: 2026-07-21 (Review stories marked done; Epic 13 closed)
 project: specwiki
 project_key: NOKEY
 tracking_system: file-system
@@ -105,8 +105,8 @@ development_status:
   12-2-openspec-grouping: backlog
   12-3-bmad-kernel-cards: backlog
   epic-12-retrospective: optional
-  epic-13: in-progress
-  13-1-npm-publish-preparation: in-progress
+  epic-13: done
+  13-1-npm-publish-preparation: done
   13-2-github-actions-ci-workflow: done
   13-3-publication-readiness-and-launch-marketing: done
   13-4-version-1-0-0-release-and-maintainer-docs: superseded
@@ -146,7 +146,7 @@ development_status:
   epic-21: in-progress
   21-1-generate-output-confined-to-project-root: done
   21-2-readme-security-section: done
-  21-3-security-md-vulnerability-reporting: review
+  21-3-security-md-vulnerability-reporting: done
   21-4-config-js-trust-warning: done
   21-5-release-dependency-audit-gate: done
   21-6-maintainer-npm-publish-security-checklist: done
@@ -176,8 +176,8 @@ development_status:
   24-3-typography-specification-doc: done
   epic-24-retrospective: optional
   epic-25: in-progress
-  25-1-adr-scaffolding-template-and-wiki-category: review
-  25-2-foundational-adrs: review
+  25-1-adr-scaffolding-template-and-wiki-category: done
+  25-2-foundational-adrs: done
   25-3-retroactive-adrs: backlog
   25-4-architecture-spine-sync: backlog
   25-5-pre-build-adrs-for-e11-e12: backlog
@@ -189,7 +189,7 @@ development_status:
   26-4-extensible-media-pipeline-and-adr: backlog
   epic-26-retrospective: optional
   epic-27: backlog
-  27-1-example-metadata-manifest: backlog
+  27-1-example-metadata-manifest: review
   27-2-build-time-example-wiki-generation: backlog
   27-3-examples-gallery-hub: backlog
   27-4-landing-page-section-04-refresh: backlog
@@ -201,8 +201,8 @@ development_status:
   28-2-blog-index-post-layout-longform-css: done
   28-3-landing-nav-integration-deploy-ci-tests: done
   28-10-blog-image-assets-hero-and-inline: done
-  28-4-seed-post-editorial-conventions: review
-  28-5-readme-launch-copy-discovery-links: review
+  28-4-seed-post-editorial-conventions: done
+  28-5-readme-launch-copy-discovery-links: done
   28-6-launch-trilogy-posts-editorial: backlog
   28-7-rss-syndication: backlog
   28-8-sitemap-og-images: backlog
