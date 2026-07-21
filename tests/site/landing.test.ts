@@ -211,16 +211,25 @@ describe("S20.1 v2 landing page — live example (AC 6)", () => {
     expect(text).toMatch(/from the specwiki repo root/i);
   });
 
-  it("links to the examples folder on GitHub", () => {
-    expect(html).toMatch(
+  it("links §04 secondary copy to the live examples gallery", () => {
+    const section =
+      /<section class="section" aria-labelledby="example-title">[\s\S]*?<\/section>/.exec(
+        html,
+      );
+    expect(section, "§04 example section must exist").not.toBeNull();
+    expect(section![0]).toMatch(
+      /class="[^"]*section-prose--secondary[^"]*"[\s\S]*?href="examples\/index\.html"/,
+    );
+    expect(section![0]).toMatch(
       /href="https:\/\/github\.com\/lucasviola\/specwiki\/tree\/main\/examples"/,
     );
   });
 
-  it("does not claim multiple live wikis on specwiki.ai", () => {
+  it("does not invent live-wiki counts beyond the catalog", () => {
     expect(text).not.toMatch(/five live/i);
     expect(text).not.toMatch(/five demos/i);
-    expect(text).toMatch(/not yet hosted on specwiki\.ai/i);
+    expect(text).not.toMatch(/not yet hosted on specwiki\.ai/i);
+    expect(text).toMatch(/three live examples/i);
   });
 });
 
@@ -408,16 +417,25 @@ describe("S20.2 landing page — responsive overflow containment (AC 2)", () => 
 });
 
 describe("S28.3 landing page — blog nav integration", () => {
-  it("header nav includes a Blog link before GitHub", () => {
+  it("header nav includes Examples, then Blog, then GitHub", () => {
     const nav = /<nav[^>]+aria-label="Primary"[^>]*>([\s\S]*?)<\/nav>/.exec(
       html,
     );
     expect(nav, "primary nav must exist").not.toBeNull();
     const navHtml = nav![1];
+    const examplesIndex = navHtml.indexOf(">Examples<");
     const blogIndex = navHtml.indexOf(">Blog<");
     const githubIndex = navHtml.indexOf(">GitHub<");
-    expect(blogIndex).toBeGreaterThan(-1);
+    expect(examplesIndex).toBeGreaterThan(-1);
+    expect(blogIndex).toBeGreaterThan(examplesIndex);
     expect(githubIndex).toBeGreaterThan(blogIndex);
+  });
+
+  it("Examples link uses a relative path to examples/index.html", () => {
+    expect(html).toMatch(
+      /<a[^>]+class="[^"]*header-link[^"]*"[^>]+href="examples\/index\.html"[^>]*>Examples<\/a>/,
+    );
+    expect(html).not.toMatch(/href="\/examples/);
   });
 
   it("Blog link uses a relative path to blog/index.html", () => {
@@ -427,11 +445,15 @@ describe("S28.3 landing page — blog nav integration", () => {
     expect(html).not.toMatch(/href="\/blog/);
   });
 
-  it("Blog link is not marked active on the landing page", () => {
+  it("Examples and Blog links are not marked active on the landing page", () => {
+    const examplesLink =
+      /<a[^>]+href="examples\/index\.html"[^>]*>Examples<\/a>/.exec(html);
     const blogLink = /<a[^>]+href="blog\/index\.html"[^>]*>Blog<\/a>/.exec(
       html,
     );
+    expect(examplesLink, "Examples link must exist").not.toBeNull();
     expect(blogLink, "Blog link must exist").not.toBeNull();
+    expect(examplesLink![0]).not.toContain("header-link--active");
     expect(blogLink![0]).not.toContain("header-link--active");
   });
 

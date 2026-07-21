@@ -45,7 +45,7 @@
 # - Retrospective appends its action items to action_items; sprint-status surfaces open ones
 
 generated: 2026-07-12
-last_updated: 2026-07-21 (Review stories marked done; Epic 13 closed)
+last_updated: 2026-07-21 (Story 27.3 → review)
 project: specwiki
 project_key: NOKEY
 tracking_system: file-system
@@ -188,10 +188,10 @@ development_status:
   26-3-remote-cdn-media-passthrough-and-opt-in-mirror: backlog
   26-4-extensible-media-pipeline-and-adr: backlog
   epic-26-retrospective: optional
-  epic-27: backlog
+  epic-27: in-progress
   27-1-example-metadata-manifest: review
   27-2-build-time-example-wiki-generation: review
-  27-3-examples-gallery-hub: backlog
+  27-3-examples-gallery-hub: review
   27-4-landing-page-section-04-refresh: review
   27-5-deploy-verification-and-site-tests: backlog
   27-6-cross-example-navigation-chrome: backlog

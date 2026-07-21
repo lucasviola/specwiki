@@ -1,0 +1,378 @@
+<!doctype html>
+<!--
+  UX mockup — Story 27.3: Examples gallery hub (/examples/)
+  Author: Sally (UX Designer)
+
+  Self-contained preview of dist/landing-site/examples/index.html.
+  Chrome, tokens, and card patterns mirror site/assets/landing.css +
+  scripts/build-blog.mjs so the real build can reproduce this look. All card
+  copy is derived from examples/manifest.yaml (three catalog entries today);
+  nothing here is hardcoded beyond what the manifest already declares.
+
+  NOTE: This is a design artifact, not build output. Hrefs to
+  <slug>/html/index.html are illustrative (no live wikis are generated here).
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Examples — [[specwiki]]</title>
+    <meta
+      name="description"
+      content="A gallery of live specwiki wikis — pick the demo closest to your workflow and open a real generated wiki."
+    />
+    <style>
+      /* ---- brand tokens (from site/assets/landing.css) ---- */
+      :root {
+        --color-base: #eaecf0;
+        --color-primary: #6b8fe8;
+        --background-color-base: #16181c;
+        --surface: #1d2026;
+        --surface-raised: #24272e;
+        --border: #2e323a;
+        --text-muted: rgba(234, 236, 240, 0.72);
+        --cta-text: #16181c;
+      }
+
+      @media (prefers-color-scheme: light) {
+        :root {
+          --color-base: #202122;
+          --color-primary: #3366cc;
+          --background-color-base: #ffffff;
+          --surface: #f6f7f9;
+          --surface-raised: #eef0f3;
+          --border: #d9dce2;
+          --text-muted: rgba(32, 33, 34, 0.72);
+          --cta-text: #ffffff;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        color: var(--color-base);
+        background: var(--background-color-base);
+        line-height: 1.65;
+      }
+
+      a {
+        color: var(--color-primary);
+      }
+
+      /* ---- skip link ---- */
+      .skip-link {
+        position: absolute;
+        top: 0.75rem;
+        left: 0.75rem;
+        z-index: 100;
+        padding: 0.55rem 0.9rem;
+        background: var(--color-primary);
+        color: var(--cta-text);
+        font-weight: 700;
+        text-decoration: none;
+        border-radius: 4px;
+        transform: translateY(calc(-100% - 1rem));
+      }
+      .skip-link:focus,
+      .skip-link:focus-visible {
+        transform: translateY(0);
+        outline: 2px solid var(--color-base);
+        outline-offset: 2px;
+      }
+
+      /* ---- header (mirrors build-blog renderHeader) ---- */
+      .site-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 1rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .specwiki-logo {
+        display: inline-block;
+        margin: 1em;
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", monospace;
+        font-weight: 700;
+        font-size: 1rem;
+        letter-spacing: -0.02em;
+        color: var(--color-base);
+        text-decoration: none;
+      }
+      .specwiki-logo-bracket {
+        color: var(--color-primary);
+      }
+      .header-link {
+        margin-right: 1em;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        text-decoration: none;
+      }
+      .header-link:hover {
+        color: var(--color-primary);
+      }
+      .header-link--active {
+        color: var(--color-primary);
+        font-weight: 600;
+      }
+
+      /* ---- gallery layout (blog-index family) ---- */
+      .gallery-main {
+        max-width: 62rem;
+        margin: 0 auto;
+        padding: 2.5rem 1.5rem 4rem;
+      }
+      main:focus {
+        outline: none;
+      }
+
+      .gallery-header {
+        max-width: 42rem;
+        margin-bottom: 2.5rem;
+      }
+      .gallery-kicker {
+        margin: 0 0 0.75rem;
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", monospace;
+        font-size: 0.8rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+      }
+      .gallery-title {
+        margin: 0 0 0.75rem;
+        font-size: clamp(1.75rem, 4vw, 2.25rem);
+        line-height: 1.2;
+      }
+      .gallery-lede {
+        margin: 0;
+        color: var(--text-muted);
+        font-size: 1.05rem;
+      }
+
+      .gallery-card-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 1.25rem;
+        grid-template-columns: repeat(
+          auto-fit,
+          minmax(min(100%, 20rem), 1fr)
+        );
+      }
+
+      .gallery-card {
+        margin: 0;
+      }
+
+      .gallery-card-link {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 1.35rem 1.4rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--surface);
+        text-decoration: none;
+        color: inherit;
+        transition: border-color 0.15s ease;
+      }
+      .gallery-card-link:hover {
+        border-color: var(--color-primary);
+      }
+      .gallery-card-link:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+      }
+
+      /* hero prominence (AC 4): ordered first + accent border + badge */
+      .gallery-card--hero .gallery-card-link {
+        border-color: var(--color-primary);
+        background: var(--surface-raised);
+      }
+
+      .gallery-card-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 0.85rem;
+      }
+
+      .gallery-framework {
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", monospace;
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 0.15rem 0.55rem;
+      }
+
+      .gallery-hero-badge {
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", monospace;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--cta-text);
+        background: var(--color-primary);
+        border-radius: 999px;
+        padding: 0.15rem 0.6rem;
+      }
+
+      .gallery-card-title {
+        margin: 0 0 0.5rem;
+        font-size: 1.2rem;
+        line-height: 1.3;
+        color: var(--color-base);
+      }
+
+      .gallery-card-tagline {
+        margin: 0 0 1.1rem;
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        line-height: 1.55;
+        flex-grow: 1;
+      }
+
+      .gallery-card-open {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--color-primary);
+      }
+      .gallery-card-open::after {
+        content: " →";
+      }
+
+      /* ---- footer (mirrors build-blog renderFooter) ---- */
+      .site-footer {
+        border-top: 1px solid var(--border);
+        padding: 2rem 1.5rem;
+        text-align: center;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+      .site-footer a {
+        color: var(--color-primary);
+        text-decoration: none;
+      }
+      .site-footer a:hover {
+        text-decoration: underline;
+      }
+      .footer-sep {
+        margin: 0 0.6em;
+      }
+
+      @media (max-width: 480px) {
+        .gallery-main {
+          padding-top: 1.75rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <header class="site-header">
+      <a href="../index.html" class="specwiki-logo" aria-label="specwiki home">
+        <span class="specwiki-logo-bracket" aria-hidden="true">[[</span
+        >specwiki<span class="specwiki-logo-bracket" aria-hidden="true">]]</span>
+      </a>
+      <nav aria-label="Primary">
+        <a class="header-link header-link--active" href="index.html">Examples</a>
+        <a class="header-link" href="../blog/index.html">Blog</a>
+        <a class="header-link" href="https://github.com/lucasviola/specwiki"
+          >GitHub</a
+        >
+      </nav>
+    </header>
+
+    <main id="main-content" class="gallery-main" tabindex="-1">
+      <header class="gallery-header">
+        <p class="gallery-kicker">Live examples</p>
+        <h1 class="gallery-title">See specwiki on real projects</h1>
+        <p class="gallery-lede">
+          Every card below is a live wiki generated by specwiki from a real
+          example project. Pick the demo closest to your workflow and open the
+          full browsable wiki — working search, CSS, and cross-links included.
+        </p>
+      </header>
+
+      <ul class="gallery-card-list">
+        <!-- HERO: manifest.hero = agent-harness-parcel (ordered first, badged) -->
+        <li class="gallery-card gallery-card--hero">
+          <a
+            class="gallery-card-link"
+            href="agent-harness-parcel/html/index.html"
+          >
+            <div class="gallery-card-top">
+              <span class="gallery-framework">agent-harness</span>
+              <span class="gallery-hero-badge">Hero demo</span>
+            </div>
+            <h2 class="gallery-card-title">Agent harness parcel</h2>
+            <p class="gallery-card-tagline">
+              Three root files many AI tools read first — README, AGENTS, CLAUDE
+            </p>
+            <span class="gallery-card-open">Open live wiki</span>
+          </a>
+        </li>
+
+        <li class="gallery-card">
+          <a
+            class="gallery-card-link"
+            href="bmad-research-relay/html/index.html"
+          >
+            <div class="gallery-card-top">
+              <span class="gallery-framework">bmad</span>
+            </div>
+            <h2 class="gallery-card-title">BMAD research relay</h2>
+            <p class="gallery-card-tagline">
+              BMAD-style _bmad-output technical research for a mock CLI
+            </p>
+            <span class="gallery-card-open">Open live wiki</span>
+          </a>
+        </li>
+
+        <li class="gallery-card">
+          <a
+            class="gallery-card-link"
+            href="article-research-mycelium/html/index.html"
+          >
+            <div class="gallery-card-top">
+              <span class="gallery-framework">article-research</span>
+            </div>
+            <h2 class="gallery-card-title">Article research mycelium</h2>
+            <p class="gallery-card-tagline">
+              Loose research markdowns for a long-form article
+            </p>
+            <span class="gallery-card-open">Open live wiki</span>
+          </a>
+        </li>
+      </ul>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        <a href="../index.html">specwiki home</a>
+        <span class="footer-sep" aria-hidden="true">·</span>
+        <a href="../blog/index.html">Blog</a>
+        <span class="footer-sep" aria-hidden="true">·</span>
+        <a href="https://github.com/lucasviola/specwiki">GitHub</a>
+      </p>
+    </footer>
+  </body>
+</html>

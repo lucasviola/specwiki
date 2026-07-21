@@ -1,8 +1,8 @@
 # specwiki — Implementation Build Log
 
 **Last updated:** 2026-07-21
-**Current position:** **E27 S27.4 landing §04 live hero wiki** — review
-**Test count:** 640 passing
+**Current position:** **E27 S27.3 examples gallery hub** — review
+**Test count:** 647 passing
 
 ## Deliverables
 
@@ -307,4 +307,5 @@ One row per completed story/task. Quality gate column uses §0.2 shorthand: `tes
 | 2026-07-21 | E27 S27.1        | `feat(examples): hero-first manifest for live demo catalog` — `examples/manifest.yaml` with schema header, hero slug, three catalog entries, hero commands + landing sync fields; `scripts/lib/examples-manifest.mjs` load/validate (bidirectional folder↔catalog check); `yaml` devDep; 10 new tests (626 total); §0.8 N/A (build-script metadata)                                                                          | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-21 | E27 S27.2        | `feat(site): build-time hero example wiki generation` — `scripts/build-examples.mjs` reads manifest, generates hero via compiled CLI, copies to `dist/landing-site/examples/<slug>/`; `--hero-only` (default) and `--all`; subpath-safe HTML guard; deploy workflow runs `npm run build` + `build:examples` before `build:site`; 9 new tests (637 total); §0.8 N/A (build script)                                            | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | 2026-07-21 | E27 S27.4        | `feat(site): landing §04 links to live hero wiki` — replaced static wiki mock with Explore live wiki CTA + GitHub source link; honest copy for GitHub-only examples; `scripts/inject-landing-example.mjs` injects §04 title/prose from manifest at `build:site`; 3 new landing/build tests (640 total); §0.8 N/A (static site)                                                                                               | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
+| 2026-07-21 | E27 S27.3        | `feat(site): examples gallery hub at /examples/` — `renderExamplesGalleryHtml` from manifest; `build:examples` emits hub for built slugs; gallery.css; deploy `--all`; §04 secondary copy → live gallery; shared `escapeHtml`; 7 new gallery tests (+ build/landing/deploy updates)                                                                                                                                          | uncommitted           | test ✓ · lint ✓ · format ✓ · coverage ✓ · typecheck ✓ · build ✓                      |
 | _template_ | _E?_ S?_         | _`<type>(<scope>): imperative summary`_                                                                                                                                                                                                                                                                                                                                                                                      | _hash or uncommitted_ | _full §0.2 gate result_                                                              |

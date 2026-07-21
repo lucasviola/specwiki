@@ -68,11 +68,11 @@ describe("S20.3 deploy-site workflow", () => {
     expect(workflow).toMatch(/actions\/deploy-pages@v4/);
   });
 
-  it("builds the CLI and generates the hero example before build:site", () => {
+  it("builds the CLI and generates all example wikis before build:site", () => {
     const workflow = readWorkflow();
 
     expect(workflow).toMatch(/npm run build$/m);
-    expect(workflow).toMatch(/npm run build:examples -- --hero-only/);
+    expect(workflow).toMatch(/npm run build:examples -- --all/);
   });
 
   it("guards production deploy to push and workflow_dispatch only", () => {

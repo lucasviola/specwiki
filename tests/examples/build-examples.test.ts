@@ -112,8 +112,17 @@ describe("build:examples (S27.2)", () => {
         "examples/agent-harness-parcel/html/index.html",
       );
       expect(fs.existsSync(indexPath)).toBe(true);
+
+      const galleryPath = path.join(outputDir, "examples/index.html");
+      expect(fs.existsSync(galleryPath)).toBe(true);
+      const galleryHtml = fs.readFileSync(galleryPath, "utf8");
+      expect(galleryHtml).toContain(
+        'href="agent-harness-parcel/html/index.html"',
+      );
+      expect(galleryHtml).toMatch(/gallery-card--hero/);
+
       await assertNoRootAbsoluteUrlsInHtmlTree(
-        path.join(outputDir, "examples/agent-harness-parcel"),
+        path.join(outputDir, "examples"),
       );
     } finally {
       fs.rmSync(outputDir, { recursive: true, force: true });

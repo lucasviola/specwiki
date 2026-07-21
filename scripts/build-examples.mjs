@@ -1,18 +1,20 @@
 #!/usr/bin/env node
 /**
- * Generate example wikis for specwiki.ai (E27 S27.2).
+ * Generate example wikis for specwiki.ai (E27 S27.2 / S27.3).
  * Reads examples/manifest.yaml; v1 default builds the hero slug only.
+ * After generation, emits the /examples/ gallery hub for built slugs.
  *
  * Usage:
  *   npm run build                          # compile CLI first
  *   npm run build:examples -- --hero-only  # hero wiki → dist/landing-site/examples/<slug>/
- *   npm run build:examples -- --all        # all catalog entries (future gallery)
+ *   npm run build:examples -- --all        # all catalog entries + gallery hub
  */
 import { execFileSync } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { assertNoRootAbsoluteUrlsInHtmlTree } from "./lib/assert-no-root-absolute-urls.mjs";
+import { renderExamplesGalleryHtml } from "./lib/examples-gallery.mjs";
 import { loadExamplesManifest } from "./lib/examples-manifest.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -131,6 +133,14 @@ export async function buildExamples(options = {}) {
   for (const slug of slugs) {
     await generateExampleWiki(slug, siteOutputDir);
   }
+
+  const examplesDir = path.join(siteOutputDir, "examples");
+  const galleryHtml = renderExamplesGalleryHtml(manifest, {
+    builtSlugs: slugs,
+  });
+  await fs.mkdir(examplesDir, { recursive: true });
+  await fs.writeFile(path.join(examplesDir, "index.html"), galleryHtml, "utf8");
+  await assertNoRootAbsoluteUrlsInHtmlTree(examplesDir);
 
   return { slugs, siteOutputDir };
 }

@@ -39,14 +39,9 @@ const DEFAULT_HERO = "media/default-hero.svg";
 const HTML_IMG_SRC_RE =
   /<img\b[^>]*?\bsrc\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi;
 
-export function escapeHtml(text) {
-  return String(text)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
+import { escapeHtml } from "./lib/html.mjs";
+
+export { escapeHtml };
 
 function normalizeDate(value) {
   if (value instanceof Date) {
@@ -200,6 +195,7 @@ function renderHeader({ activeBlog = true } = {}) {
         <span class="specwiki-logo-bracket" aria-hidden="true">[[</span>specwiki<span class="specwiki-logo-bracket" aria-hidden="true">]]</span>
       </a>
       <nav aria-label="Primary">
+        <a class="header-link" href="../examples/index.html">Examples</a>
         <a${blogClass} href="index.html">Blog</a>
         <a class="header-link" href="https://github.com/lucasviola/specwiki">GitHub</a>
       </nav>

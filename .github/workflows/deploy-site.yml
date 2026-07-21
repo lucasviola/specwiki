@@ -38,8 +38,8 @@ jobs:
       - name: Build CLI
         run: npm run build
 
-      - name: Generate hero example wiki
-        run: npm run build:examples -- --hero-only
+      - name: Generate example wikis and gallery
+        run: npm run build:examples -- --all
 
       - name: Build landing site
         run: npm run build:site -- --with-cname

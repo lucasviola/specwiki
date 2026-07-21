@@ -18,8 +18,8 @@
 # hero.examples[].landing in this manifest (S27.4). Source site/index.html
 # keeps matching defaults for local preview; built output is authoritative.
 #
-# Only the hero example is generated for specwiki.ai in v1; other catalog entries are
-# GitHub-only until the gallery hub ships (S27.3).
+# Deploy (and `build:examples -- --all`) generates every catalog entry plus the
+# gallery hub at examples/index.html (S27.3). Local default remains --hero-only.
 
 hero: agent-harness-parcel
 
