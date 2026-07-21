@@ -2,11 +2,12 @@
 #
 # Schema:
 #   hero: string              — slug of the primary live example (must match a catalog entry)
-#   examples: array           — all mock projects under examples/<slug>/
+#   unpublished: string[]     — optional; example folders kept on disk but not in the live catalog/gallery
+#   examples: array           — published mock projects under examples/<slug>/
 #     - slug: string          — directory name under examples/ (kebab-case)
 #       title: string         — short display name
 #       tagline: string       — one-line description for gallery cards and README tables
-#       framework: string      — workflow label (agent-harness | bmad | article-research | …)
+#       framework: string      — workflow label (agent-harness | speckit | bmad | …)
 #       commands:              — optional; required on the hero entry for docs parity
 #         generate: string     — full generate command from repo root
 #         open: string        — full open command from repo root
@@ -23,6 +24,11 @@
 
 hero: agent-harness-parcel
 
+# Folders under examples/ kept for local generate/open demos; not listed in the
+# live gallery and not built by `build:examples -- --all`.
+unpublished:
+  - article-research-mycelium
+
 examples:
   - slug: agent-harness-parcel
     title: Agent harness parcel
@@ -37,6 +43,14 @@ examples:
         examples/agent-harness-parcel is a minimal agent harness — the three root
         files many AI tools read first. Point specwiki at it (from the specwiki repo root):
 
+  - slug: speckit-harness-parcel
+    title: Spec Kit parcel path
+    tagline: Spec Kit constitution + feature specs for a mock tracking CLI
+    framework: speckit
+    commands:
+      generate: npx @lucasviola/specwiki generate --project examples/speckit-harness-parcel
+      open: npx @lucasviola/specwiki open --project examples/speckit-harness-parcel
+
   - slug: bmad-research-relay
     title: BMAD research relay
     tagline: BMAD-style _bmad-output technical research for a mock CLI
@@ -44,11 +58,3 @@ examples:
     commands:
       generate: npx @lucasviola/specwiki generate --project examples/bmad-research-relay
       open: npx @lucasviola/specwiki open --project examples/bmad-research-relay
-
-  - slug: article-research-mycelium
-    title: Article research mycelium
-    tagline: Loose research markdowns for a long-form article
-    framework: article-research
-    commands:
-      generate: npx @lucasviola/specwiki generate --project examples/article-research-mycelium
-      open: npx @lucasviola/specwiki open --project examples/article-research-mycelium

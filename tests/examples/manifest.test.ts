@@ -24,8 +24,14 @@ describe("examples/manifest.yaml", () => {
     expect(manifest.hero).toBe("agent-harness-parcel");
     expect(manifest.examples.map((entry) => entry.slug)).toEqual([
       "agent-harness-parcel",
+      "speckit-harness-parcel",
       "bmad-research-relay",
-      "article-research-mycelium",
+    ]);
+    expect(manifest.unpublished).toEqual(["article-research-mycelium"]);
+    expect(manifest.examples.map((entry) => entry.framework)).toEqual([
+      "agent-harness",
+      "speckit",
+      "bmad",
     ]);
   });
 
@@ -214,5 +220,57 @@ describe("parseExamplesManifest", () => {
     ).rejects.toThrow(
       "catalog slug 'agent-harness-parcel' has no examples/agent-harness-parcel/ folder",
     );
+  });
+
+  it("rejects an unpublished slug that also appears in the catalog", () => {
+    expect(() =>
+      parseExamplesManifest({
+        hero: "agent-harness-parcel",
+        unpublished: ["agent-harness-parcel"],
+        examples: [
+          {
+            slug: "agent-harness-parcel",
+            title: "Hero",
+            tagline: "Tagline",
+            framework: "speckit",
+            commands: { generate: "gen", open: "open" },
+            landing: {
+              section_title: "Title",
+              section_prose: "Prose",
+            },
+          },
+        ],
+      }),
+    ).toThrow(
+      "hero 'agent-harness-parcel' cannot also be listed under unpublished",
+    );
+  });
+
+  it("allows unpublished folders to exist without a catalog entry", async () => {
+    const examplesDir = tempDir!;
+    await fs.mkdir(path.join(examplesDir, "agent-harness-parcel"));
+    await fs.mkdir(path.join(examplesDir, "local-only-demo"));
+
+    const manifest = parseExamplesManifest({
+      hero: "agent-harness-parcel",
+      unpublished: ["local-only-demo"],
+      examples: [
+        {
+          slug: "agent-harness-parcel",
+          title: "Hero",
+          tagline: "Tagline",
+          framework: "speckit",
+          commands: { generate: "gen", open: "open" },
+          landing: {
+            section_title: "Title",
+            section_prose: "Prose",
+          },
+        },
+      ],
+    });
+
+    await expect(
+      assertCatalogCoversExampleDirectories(manifest, examplesDir),
+    ).resolves.toBeUndefined();
   });
 });

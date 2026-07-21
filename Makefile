@@ -7,7 +7,7 @@ go:
 	specwiki generate && specwiki open
 
 build-site:
-	npm run build && npm run build:examples -- --hero-only && npm run build:site
+	npm run build && npm run build:examples -- --all && npm run build:site
 
 serve: 
 	npx --yes serve dist/landing-site -p 4173

@@ -2,6 +2,8 @@
 
 Loose research notes for a magazine-style article on **mycelium (fungal root) packaging** as an alternative to polystyrene.
 
+**Local-only:** listed under `unpublished` in [`../manifest.yaml`](../manifest.yaml) — kept for local generate/open demos, not built into the live specwiki.ai examples gallery.
+
 There is no product code here — only markdown research. [[specwiki]] still turns the folder into a categorized wiki, which is useful when an article outline lives as many small notes.
 
 ```bash

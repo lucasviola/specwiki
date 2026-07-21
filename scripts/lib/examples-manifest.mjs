@@ -36,6 +36,7 @@ export const EXCLUDED_EXAMPLE_DIRS = new Set(["wiki"]);
 /**
  * @typedef {Object} ExamplesManifest
  * @property {string} hero
+ * @property {string[]} unpublished — example dirs kept on disk but not published
  * @property {ExampleCatalogEntry[]} examples
  */
 
@@ -116,6 +117,26 @@ export function parseExamplesManifest(raw) {
     throw new Error("examples must be a non-empty array");
   }
 
+  /** @type {string[]} */
+  const unpublished = [];
+  const unpublishedSeen = new Set();
+  if (raw.unpublished !== undefined && raw.unpublished !== null) {
+    if (!Array.isArray(raw.unpublished)) {
+      throw new Error("unpublished must be an array of kebab-case slugs");
+    }
+    for (const [index, value] of raw.unpublished.entries()) {
+      const slug = requireNonEmptyString(value, `unpublished[${index}]`);
+      if (!SLUG_RE.test(slug)) {
+        throw new Error(`unpublished[${index}] '${slug}' must be kebab-case`);
+      }
+      if (unpublishedSeen.has(slug)) {
+        throw new Error(`duplicate unpublished slug '${slug}'`);
+      }
+      unpublishedSeen.add(slug);
+      unpublished.push(slug);
+    }
+  }
+
   /** @type {ExampleCatalogEntry[]} */
   const examples = [];
   const seenSlugs = new Set();
@@ -156,6 +177,16 @@ export function parseExamplesManifest(raw) {
   if (!seenSlugs.has(hero)) {
     throw new Error(`hero '${hero}' must match a catalog entry slug`);
   }
+  if (unpublishedSeen.has(hero)) {
+    throw new Error(`hero '${hero}' cannot also be listed under unpublished`);
+  }
+  for (const slug of unpublished) {
+    if (seenSlugs.has(slug)) {
+      throw new Error(
+        `unpublished slug '${slug}' cannot also appear in the examples catalog`,
+      );
+    }
+  }
 
   const heroEntry = examples.find((entry) => entry.slug === hero);
   if (!heroEntry?.commands) {
@@ -169,7 +200,7 @@ export function parseExamplesManifest(raw) {
     );
   }
 
-  return { hero, examples };
+  return { hero, unpublished, examples };
 }
 
 /**
@@ -181,6 +212,7 @@ export async function assertCatalogCoversExampleDirectories(
   examplesDir,
 ) {
   const catalogSlugs = new Set(manifest.examples.map((entry) => entry.slug));
+  const unpublishedSlugs = new Set(manifest.unpublished ?? []);
   const entries = await fs.readdir(examplesDir, { withFileTypes: true });
 
   for (const entry of entries) {
@@ -190,10 +222,36 @@ export async function assertCatalogCoversExampleDirectories(
     if (EXCLUDED_EXAMPLE_DIRS.has(entry.name)) {
       continue;
     }
+    if (unpublishedSlugs.has(entry.name)) {
+      continue;
+    }
     if (!catalogSlugs.has(entry.name)) {
       throw new Error(
         `examples/${entry.name}/ is not listed in examples/manifest.yaml`,
       );
+    }
+  }
+}
+
+/**
+ * @param {ExamplesManifest} manifest
+ * @param {string} examplesDir — absolute path to examples/
+ */
+export async function assertUnpublishedDirectoriesExist(manifest, examplesDir) {
+  for (const slug of manifest.unpublished ?? []) {
+    const projectDir = path.join(examplesDir, slug);
+    try {
+      const stat = await fs.stat(projectDir);
+      if (!stat.isDirectory()) {
+        throw new Error(`examples/${slug} exists but is not a directory`);
+      }
+    } catch (error) {
+      if (/** @type {NodeJS.ErrnoException} */ (error).code === "ENOENT") {
+        throw new Error(
+          `unpublished slug '${slug}' has no examples/${slug}/ folder`,
+        );
+      }
+      throw error;
     }
   }
 }
@@ -230,14 +288,10 @@ export async function loadExamplesManifest(repoRoot) {
   const source = await fs.readFile(manifestPath, "utf8");
   const parsed = parseYaml(source);
   const manifest = parseExamplesManifest(parsed);
-  await assertExampleDirectoriesExist(
-    manifest,
-    path.join(repoRoot, "examples"),
-  );
-  await assertCatalogCoversExampleDirectories(
-    manifest,
-    path.join(repoRoot, "examples"),
-  );
+  const examplesDir = path.join(repoRoot, "examples");
+  await assertExampleDirectoriesExist(manifest, examplesDir);
+  await assertUnpublishedDirectoriesExist(manifest, examplesDir);
+  await assertCatalogCoversExampleDirectories(manifest, examplesDir);
   return manifest;
 }
 
