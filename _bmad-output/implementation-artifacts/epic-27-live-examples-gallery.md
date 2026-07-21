@@ -71,7 +71,7 @@ GitHub Pages → specwiki.ai
 | Story | Summary                                | v1?   | Depends      | Status  |
 | ----- | -------------------------------------- | ----- | ------------ | ------- |
 | S27.1 | Example metadata manifest (hero-first) | ✓     | —            | review  |
-| S27.2 | Build-time hero wiki generation        | ✓     | S27.1        | backlog |
+| S27.2 | Build-time hero wiki generation        | ✓     | S27.1        | review  |
 | S27.4 | Landing page §04 → live hero wiki      | ✓     | S27.2        | backlog |
 | S27.5 | Deploy verification and site tests     | ✓     | S27.2, S27.4 | backlog |
 | S27.3 | Examples gallery hub (`/examples/`)    | defer | S27.1, S27.2 | backlog |

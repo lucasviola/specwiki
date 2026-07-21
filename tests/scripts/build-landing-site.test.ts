@@ -4,6 +4,11 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import {
+  getHeroExample,
+  loadExamplesManifest,
+  normalizeLandingProse,
+} from "../../scripts/lib/examples-manifest.mjs";
 
 const projectRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -79,9 +84,26 @@ describe("build-landing-site", () => {
     expect(fs.existsSync(path.join(tempOutputDir, ".nojekyll"))).toBe(true);
   });
 
-  it("defaults output to dist/landing-site when no flag is passed", () => {
-    runBuildScript(defaultOutputDir);
+  it("injects §04 landing copy from the manifest into built index.html", async () => {
+    const manifest = await loadExamplesManifest(projectRoot);
+    const hero = getHeroExample(manifest);
+    runBuildScript(tempOutputDir);
 
-    expect(fs.existsSync(path.join(defaultOutputDir, "index.html"))).toBe(true);
+    const builtHtml = fs.readFileSync(
+      path.join(tempOutputDir, "index.html"),
+      "utf8",
+    );
+    const sectionProseMatch = builtHtml.match(
+      /<section class="section" aria-labelledby="example-title">[\s\S]*?<p class="section-prose">([\s\S]*?)<\/p>/,
+    );
+
+    expect(builtHtml).toContain(hero.landing?.section_title);
+    expect(sectionProseMatch, "built landing §04 section-prose").not.toBeNull();
+    expect(normalizeLandingProse(sectionProseMatch![1])).toBe(
+      normalizeLandingProse(hero.landing!.section_prose),
+    );
+    expect(builtHtml).toMatch(
+      /class="[^"]*example-live-link[^"]*"[^>]+href="examples\/agent-harness-parcel\/html\/index\.html"/,
+    );
   });
 });

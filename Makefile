@@ -5,3 +5,6 @@ build:
 
 go:
 	specwiki generate && specwiki open
+
+build-site:
+	npm run build && npm run build:examples -- --hero-only && npm run build:site

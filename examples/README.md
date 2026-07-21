@@ -2,7 +2,7 @@
 
 Small mock projects you can point [[specwiki]] at to see **spec → wiki** in action.
 
-**Catalog source of truth:** [`manifest.yaml`](./manifest.yaml) lists every mock project (`slug`, `title`, `tagline`, `framework`, generate/open commands). The hero example (`agent-harness-parcel`) is designated for the live specwiki.ai demo; landing §04 copy is documented on that entry until build-time injection ships (S27.4).
+**Catalog source of truth:** [`manifest.yaml`](./manifest.yaml) lists every mock project (`slug`, `title`, `tagline`, `framework`, generate/open commands). The hero example (`agent-harness-parcel`) is designated for the live specwiki.ai demo; `build:site` injects landing §04 title and intro prose from the hero entry's `landing` fields.
 
 Each folder is a standalone `--project` root. Generate a wiki, then open it:
 

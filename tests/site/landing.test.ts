@@ -187,16 +187,18 @@ describe("S20.1 v2 landing page — live example (AC 6)", () => {
     expect(text).toContain("CLAUDE.md");
   });
 
-  it("renders a static wiki-mock panel, not an iframe or embed", () => {
-    expect(html).toMatch(/class="[^"]*wiki-mock[^"]*"/);
+  it("renders a live wiki CTA panel, not an iframe or static mock", () => {
+    expect(html).toMatch(/class="[^"]*example-live[^"]*"/);
+    expect(html).toMatch(/class="[^"]*example-live-link[^"]*"/);
     expect(html).not.toMatch(/<iframe/i);
+    expect(html).not.toMatch(/class="[^"]*wiki-mock[^"]*"/);
   });
 
-  it("wiki mock mirrors the real generated index (Main Page portal heading)", () => {
-    const mockBody = /<div class="wiki-mock-body">[\s\S]*?<\/div>/.exec(html);
-    expect(mockBody, "wiki mock must have a body panel").not.toBeNull();
-    expect(mockBody![0]).toContain("Main Page");
-    expect(mockBody![0]).toContain("Parcel Path (mock)");
+  it("links the live wiki with a subpath-safe relative href", () => {
+    expect(html).toMatch(
+      /class="[^"]*example-live-link[^"]*"[^>]+href="examples\/agent-harness-parcel\/html\/index\.html"/,
+    );
+    expect(html).not.toMatch(/href="\/examples\//);
   });
 
   it("names the example directory link to its actual subfolder", () => {
@@ -212,6 +214,43 @@ describe("S20.1 v2 landing page — live example (AC 6)", () => {
   it("links to the examples folder on GitHub", () => {
     expect(html).toMatch(
       /href="https:\/\/github\.com\/lucasviola\/specwiki\/tree\/main\/examples"/,
+    );
+  });
+
+  it("does not claim multiple live wikis on specwiki.ai", () => {
+    expect(text).not.toMatch(/five live/i);
+    expect(text).not.toMatch(/five demos/i);
+    expect(text).toMatch(/not yet hosted on specwiki\.ai/i);
+  });
+});
+
+describe("S27.4 landing page — live hero wiki", () => {
+  it("places a primary Explore live wiki CTA in §04", () => {
+    const section =
+      /<section class="section" aria-labelledby="example-title">[\s\S]*?<\/section>/.exec(
+        html,
+      );
+    expect(section, "§04 example section must exist").not.toBeNull();
+    expect(section![0]).toMatch(
+      /class="[^"]*example-primary-cta[^"]*"[\s\S]*?Explore live wiki/,
+    );
+  });
+
+  it("includes a secondary GitHub source link for the hero example", () => {
+    const section =
+      /<section class="section" aria-labelledby="example-title">[\s\S]*?<\/section>/.exec(
+        html,
+      );
+    expect(section, "§04 example section must exist").not.toBeNull();
+    expect(section![0]).toContain(
+      'href="https://github.com/lucasviola/specwiki/tree/main/examples/agent-harness-parcel"',
+    );
+    expect(section![0]).toContain("View source on GitHub");
+  });
+
+  it("delivers the live wiki CTA without JavaScript", () => {
+    expect(html).toMatch(
+      /<a[^>]+class="[^"]*example-live-link[^"]*"[^>]+href="examples\/agent-harness-parcel\/html\/index\.html"/,
     );
   });
 });
@@ -414,12 +453,5 @@ describe("S20.2 landing page — contrast and motion (AC 1, 3)", () => {
 
   it("respects prefers-reduced-motion", () => {
     expect(css).toMatch(/prefers-reduced-motion:\s*reduce/);
-  });
-
-  it("keeps decorative wiki-mock search hidden from assistive technology", () => {
-    const search = html.match(
-      /class="[^"]*wiki-mock-search[^"]*"[^>]*aria-hidden="true"/,
-    );
-    expect(search, "wiki mock search is decorative").not.toBeNull();
   });
 });

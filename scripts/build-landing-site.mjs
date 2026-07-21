@@ -7,6 +7,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildBlog } from "./build-blog.mjs";
+import { injectLandingExampleFromManifest } from "./inject-landing-example.mjs";
+import { loadExamplesManifest } from "./lib/examples-manifest.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sourceDir = path.join(root, "site");
@@ -56,6 +58,13 @@ async function main() {
 
   await fs.access(sourceDir);
   await copySite(sourceDir, outputDir);
+  const manifest = await loadExamplesManifest(root);
+  const indexPath = path.join(outputDir, "index.html");
+  const landingHtml = await fs.readFile(indexPath, "utf8");
+  await fs.writeFile(
+    indexPath,
+    injectLandingExampleFromManifest(landingHtml, manifest),
+  );
   await buildBlog({
     sourceDir: path.join(sourceDir, "blog"),
     outputDir: path.join(outputDir, "blog"),

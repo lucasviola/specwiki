@@ -49,25 +49,40 @@ describe("examples/manifest.yaml", () => {
     );
   });
 
-  it("documents landing §04 copy on the hero entry (manual sync until S27.4)", async () => {
+  it("build:site injects §04 landing copy from the manifest hero entry", async () => {
     const manifest = await loadExamplesManifest(projectRoot);
     const hero = getHeroExample(manifest);
-    const html = await fs.readFile(
-      path.join(projectRoot, "site/index.html"),
-      "utf8",
-    );
-    const sectionProseMatch = html.match(
-      /<p class="section-prose">([\s\S]*?)<\/p>/,
+    const { execFileSync } = await import("node:child_process");
+    const scriptPath = path.join(projectRoot, "scripts/build-landing-site.mjs");
+    const tempOutputDir = await fs.mkdtemp(
+      path.join(os.tmpdir(), "specwiki-manifest-build-"),
     );
 
-    expect(hero.landing?.section_title).toBe(
-      "Three root files in. A browsable wiki out.",
-    );
-    expect(html).toContain(hero.landing?.section_title);
-    expect(sectionProseMatch, "landing §04 section-prose").not.toBeNull();
-    expect(normalizeLandingProse(sectionProseMatch![1])).toBe(
-      normalizeLandingProse(hero.landing!.section_prose),
-    );
+    try {
+      execFileSync("node", [scriptPath, `--output=${tempOutputDir}`], {
+        cwd: projectRoot,
+        stdio: "pipe",
+      });
+
+      const builtHtml = await fs.readFile(
+        path.join(tempOutputDir, "index.html"),
+        "utf8",
+      );
+      const sectionProseMatch = builtHtml.match(
+        /<section class="section" aria-labelledby="example-title">[\s\S]*?<p class="section-prose">([\s\S]*?)<\/p>/,
+      );
+
+      expect(builtHtml).toContain(hero.landing?.section_title);
+      expect(
+        sectionProseMatch,
+        "built landing §04 section-prose",
+      ).not.toBeNull();
+      expect(normalizeLandingProse(sectionProseMatch![1])).toBe(
+        normalizeLandingProse(hero.landing!.section_prose),
+      );
+    } finally {
+      await fs.rm(tempOutputDir, { recursive: true, force: true });
+    }
   });
 
   it("requires every mock-project folder under examples/ to appear in the catalog", async () => {

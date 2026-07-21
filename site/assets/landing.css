@@ -461,6 +461,37 @@ main {
   margin: 2rem 0;
 }
 
+.example-primary-cta {
+  margin: 1.25rem 0 0;
+}
+
+.example-live {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem 1.35rem;
+  background: var(--surface);
+}
+
+.example-live-lead {
+  margin: 0 0 0.85rem;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.example-live-actions {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.example-live-link {
+  font-weight: 600;
+}
+
+.example-live-sep {
+  margin: 0 0.45rem;
+  color: var(--text-muted);
+}
+
 .panel-label {
   margin: 0 0 0.6rem;
   font-family:
@@ -484,99 +515,6 @@ main {
   margin: 0;
   font-size: 0.85rem;
   line-height: 1.7;
-}
-
-/* static wiki-mock panel — reads as the generated wiki, stays pure HTML/CSS */
-.wiki-mock {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  overflow: hidden;
-  background: var(--surface);
-}
-
-.wiki-mock-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.65rem 1rem;
-  background: var(--surface-raised);
-  border-bottom: 1px solid var(--border);
-}
-
-.wiki-mock-logo {
-  font-family:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    monospace;
-  font-weight: 700;
-  font-size: 0.85rem;
-}
-
-.wiki-mock-bracket {
-  color: var(--color-primary);
-}
-
-.wiki-mock-search {
-  flex: 1 1 8rem;
-  min-width: 0;
-  max-width: 14rem;
-  padding: 0.3rem 0.7rem;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  background: var(--background-color-base);
-}
-
-.wiki-mock-body {
-  padding: 1rem 1.25rem 1.25rem;
-}
-
-.wiki-mock-portal {
-  margin: 0 0 0.6rem;
-  padding-bottom: 0.4rem;
-  border-bottom: 1px solid var(--border);
-  font-size: 1.3rem;
-  font-weight: 700;
-}
-
-.wiki-mock-title {
-  margin: 0 0 0.25rem;
-  font-size: 1.05rem;
-  font-weight: 700;
-}
-
-.wiki-mock-meta {
-  margin: 0 0 1rem;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-.wiki-mock-category {
-  margin: 0 0 0.4rem;
-  font-family:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-    monospace;
-  font-size: 0.75rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--color-primary);
-}
-
-.wiki-mock-pages {
-  margin: 0;
-  padding-left: 1.2rem;
-  font-size: 0.9rem;
-}
-
-.wiki-mock-pages li {
-  margin-bottom: 0.3rem;
-}
-
-.wiki-mock-link {
-  color: var(--color-primary);
-  text-decoration: underline;
 }
 
 /* ---------- 05 facts ---------- */
@@ -651,10 +589,6 @@ main {
 
   .hero h1 {
     margin-bottom: 2rem;
-  }
-
-  .wiki-mock-search {
-    display: none;
   }
 }
 

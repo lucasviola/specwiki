@@ -14,8 +14,9 @@
 #         section_title: string
 #         section_prose: string
 #
-# Sync point (v1): site/index.html §04 section-title and section-prose must match
-# hero.examples[].landing until build:site injects them from this manifest (S27.4).
+# Sync point (v1): build:site injects §04 section-title and section-prose from
+# hero.examples[].landing in this manifest (S27.4). Source site/index.html
+# keeps matching defaults for local preview; built output is authoritative.
 #
 # Only the hero example is generated for specwiki.ai in v1; other catalog entries are
 # GitHub-only until the gallery hub ships (S27.3).

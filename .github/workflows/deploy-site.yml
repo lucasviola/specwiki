@@ -35,6 +35,12 @@ jobs:
       - name: Verify landing page and blog
         run: npm test -- tests/site/
 
+      - name: Build CLI
+        run: npm run build
+
+      - name: Generate hero example wiki
+        run: npm run build:examples -- --hero-only
+
       - name: Build landing site
         run: npm run build:site -- --with-cname
 

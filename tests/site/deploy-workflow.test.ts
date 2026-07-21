@@ -68,6 +68,13 @@ describe("S20.3 deploy-site workflow", () => {
     expect(workflow).toMatch(/actions\/deploy-pages@v4/);
   });
 
+  it("builds the CLI and generates the hero example before build:site", () => {
+    const workflow = readWorkflow();
+
+    expect(workflow).toMatch(/npm run build$/m);
+    expect(workflow).toMatch(/npm run build:examples -- --hero-only/);
+  });
+
   it("guards production deploy to push and workflow_dispatch only", () => {
     const workflow = readWorkflow();
 
@@ -137,6 +144,16 @@ describe("S20.3 package script", () => {
 
     expect(pkg.scripts["build:site"]).toBe(
       "node scripts/build-landing-site.mjs",
+    );
+  });
+
+  it("exposes build:examples in package.json", () => {
+    const pkg = JSON.parse(
+      fs.readFileSync(path.join(projectRoot, "package.json"), "utf8"),
+    );
+
+    expect(pkg.scripts["build:examples"]).toBe(
+      "node scripts/build-examples.mjs",
     );
   });
 });

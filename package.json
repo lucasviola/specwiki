@@ -20,6 +20,7 @@
     "verify-package": "node scripts/verify-package.mjs",
     "publish:package": "node scripts/publish-package.mjs",
     "build": "tsc && node scripts/copy-html-assets.mjs",
+    "build:examples": "node scripts/build-examples.mjs",
     "build:site": "node scripts/build-landing-site.mjs",
     "dev": "tsx src/cli.ts",
     "start": "node dist/cli.js",

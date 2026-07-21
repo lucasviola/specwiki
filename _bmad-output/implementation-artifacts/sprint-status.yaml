@@ -190,9 +190,9 @@ development_status:
   epic-26-retrospective: optional
   epic-27: backlog
   27-1-example-metadata-manifest: review
-  27-2-build-time-example-wiki-generation: backlog
+  27-2-build-time-example-wiki-generation: review
   27-3-examples-gallery-hub: backlog
-  27-4-landing-page-section-04-refresh: backlog
+  27-4-landing-page-section-04-refresh: review
   27-5-deploy-verification-and-site-tests: backlog
   27-6-cross-example-navigation-chrome: backlog
   epic-27-retrospective: optional
