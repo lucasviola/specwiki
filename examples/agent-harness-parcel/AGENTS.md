@@ -25,6 +25,10 @@ npm run typecheck
 3. **Never log tracking tokens or full addresses** — redact PII in errors and verbose logs.
 4. Match existing naming: `CarrierAdapter`, `TrackingEvent`, `formatTimeline()`.
 
+## Custom skills
+
+Day-to-day workflows live in `custom-skills/` (add carrier, local track debug, fixtures, PII review, vertical slices). Prefer invoking those skills over re-deriving steps from scratch.
+
 ## Definition of done
 
 - Tests cover the happy path and one failure path

@@ -8,3 +8,6 @@ go:
 
 build-site:
 	npm run build && npm run build:examples -- --hero-only && npm run build:site
+
+serve: 
+	npx --yes serve dist/landing-site -p 4173

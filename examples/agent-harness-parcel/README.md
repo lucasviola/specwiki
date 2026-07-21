@@ -28,9 +28,17 @@ npx parcel-path track --id DEMO-1001
 ## Project layout (planned)
 
 ```text
+custom-skills/          # example agent skills for day-to-day tasks
+  add-carrier-adapter/
+  track-package-locally/
+  write-tracking-fixture/
+  review-pii-redaction/
+  ship-vertical-slice/
 src/
   cli.ts
   carriers/
   format.ts
 tests/
 ```
+
+See [`custom-skills/README.md`](./custom-skills/README.md) for how to use or copy them into `.cursor/skills/`.
