@@ -6,7 +6,7 @@ import {
 } from "../../src/config/patterns.js";
 
 describe("patterns config", () => {
-  const LEGACY_PATTERN_COUNT = 15;
+  const LEGACY_PATTERN_COUNT = 16;
   const EXTENDED_PATTERN_COUNT = 4;
   const CATCH_ALL_PATTERN_COUNT = 1;
 
@@ -38,6 +38,7 @@ describe("patterns config", () => {
       "specs/**/*.{md,mdc}",
       "spec/**/*.{md,mdc}",
       "openspec/**/*.{md,mdc}",
+      ".specs/**/*.{md,mdc}",
       ".kiro/**/*.{md,mdc}",
       "docs/specs/**/*.{md,mdc}",
       "requirements/**/*.{md,mdc}",
@@ -62,6 +63,7 @@ describe("patterns config", () => {
     expect(CATEGORY_LABELS["bmad-output"]).toBe("BMAD Output");
     expect(CATEGORY_LABELS["agent-skills"]).toBe("Agent Skills");
     expect(CATEGORY_LABELS.adr).toBe("Architecture Decisions");
+    expect(CATEGORY_LABELS["tlc-specs"]).toBe("TLC Spec-Driven");
   });
 
   it.each([

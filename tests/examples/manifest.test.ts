@@ -28,6 +28,7 @@ describe("examples/manifest.yaml", () => {
       "openspec-harness-parcel",
       "kiro-harness-parcel",
       "bmad-harness-parcel",
+      "tlc-harness-parcel",
     ]);
     expect(manifest.unpublished).toEqual(["article-research-mycelium"]);
     expect(manifest.examples.map((entry) => entry.framework)).toEqual([
@@ -36,6 +37,7 @@ describe("examples/manifest.yaml", () => {
       "openspec",
       "kiro",
       "bmad",
+      "tlc-spec-driven",
     ]);
   });
 

@@ -50,3 +50,11 @@ examples:
     commands:
       generate: npx @lucasviola/specwiki generate --project examples/bmad-harness-parcel
       open: npx @lucasviola/specwiki open --project examples/bmad-harness-parcel
+
+  - slug: tlc-harness-parcel
+    title: TLC Spec-Driven parcel
+    tagline: Built using tlc-spec-driven as a harness
+    framework: tlc-spec-driven
+    commands:
+      generate: npx @lucasviola/specwiki generate --project examples/tlc-harness-parcel
+      open: npx @lucasviola/specwiki open --project examples/tlc-harness-parcel

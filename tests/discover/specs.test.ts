@@ -86,6 +86,8 @@ describe("deriveCategory", () => {
     ["specs/feature.md", "specs"],
     ["spec/feature.md", "spec"],
     ["openspec/change.md", "openspec"],
+    [".specs/STATE.md", "tlc-specs"],
+    [".specs/features/track-command/spec.md", "tlc-specs"],
     [".kiro/specs/design.md", "kiro"],
     [".kiro/steering/product.md", "kiro"],
     ["docs/specs/architecture.md", "docs-specs"],

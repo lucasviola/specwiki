@@ -17,6 +17,7 @@ export function deriveCategory(relativePath: string): string {
   if (normalized.startsWith("specs/")) return "specs";
   if (normalized.startsWith("spec/")) return "spec";
   if (normalized.startsWith("openspec/")) return "openspec";
+  if (normalized.startsWith(".specs/")) return "tlc-specs";
   if (normalized.startsWith(".kiro/")) return "kiro";
   if (normalized.startsWith("docs/specs/")) return "docs-specs";
   if (normalized.startsWith("docs/plans/")) return "plans";
