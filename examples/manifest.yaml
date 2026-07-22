@@ -1,27 +1,3 @@
-# examples/manifest.yaml — catalog of mock projects for specwiki demos and specwiki.ai live examples.
-#
-# Schema:
-#   hero: string              — slug of the primary live example (must match a catalog entry)
-#   unpublished: string[]     — optional; example folders kept on disk but not in the live catalog/gallery
-#   examples: array           — published mock projects under examples/<slug>/
-#     - slug: string          — directory name under examples/ (kebab-case)
-#       title: string         — short display name
-#       tagline: string       — one-line description for gallery cards and README tables
-#       framework: string      — workflow label (agent-harness | speckit | bmad | …)
-#       commands:              — optional; required on the hero entry for docs parity
-#         generate: string     — full generate command from repo root
-#         open: string        — full open command from repo root
-#       landing:               — optional; hero only until S27.4 wires build-time injection
-#         section_title: string
-#         section_prose: string
-#
-# Sync point (v1): build:site injects §04 section-title and section-prose from
-# hero.examples[].landing in this manifest (S27.4). Source site/index.html
-# keeps matching defaults for local preview; built output is authoritative.
-#
-# Deploy (and `build:examples -- --all`) generates every catalog entry plus the
-# gallery hub at examples/index.html (S27.3). Local default remains --hero-only.
-
 hero: agent-harness-parcel
 
 # Folders under examples/ kept for local generate/open demos; not listed in the
@@ -32,7 +8,7 @@ unpublished:
 examples:
   - slug: agent-harness-parcel
     title: Agent harness parcel
-    tagline: Basic example with minimal agent-harness files
+    tagline: Basic example with minimal agent-harness files such as AGENTS.MD and CLAUDE.MD
     framework: agent-harness
     commands:
       generate: npx @lucasviola/specwiki generate --project examples/agent-harness-parcel
@@ -45,7 +21,7 @@ examples:
 
   - slug: speckit-harness-parcel
     title: Spec Kit parcel
-    tagline: The same parcel mock example built with speckit
+    tagline: Built using spec kit as a harness
     framework: speckit
     commands:
       generate: npx @lucasviola/specwiki generate --project examples/speckit-harness-parcel
@@ -53,7 +29,7 @@ examples:
 
   - slug: openspec-harness-parcel
     title: OpenSpec parcel
-    tagline: The same parcel mock example built with OpenSpec
+    tagline: Built using OpenSpec as a harness
     framework: openspec
     commands:
       generate: npx @lucasviola/specwiki generate --project examples/openspec-harness-parcel
@@ -61,7 +37,7 @@ examples:
 
   - slug: kiro-harness-parcel
     title: Kiro parcel
-    tagline: The same parcel mock example built with Kiro
+    tagline: Built using kiro as a harness
     framework: kiro
     commands:
       generate: npx @lucasviola/specwiki generate --project examples/kiro-harness-parcel
@@ -69,7 +45,7 @@ examples:
 
   - slug: bmad-harness-parcel
     title: BMAD parcel
-    tagline: The same parcel mock example built with BMAD
+    tagline: Built using BMAD as a harness
     framework: bmad
     commands:
       generate: npx @lucasviola/specwiki generate --project examples/bmad-harness-parcel
