@@ -32,7 +32,7 @@ unpublished:
 examples:
   - slug: agent-harness-parcel
     title: Agent harness parcel
-    tagline: Three root files many AI tools read first — README, AGENTS, CLAUDE
+    tagline: Basic example with minimal agent-harness files
     framework: agent-harness
     commands:
       generate: npx @lucasviola/specwiki generate --project examples/agent-harness-parcel
@@ -44,8 +44,8 @@ examples:
         files many AI tools read first. Point specwiki at it (from the specwiki repo root):
 
   - slug: speckit-harness-parcel
-    title: Spec Kit parcel path
-    tagline: Spec Kit constitution + feature specs for a mock tracking CLI
+    title: Spec Kit parcel
+    tagline: The same parcel mock example built with speckit
     framework: speckit
     commands:
       generate: npx @lucasviola/specwiki generate --project examples/speckit-harness-parcel

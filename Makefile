@@ -6,7 +6,7 @@ build:
 go:
 	specwiki generate && specwiki open
 
-build-site:
+build-all:
 	npm run build && npm run build:examples -- --all && npm run build:site
 
 serve: 
