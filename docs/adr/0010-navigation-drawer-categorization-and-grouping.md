@@ -46,7 +46,7 @@ Every discovered file receives a **category key** via first-match path-prefix ru
 | `.cursor/skills/` | `cursor-skills`  | Cursor Skills          |
 | `specs/`, `spec/` | `specs` / `spec` | Specifications         |
 | `openspec/`       | `openspec`       | OpenSpec               |
-| `.kiro/specs/`    | `kiro`           | Kiro Specs             |
+| `.kiro/`          | `kiro`           | Kiro Specs             |
 | `docs/specs/`     | `docs-specs`     | Documentation Specs    |
 | `docs/plans/`     | `plans`          | Plans                  |
 | `docs/adr/`       | `adr`            | Architecture Decisions |

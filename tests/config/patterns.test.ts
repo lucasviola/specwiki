@@ -38,7 +38,7 @@ describe("patterns config", () => {
       "specs/**/*.{md,mdc}",
       "spec/**/*.{md,mdc}",
       "openspec/**/*.{md,mdc}",
-      ".kiro/specs/**/*.{md,mdc}",
+      ".kiro/**/*.{md,mdc}",
       "docs/specs/**/*.{md,mdc}",
       "requirements/**/*.{md,mdc}",
       "docs/plans/**/*.{md,mdc}",

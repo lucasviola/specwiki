@@ -87,6 +87,7 @@ describe("deriveCategory", () => {
     ["spec/feature.md", "spec"],
     ["openspec/change.md", "openspec"],
     [".kiro/specs/design.md", "kiro"],
+    [".kiro/steering/product.md", "kiro"],
     ["docs/specs/architecture.md", "docs-specs"],
     ["docs/plans/roadmap.md", "plans"],
     ["docs/adr/index.md", "adr"],

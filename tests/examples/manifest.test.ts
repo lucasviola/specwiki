@@ -25,12 +25,16 @@ describe("examples/manifest.yaml", () => {
     expect(manifest.examples.map((entry) => entry.slug)).toEqual([
       "agent-harness-parcel",
       "speckit-harness-parcel",
+      "openspec-harness-parcel",
+      "kiro-harness-parcel",
       "bmad-research-relay",
     ]);
     expect(manifest.unpublished).toEqual(["article-research-mycelium"]);
     expect(manifest.examples.map((entry) => entry.framework)).toEqual([
       "agent-harness",
       "speckit",
+      "openspec",
+      "kiro",
       "bmad",
     ]);
   });

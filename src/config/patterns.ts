@@ -18,7 +18,7 @@ export const DEFAULT_SPEC_PATTERNS = [
   "specs/**/*.{md,mdc}",
   "spec/**/*.{md,mdc}",
   "openspec/**/*.{md,mdc}",
-  ".kiro/specs/**/*.{md,mdc}",
+  ".kiro/**/*.{md,mdc}",
   "docs/specs/**/*.{md,mdc}",
   "requirements/**/*.{md,mdc}",
 

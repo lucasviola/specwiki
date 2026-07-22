@@ -27,7 +27,7 @@ Out of the box, [[specwiki]] discovers specs from:
 | ---------------- | --------------------------------------------------- |
 | Root agent files | `AGENTS.md`, `SPEC.md`, `CLAUDE.md`, `GEMINI.md`    |
 | Cursor           | `.cursor/rules/**`, `.cursor/skills/**/SKILL.md`    |
-| Spec frameworks  | `specs/**`, `openspec/**`, `.kiro/specs/**`         |
+| Spec frameworks  | `specs/**`, `openspec/**`, `.kiro/**`               |
 | Docs & plans     | `docs/specs/**`, `docs/plans/**`, `requirements/**` |
 | GitHub Copilot   | `.github/copilot-instructions.md`                   |
 | Monorepo agents  | `**/AGENTS.md` (nested packages)                    |

@@ -51,6 +51,22 @@ examples:
       generate: npx @lucasviola/specwiki generate --project examples/speckit-harness-parcel
       open: npx @lucasviola/specwiki open --project examples/speckit-harness-parcel
 
+  - slug: openspec-harness-parcel
+    title: OpenSpec parcel
+    tagline: The same parcel mock example built with OpenSpec
+    framework: openspec
+    commands:
+      generate: npx @lucasviola/specwiki generate --project examples/openspec-harness-parcel
+      open: npx @lucasviola/specwiki open --project examples/openspec-harness-parcel
+
+  - slug: kiro-harness-parcel
+    title: Kiro parcel
+    tagline: The same parcel mock example built with Kiro
+    framework: kiro
+    commands:
+      generate: npx @lucasviola/specwiki generate --project examples/kiro-harness-parcel
+      open: npx @lucasviola/specwiki open --project examples/kiro-harness-parcel
+
   - slug: bmad-research-relay
     title: BMAD research relay
     tagline: BMAD-style _bmad-output technical research for a mock CLI

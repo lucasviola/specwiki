@@ -61,7 +61,7 @@ const CATEGORY_PATH_PREFIXES: Record<string, string> = {
   specs: "specs/",
   spec: "spec/",
   openspec: "openspec/",
-  kiro: ".kiro/specs/",
+  kiro: ".kiro/",
   "docs-specs": "docs/specs/",
   plans: "docs/plans/",
   adr: "docs/adr/",
