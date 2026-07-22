@@ -67,10 +67,10 @@ examples:
       generate: npx @lucasviola/specwiki generate --project examples/kiro-harness-parcel
       open: npx @lucasviola/specwiki open --project examples/kiro-harness-parcel
 
-  - slug: bmad-research-relay
-    title: BMAD research relay
-    tagline: BMAD-style _bmad-output technical research for a mock CLI
+  - slug: bmad-harness-parcel
+    title: BMAD parcel
+    tagline: The same parcel mock example built with BMAD
     framework: bmad
     commands:
-      generate: npx @lucasviola/specwiki generate --project examples/bmad-research-relay
-      open: npx @lucasviola/specwiki open --project examples/bmad-research-relay
+      generate: npx @lucasviola/specwiki generate --project examples/bmad-harness-parcel
+      open: npx @lucasviola/specwiki open --project examples/bmad-harness-parcel

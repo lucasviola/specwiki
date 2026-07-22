@@ -1,4 +1,4 @@
-.PHONY: build go
+.PHONY: build go build-all open-site
 
 build:
 	npm run build && npm link --force
@@ -9,5 +9,5 @@ go:
 build-all:
 	npm run build && npm run build:examples -- --all && npm run build:site
 
-serve: 
-	npx --yes serve dist/landing-site -p 4173
+open-site:
+	open dist/landing-site/examples/index.html 

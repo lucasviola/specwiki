@@ -26,22 +26,22 @@ npx @lucasviola/specwiki open --project examples/openspec-harness-parcel --outpu
 npx @lucasviola/specwiki generate --project examples/kiro-harness-parcel --output /tmp/specwiki-kiro
 npx @lucasviola/specwiki open --project examples/kiro-harness-parcel --output /tmp/specwiki-kiro
 
-# 5) BMAD technical research
-npx @lucasviola/specwiki generate --project examples/bmad-research-relay --output /tmp/specwiki-bmad
-npx @lucasviola/specwiki open --project examples/bmad-research-relay --output /tmp/specwiki-bmad
+# 5) BMAD
+npx @lucasviola/specwiki generate --project examples/bmad-harness-parcel --output /tmp/specwiki-bmad
+npx @lucasviola/specwiki open --project examples/bmad-harness-parcel --output /tmp/specwiki-bmad
 
 # 6) Article research notes (local-only — not on the live gallery)
 npx @lucasviola/specwiki generate --project examples/article-research-mycelium --output /tmp/specwiki-article
 npx @lucasviola/specwiki open --project examples/article-research-mycelium --output /tmp/specwiki-article
 ```
 
-| Example                                                      | What it demonstrates (see `manifest.yaml` for canonical copy)  |
-| ------------------------------------------------------------ | -------------------------------------------------------------- |
-| [`agent-harness-parcel/`](./agent-harness-parcel/) **hero**  | Root agent harness: `README.md`, `AGENTS.md`, `CLAUDE.md`      |
-| [`speckit-harness-parcel/`](./speckit-harness-parcel/)       | Spec Kit: constitution + feature `spec` / `plan` / `tasks`     |
-| [`openspec-harness-parcel/`](./openspec-harness-parcel/)     | OpenSpec: living specs + delta change for `track`              |
-| [`kiro-harness-parcel/`](./kiro-harness-parcel/)             | Kiro: steering + `requirements` / `design` / `tasks`           |
-| [`bmad-research-relay/`](./bmad-research-relay/)             | BMAD-style `_bmad-output/**` technical research for a mock CLI |
-| [`article-research-mycelium/`](./article-research-mycelium/) | Loose research markdowns (unpublished / local-only)            |
+| Example                                                      | What it demonstrates (see `manifest.yaml` for canonical copy) |
+| ------------------------------------------------------------ | ------------------------------------------------------------- |
+| [`agent-harness-parcel/`](./agent-harness-parcel/) **hero**  | Root agent harness: `README.md`, `AGENTS.md`, `CLAUDE.md`     |
+| [`speckit-harness-parcel/`](./speckit-harness-parcel/)       | Spec Kit: constitution + feature `spec` / `plan` / `tasks`    |
+| [`openspec-harness-parcel/`](./openspec-harness-parcel/)     | OpenSpec: living specs + delta change for `track`             |
+| [`kiro-harness-parcel/`](./kiro-harness-parcel/)             | Kiro: steering + `requirements` / `design` / `tasks`          |
+| [`bmad-harness-parcel/`](./bmad-harness-parcel/)             | BMAD: `_bmad-output/**` product brief, research, track story  |
+| [`article-research-mycelium/`](./article-research-mycelium/) | Loose research markdowns (unpublished / local-only)           |
 
 These folders are demos only — not part of the published npm package.
